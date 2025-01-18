@@ -1,0 +1,13 @@
+
+    ----------------------------------------ConnectionString-----------------------------------
+
+Scaffold-DbContext "Server=DESKTOP-1VNNIKF;Database=GCT Connect;Trusted_Connection=True; TrustServerCertificate=True" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models -force
+
+ --------------------------------------RegisterConnectionString-----------------------------------
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("gtconnectdbcs")));
+
+
+
+

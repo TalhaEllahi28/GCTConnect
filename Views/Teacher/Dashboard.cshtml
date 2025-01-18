@@ -1,0 +1,25 @@
+﻿
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<h1>Dashboard</h1>
+<div class="container">
+    <div class="row">
+        <!-- Sidebar with groups -->
+        <div class="col-md-4" id="group-list">
+            <h4>My Groups</h4>
+            <ul>
+                <!-- Groups loaded dynamically via Fetch -->
+            </ul>
+        </div>
+
+        <!-- Partial view for messages -->
+        <div class="col-md-8" id="chat-container">
+            <!-- Messages and input form will load here -->
+        </div>
+    </div>
+</div>
+
+
+<script src="~/js/GetGroupsAndMessages.js"></script>

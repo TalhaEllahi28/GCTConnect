@@ -1,0 +1,97 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\PMYLS\\Desktop\\GCTConnect\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{2221D7A7-513B-42FB-BB3C-0EEFA4993935}|GCTConnect.csproj|c:\\users\\pmyls\\desktop\\gctconnect\\views\\home\\addsomeone.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{2221D7A7-513B-42FB-BB3C-0EEFA4993935}|GCTConnect.csproj|solutionrelative:views\\home\\addsomeone.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2221D7A7-513B-42FB-BB3C-0EEFA4993935}|GCTConnect.csproj|c:\\users\\pmyls\\desktop\\gctconnect\\controllers\\homecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2221D7A7-513B-42FB-BB3C-0EEFA4993935}|GCTConnect.csproj|solutionrelative:controllers\\homecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2221D7A7-513B-42FB-BB3C-0EEFA4993935}|GCTConnect.csproj|c:\\users\\pmyls\\desktop\\gctconnect\\controllers\\getgroupsandmessages.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2221D7A7-513B-42FB-BB3C-0EEFA4993935}|GCTConnect.csproj|solutionrelative:controllers\\getgroupsandmessages.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2221D7A7-513B-42FB-BB3C-0EEFA4993935}|GCTConnect.csproj|c:\\users\\pmyls\\desktop\\gctconnect\\wwwroot\\js\\chatwindow.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{2221D7A7-513B-42FB-BB3C-0EEFA4993935}|GCTConnect.csproj|solutionrelative:wwwroot\\js\\chatwindow.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 3,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c64b9c2-e352-428e-a56d-0ace190b99a6}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "AddSomeone.cshtml",
+              "DocumentMoniker": "C:\\Users\\PMYLS\\Desktop\\GCTConnect\\Views\\Home\\AddSomeone.cshtml",
+              "RelativeDocumentMoniker": "Views\\Home\\AddSomeone.cshtml",
+              "ToolTip": "C:\\Users\\PMYLS\\Desktop\\GCTConnect\\Views\\Home\\AddSomeone.cshtml",
+              "RelativeToolTip": "Views\\Home\\AddSomeone.cshtml",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAFoAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-01-12T11:32:25.55Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "HomeController.cs",
+              "DocumentMoniker": "C:\\Users\\PMYLS\\Desktop\\GCTConnect\\Controllers\\HomeController.cs",
+              "RelativeDocumentMoniker": "Controllers\\HomeController.cs",
+              "ToolTip": "C:\\Users\\PMYLS\\Desktop\\GCTConnect\\Controllers\\HomeController.cs",
+              "RelativeToolTip": "Controllers\\HomeController.cs",
+              "ViewState": "AQIAACYAAAAAAAAAAAAcwCoAAAA6AAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-12-14T12:48:03.204Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "GetGroupsAndMessages.cs",
+              "DocumentMoniker": "C:\\Users\\PMYLS\\Desktop\\GCTConnect\\Controllers\\GetGroupsAndMessages.cs",
+              "RelativeDocumentMoniker": "Controllers\\GetGroupsAndMessages.cs",
+              "ToolTip": "C:\\Users\\PMYLS\\Desktop\\GCTConnect\\Controllers\\GetGroupsAndMessages.cs",
+              "RelativeToolTip": "Controllers\\GetGroupsAndMessages.cs",
+              "ViewState": "AQIAABUAAAAAAAAAAAAYwBwAAAANAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-12-28T12:57:44.699Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "ChatWindow.js",
+              "DocumentMoniker": "C:\\Users\\PMYLS\\Desktop\\GCTConnect\\wwwroot\\js\\ChatWindow.js",
+              "RelativeDocumentMoniker": "wwwroot\\js\\ChatWindow.js",
+              "ToolTip": "C:\\Users\\PMYLS\\Desktop\\GCTConnect\\wwwroot\\js\\ChatWindow.js",
+              "RelativeToolTip": "wwwroot\\js\\ChatWindow.js",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAuwBYAAAAWAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2024-12-28T20:39:16.64Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

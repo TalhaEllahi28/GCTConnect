@@ -1,0 +1,128 @@
+﻿@model IEnumerable<dynamic>
+<style>
+    /* General Layout */
+    #chat-window {
+        display: flex;
+        flex-direction: column;
+        height: 90vh;
+        background-color: #f0f0f0;
+        border: 1px solid #ddd;
+        padding: 10px;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    #messages-container {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding: 10px;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    /* Message Styles */
+    .message {
+        margin: 10px 0;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+        .message.my-message {
+            align-items: flex-end;
+        }
+
+    .message-card {
+        max-width: 80%;
+        padding: 10px 15px;
+        border-radius: 10px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-size: 14px;
+        line-height: 1.4;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        word-wrap: break-word;
+    }
+
+    .message.other-message .message-card {
+        background-color: #e0e0e0;
+        color: #333;
+    }
+
+    .message.my-message .message-card {
+        background-color: #007bff;
+        color: white;
+    }
+
+    /* Message Sender and Timestamp */
+    .message-header {
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .message-timestamp {
+        font-size: 12px;
+        color: #777;
+        margin-top: 5px;
+    }
+
+    /* Input Styles */
+    #input-container {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    #message-input {
+        flex-grow: 1;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 10px;
+        font-size: 14px;
+    }
+
+    #send-button {
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        font-size: 14px;
+    }
+
+        #send-button:hover {
+            background-color: #0056b3;
+        }
+
+</style>
+
+<div id="chat-window">
+    <!-- Display messages -->
+    <div id="messages-container" data-current-user="@User.Identity.Name">
+        @foreach (var message in Model)
+        {
+            <div class="message @((message.IsCurrentUser) ? "my-message" : "other-message")" data-sender="@message.Sender">
+                <div class="message-card">
+                    <div class="message-header">
+                        @message.Sender
+                    </div>
+                    <div>
+                        @message.Content
+                    </div>
+                    <div class="message-timestamp">
+                        @message.Timestamp.ToString("hh:mm tt")
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Input area for new messages -->
+    <div id="input-container">
+        <input type="text" id="message-input" placeholder="Type a message..." />
+        <button id="send-button" onclick="sendMessage()">Send</button>
+    </div>
+</div>
+

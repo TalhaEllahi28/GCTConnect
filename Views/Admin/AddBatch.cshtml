@@ -1,0 +1,124 @@
+﻿@model IEnumerable<Batch>
+@{
+    ViewData["Title"] = "AddBatch";
+    var batchDetails = ViewBag.BatchDetails as List<Batch>;
+}
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Message"]
+    </div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+<style>
+    .card {
+        border: 1px solid #ddd;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-header {
+        font-weight: bold;
+        font-size: 1.2rem;
+    }
+
+    .card-footer {
+        padding: 1rem;
+    }
+
+</style>
+<h1>Batch</h1>
+<form asp-action="AddBatch" asp-controller="Admin" method="post">
+    <div class="form-group">
+        <label for="newBatch">Batch Year</label>
+        <input type="text" id="newBatch" name="newBatch" class="form-control" required />
+    </div>
+    <button onclick="addBatch()" class="btn btn-success">Create Batch</button>
+</form>
+<div class="container">
+    <h2 class="mb-4">Batch List</h2>
+
+    @if (batchDetails != null && batchDetails.Any())
+    {
+        @foreach (var batchYearGroup in batchDetails.GroupBy(b => b.BatchYear))
+        {
+            <div class="card mb-3">
+                <div class="card-header text-white bg-primary">
+                    <h4 class="mb-0">Batch Year: @batchYearGroup.Key</h4>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Department Name</th>
+                                <th>Student Count</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var batch in batchYearGroup)
+                            {
+                                <tr>
+                                    <td>@batch.Department?.Name</td>
+                                    <td>@batch.StudentsCount</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer">
+                    <!-- Delete Button -->
+                    <div>
+                        <input id="deleteBatch" type="hidden" name="batch" value="@batchYearGroup.Key" />
+                        <button onclick="deleteBatch(@batchYearGroup.Key)" class="btn btn-danger btn-block">
+                            Delete Batch Year @batchYearGroup.Key
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="alert alert-warning text-center">
+            No batches found.
+        </div>
+    }
+</div>
+@section Scripts {
+    <script>
+        function addBatch() {
+            const batchYear = $("#newBatch").val();
+
+            $.ajax({
+                url: '/Admin/AddBatch',
+                type: 'POST',
+                data: { newBatch: batchYear },
+                success: function (response) {
+                    location.reload();
+                },
+                error: function () {
+
+                }
+            });
+        }
+        function deleteBatch(deleteBatch) {
+          
+            alert(deleteBatch);
+            $.ajax({
+                url: '/Admin/DeleteBatch',
+                type: 'POST',
+                data: { batch: deleteBatch },
+                success: function (response) {
+                    location.reload();
+                },
+                error: function () {
+
+                }
+            });
+        }
+    </script>
+}
