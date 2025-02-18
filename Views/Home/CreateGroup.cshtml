@@ -1,0 +1,155 @@
+﻿@model GCTConnect.Models.ViewModels.CreateGroup
+
+@{
+    var batches = ViewBag.Batches as IEnumerable<dynamic>;
+    var departments = ViewBag.Departments as IEnumerable<dynamic>;
+}
+
+<div class="container mt-5">
+    <h2 class="text-center">Create a New Group</h2>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+
+    <form id="create-group-form" method="post">
+        <div class="mb-3">
+            <label for="BatchId" class="form-label">Batch</label>
+            <select id="BatchId" class="form-select">
+                <option value="" disabled selected>-- Select a Batch --</option>
+                @foreach (var batch in batches)
+                {
+                    <option value="@batch.Id">@batch.Year</option>
+                }
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="studentDepartmentId" class="form-label">Student Department</label>
+            <select id="studentDepartmentId" class="form-select">
+                <option value="" disabled selected>-- Select a Department for Students --</option>
+                @foreach (var department in departments)
+                {
+                    <option value="@department.Id">@department.Name</option>
+                }
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="teacherDepartmentId" class="form-label">Teacher Department</label>
+            <select id="teacherDepartmentId" class="form-select">
+                <option value="" disabled selected>-- Select a Department for Teacher --</option>
+                @foreach (var department in departments)
+                {
+                    <option value="@department.Id">@department.Name</option>
+                }
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="TeacherId" class="form-label">Teacher</label>
+            <select id="TeacherId" class="form-select" disabled>
+                <option value="" disabled selected>-- Select a Teacher --</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="Subject" class="form-label">Subject</label>
+            <input list="subject-list" id="Subject" class="form-control" placeholder="Enter or select a subject" disabled />
+            <datalist id="subject-list"></datalist>
+        </div>
+
+        <button type="button" onclick="submitForm()" class="btn btn-primary w-100">Create Group</button>
+    </form>
+</div>
+
+
+@section Scripts {
+    <script>
+        const departmentSelect = document.getElementById('teacherDepartmentId');
+
+        const teacherSelect = document.getElementById('TeacherId');
+        const subjectInput = document.getElementById('Subject');
+        const subjectDatalist = document.getElementById('subject-list');
+
+        // On Department Selection
+        departmentSelect.addEventListener('change', function () {
+            teacherSelect.disabled = true;
+            subjectInput.disabled = true;
+            subjectDatalist.innerHTML = "";
+
+            const departmentId = this.value;
+            if (!departmentId) return;
+
+            // Load teachers and subjects based on the selected department
+            fetch(`/api/teachers-and-subjects?departmentId=${departmentId}`)
+                .then(response => response.json())
+                .then(data => {
+                    teacherSelect.innerHTML = '<option value="" disabled selected>-- Select a Teacher --</option>';
+                    data.teachers.forEach(teacher => {
+                        teacherSelect.innerHTML += `<option value="${teacher.id}">${teacher.name}</option>`;
+                    });
+                    teacherSelect.disabled = false;
+
+                    subjectDatalist.innerHTML = '';
+                    data.subjects.forEach(subject => {
+                        subjectDatalist.innerHTML += `<option value="${subject}"></option>`;
+                    });
+                    subjectInput.disabled = false;
+                })
+                .catch(error => console.error('Error fetching teachers and subjects:', error));
+        });
+
+        function submitForm() {
+            const batchId = document.getElementById("BatchId").value;
+            console.log("batchId: ", batchId);
+            const teacherDeptId = document.getElementById("teacherDepartmentId").value;
+            console.log("teacherDeptId: ", teacherDeptId);
+
+            const studentDeptId = document.getElementById("studentDepartmentId").value;
+            console.log("studentDeptId: ", studentDeptId);
+
+            const teacherId = document.getElementById("TeacherId").value;
+            console.log("teacherId: ", teacherId);
+
+            const subject = document.getElementById("Subject").value;
+            console.log("subject: ", subject);
+
+            // Validations
+            if (!batchId || !teacherDeptId || !studentDeptId || !teacherId || !subject) {
+                alert("Please fill all the fields.");
+                return;
+            }
+
+            $.ajax({
+                url: '/Home/CreateGroups',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    BatchId: batchId,
+                    TeacherDepartmentId: teacherDeptId,
+                    StudentDepartmentId: studentDeptId,
+                    TeacherId: teacherId,
+                    Subject: subject
+                }),
+                success: function (response) {
+                    if (response.success) {
+                        location.reload();
+                        alert("Group created successfully!");
+                    } else {
+                        alert("Failed to create group. Please try again.");
+                    }
+                },
+                error: function () {
+                    alert("An error occurred while creating the group.");
+                }
+            });
+        }
+    </script>
+}

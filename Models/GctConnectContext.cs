@@ -35,7 +35,10 @@ public partial class GctConnectContext : DbContext
 
     public virtual DbSet<UserProfile> UserProfiles { get; set; }
 
-   
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseSqlServer("Server=DESKTOP-1VNNIKF;Database=GCT Connect;Trusted_Connection=True; TrustServerCertificate=True");
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Announcement>(entity =>
@@ -262,6 +265,9 @@ public partial class GctConnectContext : DbContext
             entity.Property(e => e.RollNumber)
                 .HasMaxLength(50)
                 .HasColumnName("roll_number");
+            entity.Property(e => e.Subject)
+                .HasMaxLength(255)
+                .HasColumnName("subject");
             entity.Property(e => e.Username)
                 .HasMaxLength(255)
                 .HasColumnName("username");

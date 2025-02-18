@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "3sO3ZmIz3d4ukxEy3A/MzB3G0X+MmU19Wb4pDG4EqKI=",
+  "Hash": "JBKT/p9ApXHTxMGt8C01NWYle6/66MbHcunwtGj1Oeo=",
   "Source": "GCTConnect",
   "BasePath": "_content/GCTConnect",
   "Mode": "Default",
@@ -55,6 +55,25 @@
       "OriginalItemSpec": "D:\\Talha\\GCTConnect\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\GCTConnect.bundle.scp.css"
     },
     {
+      "Identity": "D:\\Talha\\GCTConnect\\wwwroot\\css\\Dashboard.css",
+      "SourceId": "GCTConnect",
+      "SourceType": "Discovered",
+      "ContentRoot": "D:\\Talha\\GCTConnect\\wwwroot\\",
+      "BasePath": "_content/GCTConnect",
+      "RelativePath": "css/Dashboard.css",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\css\\Dashboard.css"
+    },
+    {
       "Identity": "D:\\Talha\\GCTConnect\\wwwroot\\css\\site.css",
       "SourceId": "GCTConnect",
       "SourceType": "Discovered",
@@ -91,6 +110,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\favicon.ico"
+    },
+    {
+      "Identity": "D:\\Talha\\GCTConnect\\wwwroot\\images\\background.png",
+      "SourceId": "GCTConnect",
+      "SourceType": "Discovered",
+      "ContentRoot": "D:\\Talha\\GCTConnect\\wwwroot\\",
+      "BasePath": "_content/GCTConnect",
+      "RelativePath": "images/background.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\images\\background.png"
     },
     {
       "Identity": "D:\\Talha\\GCTConnect\\wwwroot\\js\\ChatWindow.js",

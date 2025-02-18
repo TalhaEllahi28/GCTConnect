@@ -9013,11 +9013,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\PMYLS\\Desktop\\GCTConnect\\GCTConnect.csproj",
+      "projectUniqueName": "D:\\Talha\\GCTConnect\\GCTConnect.csproj",
       "projectName": "GCTConnect",
-      "projectPath": "C:\\Users\\PMYLS\\Desktop\\GCTConnect\\GCTConnect.csproj",
+      "projectPath": "D:\\Talha\\GCTConnect\\GCTConnect.csproj",
       "packagesPath": "C:\\Users\\PMYLS\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\PMYLS\\Desktop\\GCTConnect\\obj\\",
+      "outputPath": "D:\\Talha\\GCTConnect\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\PMYLS\\AppData\\Roaming\\NuGet\\NuGet.Config",

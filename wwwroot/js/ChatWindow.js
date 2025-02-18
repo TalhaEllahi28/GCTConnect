@@ -1,33 +1,23 @@
-﻿connection.on('ReceiveMessage', function (user, message) {
+﻿connection.on('ReceiveMessage', function (user, message, profilePic) {
     const chatContainer = document.getElementById('messages-container');
-
-    const currentUser = document.getElementById("messages-container").dataset.currentUser;
-    document.querySelectorAll(".message").forEach((msg) => {
-        const sender = msg.dataset.sender;
-        if (sender === currentUser) {
-            msg.classList.add("my-message");
-        } else {
-            msg.classList.add("other-message");
-        }
-    });
-    const messageAlignment = (user === currentUser) ? 'my-message' : 'other-message';
+    const currentUser = chatContainer.dataset.currentUser;
+    const messageClass = (user === currentUser) ? "sent" : "received";
 
     const newMessage = `
-        <div class="message ${messageAlignment}">
-            <div class="message-card">
-                <div class="message-header">
-                    <strong class="message-sender">${user}</strong>
-                </div>
-                <div class="message-content">
-                    ${message}
-                </div>
-                <div class="message-timestamp">
-                    ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                </div>
+        <div class="message-container ${messageClass}" data-sender="${user}">
+            <div class="avatar-wrapper">
+                <img src="${profilePic}" alt="${user}" class="avatar-image"/>
             </div>
-        </div>`;
+            <div class="message-content">
+                <div class="message-bubble">
+                    <p>${message}</p>
+                </div>
+                <span class="timestamp">
+                    ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </span>
+            </div>
+        </div>
+    `;
     chatContainer.innerHTML += newMessage;
-
-    // Scroll to the bottom of the chat container
     chatContainer.scrollTop = chatContainer.scrollHeight;
 });

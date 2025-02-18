@@ -33,6 +33,8 @@ public partial class User
 
     public string? Gender { get; set; }
 
+    public string? Subject { get; set; }
+
     public virtual ICollection<ChatbotQuery> ChatbotQueries { get; set; } = new List<ChatbotQuery>();
 
     public virtual ICollection<Department> Departments { get; set; } = new List<Department>();

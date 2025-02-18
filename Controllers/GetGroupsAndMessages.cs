@@ -55,6 +55,7 @@ namespace GCTConnect.Controllers
                     m.Content,
                     m.Timestamp,
                     Sender = m.Sender.Username,
+                    ProfilePic = m.Sender.ProfilePic,
                     IsCurrentUser = m.Sender.Username == currentUserName // Check if the sender is the current user
                 })
                 .ToListAsync();

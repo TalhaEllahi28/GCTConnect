@@ -11,6 +11,7 @@ using System.Security.Claims;
 using System.Text;
 using GCTConnect.Services;
 using System.Linq;
+using GCTConnect.Models.ViewModels;
 
 
 namespace GCTConnect.Controllers
@@ -31,6 +32,111 @@ namespace GCTConnect.Controllers
             _userService = userService;
         }
 
+
+
+        [HttpGet("api/teachers-and-subjects")]
+        public IActionResult GetTeachersAndSubjects(int departmentId)
+        {
+            var teachers = _context.Users
+                .Where(u => u.DepartmentId == departmentId && (u.Role == "Teachers" || u.Role == "Hod"))
+                .Select(u => new { Id = u.UserId, Name = u.Username })
+                .ToList();
+
+            var subjects = _context.Users
+                .Where(u => u.DepartmentId == departmentId && u.Subject != null)
+                .Select(u => u.Subject)
+                .Distinct()
+                .ToList();
+
+            return Json(new { teachers, subjects });
+        }
+
+
+        [Authorize(Roles = "Admin,Hod")]
+        public IActionResult CreateGroup()
+        {
+            ViewBag.Batches = _context.Batches
+                .GroupBy(b => b.BatchYear) // Group batches by year
+                .Select(g => new
+                {
+                    Id = g.First().BatchId,  // Use the first BatchId in the group
+                    Year = g.Key              // The key is the BatchYear
+                })
+                .ToList(); // Materialize the results in memory
+            ViewBag.Departments = _context.Departments.Select(d => new { Id = d.DepartmentId, Name = d.Name }).ToList();
+
+            return View();
+        }
+
+        [Authorize(Roles = "Admin,Hod")]
+        [HttpPost]
+        public JsonResult CreateGroups([FromBody] CreateGroup newGroup)
+        {
+            var currentUser = _userService.GetCurrentUser();
+            if (currentUser == null)
+            {
+                TempData["ErrorMessage"] = "User is not authenticated OR Your Session is expired please Login ";
+                return Json(new
+                {
+                    success = false
+                });
+            }
+
+            if (ModelState.IsValid)
+            {
+                int batch = _context.Batches.FirstOrDefault(b => b.BatchId == newGroup.BatchId).BatchYear;
+                string department = _context.Departments.FirstOrDefault(d => d.DepartmentId == newGroup.StudentDepartmentId).Name;
+                Group group = new Group
+                {
+                    CreatedBy = currentUser.UserId,
+                    IsPrivate = false,
+                    GroupName = $"{batch}_{department}_{newGroup.Subject}",
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                _context.Groups.Add(group); 
+                _context.SaveChanges();
+                
+
+                List<User> user = _context.Users.Where(u => u.BatchId==newGroup.BatchId && u.DepartmentId == newGroup.StudentDepartmentId).ToList();
+                var Teacher = _context.Users.Where(u => u.UserId == newGroup.TeacherId && u.DepartmentId == newGroup.TeacherDepartmentId).FirstOrDefault();
+
+                foreach (var item in user)
+                {
+                    GroupMember groupMember = new GroupMember
+                    {
+                        GroupId = group.GroupId,
+                        UserId = item.UserId,
+                        Role = "group_member",
+                        JoinedAt = DateTime.UtcNow
+                    };
+                    _context.GroupMembers.Add(groupMember);
+                    _context.SaveChanges();
+                }
+                GroupMember groupMember1 = new GroupMember
+                {
+                    GroupId = group.GroupId,
+                    UserId = Teacher.UserId,
+                    Role = "group_admin",
+                    JoinedAt = DateTime.UtcNow
+                };
+                _context.GroupMembers.Add(groupMember1);
+                _context.SaveChanges();
+                ModelState.Clear();
+                TempData["SuccessMessage"] = "Group is successfully created";
+
+                return Json(new
+                {
+                    success = true
+                });
+            }
+
+            return Json(new
+            {
+                success = false
+            });
+        }
+
         [Authorize(Roles = "Admin,Hod")]
         public IActionResult AddSomeone()
         {
@@ -43,12 +149,20 @@ namespace GCTConnect.Controllers
             ViewData["CurrentUserRole"] = currentUserRole;
             ViewBag.Batches = _context.Batches
                 .GroupBy(b => b.BatchYear) // Group batches by year
-                .Select(g => new {
+                .Select(g => new
+                {
                     Id = g.First().BatchId,  // Use the first BatchId in the group
                     Year = g.Key              // The key is the BatchYear
                 })
                 .ToList(); // Materialize the results in memory
             ViewBag.Departments = _context.Departments.Select(d => new { Id = d.DepartmentId, Name = d.Name }).ToList();
+
+            ViewBag.Subjects = _context.Users
+                  .Where(u => u.Subject != null) // Exclude NULL entries
+                  .Select(u => u.Subject)
+                  .Distinct()
+                  .ToList();
+
             return View();
         }
 
@@ -62,6 +176,11 @@ namespace GCTConnect.Controllers
                 .ToList();
             ViewBag.Departments = _context.Departments
                 .Select(d => new { Id = d.DepartmentId, Name = d.Name })
+                .ToList();
+            ViewBag.Subjects = _context.Users
+                .Where(u => u.Subject != null) // Exclude NULL entries
+                .Select(u => u.Subject)
+                .Distinct()
                 .ToList();
 
             var currentUser = _userService.GetCurrentUser();
@@ -122,11 +241,12 @@ namespace GCTConnect.Controllers
 
                 User.RollNumber = newUser.RollNumber;
                 User.Username = $"{newUser.Name}-{newUser.RollNumber}";
-                User.BatchId = newUser.BatchId;
+                var batchYear = _context.Batches.FirstOrDefault(b => b.BatchId == newUser.BatchId)?.BatchYear;
+                User.BatchId = _context.Batches.FirstOrDefault(b => b.DepartmentId == newUser.DepartmentId && b.BatchYear == batchYear)?.BatchId;
                 User.DepartmentId = newUser.DepartmentId;
 
-                var batch = _context.Batches.FirstOrDefault(b => b.BatchId == newUser.BatchId);
-                var department=_context.Departments.FirstOrDefault(d=>d.DepartmentId == newUser.DepartmentId);
+                var batch = _context.Batches.FirstOrDefault(b => b.BatchId == User.BatchId);
+                var department = _context.Departments.FirstOrDefault(d => d.DepartmentId == newUser.DepartmentId);
                 // Save user to the database
                 _context.Users.Add(User);
                 _context.SaveChanges();
@@ -135,7 +255,7 @@ namespace GCTConnect.Controllers
                     batch.StudentsCount += 1; // Increment student count
                     _context.SaveChanges(); // Save changes
                 }
-                
+
 
                 addUserInGroup(batch, department, User, "StudentsOnly");
                 addUserInGroup(batch, department, User, "StudentsTeachersHod");
@@ -146,15 +266,16 @@ namespace GCTConnect.Controllers
                 User.Role = newUser.Role;
                 User.Username = newUser.Name;
                 User.BatchId = null;
-                User.DepartmentId = null;
+                User.DepartmentId = newUser.DepartmentId;
+                User.Subject = newUser.Subject;
                 // Save user to the database
                 _context.Users.Add(User);
                 _context.SaveChanges();
                 var department = _context.Departments.FirstOrDefault(d => d.DepartmentId == newUser.DepartmentId);
-                addUserInGroup(department,User,"StudentsTeachersHod");
+                addUserInGroup(department, User, "StudentsTeachersHod");
                 addUserInGroup(department, User, "TeachersHod");
             }
-            
+
             else if ((newUser.Role == "Principal" || newUser.Role == "Hod" || newUser.Role == "Admin") &&
                      currentUser.Role == "Admin")
             {
@@ -171,7 +292,7 @@ namespace GCTConnect.Controllers
                     addUserInGroup(department, User, "StudentsTeachersHod");
                     addUserInGroup(User, "PrincipalHod");
                 }
-                else if(newUser.Role == "Principle")
+                else if (newUser.Role == "Principle")
                 {
                     addUserInGroup(User, "PrincipalOnly");
                 }
@@ -200,7 +321,7 @@ namespace GCTConnect.Controllers
             }
 
             // Redirect to appropriate dashboard
-            return currentUser.Role == "Admin" ? RedirectToAction("Dashboard","Admin") : RedirectToAction("Dashboard","Hod");
+            return currentUser.Role == "Admin" ? RedirectToAction("Dashboard", "Admin") : RedirectToAction("Dashboard", "Hod");
         }
 
         public IActionResult Login()
@@ -216,11 +337,11 @@ namespace GCTConnect.Controllers
                 .FirstOrDefault(u => u.Username == loginRequest.Username && u.Password == loginRequest.Password);
 
             if (user == null)
-            if (user == null)
-            {
-                ModelState.AddModelError("", "Invalid username or password.");
-                return View();
-            }
+                if (user == null)
+                {
+                    ModelState.AddModelError("", "Invalid username or password.");
+                    return View();
+                }
             // Create user claims
             var claims = new List<Claim>
         {
@@ -279,7 +400,7 @@ namespace GCTConnect.Controllers
         }
 
 
-        private void addUserInGroup(Batch batch, Department department, User user, string groupType) 
+        private void addUserInGroup(Batch batch, Department department, User user, string groupType)
         {
             var Group = _context.Groups.FirstOrDefault(u => u.GroupName == $"{batch.BatchYear}_{department.Name}_{groupType}");
             GroupMember groupMember = new GroupMember
@@ -293,23 +414,36 @@ namespace GCTConnect.Controllers
             _context.SaveChanges();
         }
 
-        private void addUserInGroup(Department department, User user, string groupType) 
+        private void addUserInGroup(Department department, User user, string groupType)
         {
-            Group Group = _context.Groups.FirstOrDefault(g => g.GroupName == $"{department.Name}_{groupType}");
-            GroupMember groupMember = new GroupMember
+            // Get all groups where the department and groupType match after splitting the GroupName
+            var groups = _context.Groups
+                                 .AsEnumerable() // Switch to LINQ to Objects for string.Split
+                                 .Where(g => {
+                                     var parts = g.GroupName.Split('_');
+                                     return parts.Length >= 3
+                                            && parts[1].Equals(department.Name, StringComparison.OrdinalIgnoreCase)
+                                            && parts[2].Equals(groupType, StringComparison.OrdinalIgnoreCase);
+                                 })
+                                 .ToList();
+
+            // Add the user to each matching group
+            foreach (var group in groups)
             {
-                GroupId = Group.GroupId,
-                UserId = user.UserId,
-                JoinedAt = DateTime.UtcNow,
-            };
-            if (user.Role == "Teachers" || user.Role == "Hod")
-            {
-                groupMember.Role = "group_admin";
+                GroupMember groupMember = new GroupMember
+                {
+                    GroupId = group.GroupId,
+                    UserId = user.UserId,
+                    JoinedAt = DateTime.UtcNow,
+                    Role = (user.Role == "Teachers" || user.Role == "Hod") ? "group_admin" : null
+                };
+
+                _context.GroupMembers.Add(groupMember);
             }
-            _context.GroupMembers.Add(groupMember);
             _context.SaveChanges();
         }
-        private void addUserInGroup(User user,string groupType)
+
+        private void addUserInGroup(User user, string groupType)
         {
             var Group = _context.Groups.FirstOrDefault(u => u.GroupName == $"{groupType}");
             GroupMember groupMember = new GroupMember

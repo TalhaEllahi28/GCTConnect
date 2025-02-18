@@ -2,19 +2,20 @@
 @{
     ViewData["Title"] = "AddBatch";
     var batchDetails = ViewBag.BatchDetails as List<Batch>;
+    if (TempData["Message"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Message"]
+        </div>
+    }
+    else if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
 }
-@if (TempData["Message"] != null)
-{
-    <div class="alert alert-success">
-        @TempData["Message"]
-    </div>
-}
-@if (TempData["ErrorMessage"] != null)
-{
-    <div class="alert alert-danger">
-        @TempData["ErrorMessage"]
-    </div>
-}
+
 <style>
     .card {
         border: 1px solid #ddd;
@@ -106,7 +107,7 @@
             });
         }
         function deleteBatch(deleteBatch) {
-          
+
             alert(deleteBatch);
             $.ajax({
                 url: '/Admin/DeleteBatch',

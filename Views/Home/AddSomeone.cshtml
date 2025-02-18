@@ -72,6 +72,17 @@
             <span asp-validation-for="DepartmentId" class="text-danger"></span>
         </div>
 
+        <div class="form-group" id="subject" style="display:none">
+            <label asp-for="Subject">Subject</label>
+            <input asp-for="Subject" list="subject-options" id="subject-input" class="form-control" placeholder="Type to search or add a new subject" autocomplete="off" />
+            <span asp-validation-for="Subject" class="text-danger"></span>
+            <datalist id="subject-options">
+                @foreach (var subject in ViewBag.Subjects)
+                {
+                    <option value="@subject"></option>
+                }
+            </datalist>
+        </div>
 
         <div class="form-group" id="rollno" style="display:none">
             <label asp-for="RollNumber">Roll Number (for Students only)</label>
@@ -81,16 +92,14 @@
 
         <div class="form-group" id="batch" style="display:none">
             <label asp-for="BatchId">Batch Year (for Students only)</label>
-            <select asp-for="BatchId"
-                    asp-items="@(new SelectList(ViewBag.Batches, "Id", "Year"))"
-                    class="form-control">
-                <option value="">Select Batch Year</option>
+            <select asp-for="BatchId" asp-items="@(new SelectList(ViewBag.Batches, "Id", "Year"))" class="form-control">
+                <option value="">Select Batch</option>
             </select>
             <span asp-validation-for="BatchId" class="text-danger"></span>
         </div>
 
 
-        <br/>
+        <br />
 
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
@@ -131,6 +140,7 @@
             document.getElementById("department").style.display = "none";
             document.getElementById("rollno").style.display = "none";
             document.getElementById("batch").style.display = "none";
+            document.getElementById("subject").style.display = "none";
 
             // Display specific fields based on the selected role
             if (selectedRole === "Students") {
@@ -139,8 +149,20 @@
                 document.getElementById("department").style.display = "block";
             } else if (selectedRole === "Hod" || selectedRole === "Teachers") {
                 document.getElementById("department").style.display = "block";
+                document.getElementById("subject").style.display = "block";
             }
         }
+
+        document.getElementById('subject-input').addEventListener('input', function () {
+            const input = this.value.toLowerCase();
+            const datalist = document.getElementById('subjects-datalist');
+
+            // Show only matching subjects
+            Array.from(datalist.options).forEach(option => {
+                option.style.display = option.value.toLowerCase().includes(input) ? '' : 'none';
+            });
+        });
+
     </script>
 }
 

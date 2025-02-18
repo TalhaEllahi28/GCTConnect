@@ -39,6 +39,10 @@ CREATE TABLE Users (
     Name NVARCHAR(100) NOT NULL,
     LastName NVARCHAR(100) NOT NULL,
     Gender NVARCHAR(50) CHECK (Gender IN ('Male', 'Female', 'Other')),
+    subject NVARCHAR(255) NULL,
+
+    --Subject constraint
+    CONSTRAINT CHK_Subject_Role CHECK ((role IN ('Teachers', 'Hod') AND subject IS NOT NULL) OR (role NOT IN ('Teachers', 'Hod') AND subject IS NULL));
 
     -- Role constraints
     CONSTRAINT CHK_Role CHECK (role IN ('Admin', 'Principal', 'Hod', 'Teachers', 'Students')),

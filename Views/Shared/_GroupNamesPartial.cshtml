@@ -1,0 +1,31 @@
+﻿@model IEnumerable<dynamic>
+
+<!-- The bounce-in class triggers the pop (bounce) animation on load -->
+<div class="group-container ">
+    <!-- Search Bar -->
+    <div class="group-header">
+        <input type="text" id="group-search" placeholder="Search groups..." onkeyup="filterGroups()" />
+    </div>
+    <!-- Group List -->
+    <div class="group-list">
+        <ul id="groups-ul">
+            <!-- Group buttons loaded dynamically will be inserted here -->
+        </ul>
+    </div>
+</div>
+
+<script src="~/js/GetGroupsAndMessages.js"></script>
+<script>
+    // Simple filtering function for the search bar
+    function filterGroups() {
+        var input = document.getElementById("group-search");
+        var filter = input.value.toLowerCase();
+        var ul = document.getElementById("groups-ul");
+        var li = ul.getElementsByTagName("li");
+        for (var i = 0; i < li.length; i++) {
+            var btn = li[i].getElementsByTagName("button")[0];
+            var txtValue = btn.textContent || btn.innerText;
+            li[i].style.display = txtValue.toLowerCase().indexOf(filter) > -1 ? "" : "none";
+        }
+    }
+</script>

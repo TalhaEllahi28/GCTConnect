@@ -1,40 +1,46 @@
 ﻿document.addEventListener("DOMContentLoaded", function () {
     fetch('/GetGroupsAndMessages/GetUserGroups', {
         method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-        }
+        headers: { 'Content-Type': 'application/json' }
     })
         .then(response => response.json())
         .then(groups => {
             let groupList = '';
             groups.forEach(group => {
                 groupList += `
-                    <li>
-                        <button onclick="loadMessages(${group.groupId}, '${group.groupName}')">${group.groupName}</button>
-                    </li>`;
+                <li>
+                    <button id="group-button" class="group-item" onclick="selectGroup(this); loadMessages(${group.groupId}, '${group.groupName}')">
+                        ${group.groupName}
+                    </button>
+                </li>`;
             });
-            document.querySelector('#group-list ul').innerHTML = groupList;
+            document.querySelector('#groups-ul').innerHTML = groupList;
         })
         .catch(error => console.error('Error fetching groups:', error));
 });
 
+// Function to set the clicked group as active
+function selectGroup(elem) {
+    var buttons = document.querySelectorAll(".group-item");
+    buttons.forEach(function (btn) {
+        btn.classList.remove("active");
+    });
+    elem.classList.add("active");
+}
+
 function loadMessages(groupId, groupName) {
     fetch(`/GetGroupsAndMessages/GetGroupMessages?groupId=${groupId}`, {
         method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-        }
+        headers: { 'Content-Type': 'application/json' }
     })
         .then(response => response.text())
         .then(partialViewHtml => {
             document.querySelector('#chat-container').innerHTML = partialViewHtml;
-            setupSignalR(groupName); // Use groupName in the SignalR setup
-            attachSendButtonListener(groupName); // Attach the send message event for this group
+            setupSignalR(groupName); // Setup SignalR for the selected group
+            attachSendButtonListener(groupName);
         })
         .catch(error => console.error('Error loading messages:', error));
 }
-
 let connection;
 
 // SignalR Setup
@@ -43,7 +49,6 @@ function setupSignalR(groupName) {
         connection = new signalR.HubConnectionBuilder()
             .withUrl('/Services/ChatHub') // Ensure correct endpoint
             .build();
-
 
         connection.onreconnecting((error) => {
             console.log('Connection lost, attempting to reconnect...', error);
@@ -64,49 +69,63 @@ function setupSignalR(groupName) {
                 console.error('Failed to reconnect:', err);
             }
         });
-        
 
-        connection.on('ReceiveMessage', function (user, message) {
+
+        connection.on('ReceiveMessage', function (user, message, profilePic) {
             const chatContainer = document.getElementById('messages-container');
+            const currentUser = chatContainer.dataset.currentUser;
+            const messageClass = (user === currentUser) ? "sent" : "received";
+
+            const newMessage = `
+        <div class="message-container ${messageClass}" data-sender="${user}">
+            <div class="avatar-wrapper">
+                <img src="${profilePic}" alt="${user}" class="avatar-image"/>
+            </div>
+            <div class="message-content">
+                <div class="message-bubble">
+                    <p>${message}</p>
+                </div>
+                <span class="timestamp">
+                    ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </span>
+            </div>
+        </div>
+    `;
+            chatContainer.innerHTML += newMessage;
             chatContainer.scrollTop = chatContainer.scrollHeight;
-            if (chatContainer) {
-
-                const currentUser = chatContainer.dataset.currentUser;
-
-                // Determine message alignment class
-                const messageClass = user === currentUser ? "my-message" : "other-message";
-
-                // Create new message element
-                const messageElement = document.createElement('div');
-                messageElement.classList.add('message', messageClass);
-                messageElement.setAttribute('data-sender', user);
-
-                const messageCard = document.createElement('div');
-                messageCard.classList.add('message-card');
-
-                const messageHeader = document.createElement('div');
-                messageHeader.classList.add('message-header');
-                messageHeader.textContent = user;
-
-                const messageContent = document.createElement('div');
-                messageContent.textContent = message;
-
-                const messageTimestamp = document.createElement('div');
-                messageTimestamp.classList.add('message-timestamp');
-                messageTimestamp.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-                // Append elements in hierarchy
-                messageCard.appendChild(messageHeader);
-                messageCard.appendChild(messageContent);
-                messageCard.appendChild(messageTimestamp);
-                messageElement.appendChild(messageCard);
-                chatContainer.appendChild(messageElement);
-
-                // Scroll to the bottom
-                chatContainer.scrollTop = chatContainer.scrollHeight;
-
-            }
         });
+
+
+
+
+
+        //connection.on('ReceiveMessage', function (user, message) {
+        //    const chatContainer = document.getElementById('messages-container');
+        //    chatContainer.scrollTop = chatContainer.scrollHeight;
+        //    if (chatContainer) {
+        //        const currentUser = chatContainer.dataset.currentUser;
+        //        const messageClass = user === currentUser ? "my-message" : "other-message";
+        //        const messageElement = document.createElement('div');
+        //        messageElement.classList.add('message', messageClass);
+        //        messageElement.setAttribute('data-sender', user);
+        //        const messageCard = document.createElement('div');
+        //        messageCard.classList.add('message-card');
+        //        const messageHeader = document.createElement('div');
+        //        messageHeader.classList.add('message-header');
+        //        messageHeader.textContent = user;
+        //        const messageContent = document.createElement('div');
+        //        messageContent.textContent = message;
+        //        const messageTimestamp = document.createElement('div');
+        //        messageTimestamp.classList.add('message-timestamp');
+        //        messageTimestamp.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        //        messageCard.appendChild(messageHeader);
+        //        messageCard.appendChild(messageContent);
+        //        messageCard.appendChild(messageTimestamp);
+        //        messageElement.appendChild(messageCard);
+        //        chatContainer.appendChild(messageElement);
+        //        chatContainer.scrollTop = chatContainer.scrollHeight;
+        //    }
+        //});
 
         connection.start()
             .then(() => {
@@ -128,7 +147,6 @@ function joinGroup(groupName) {
     }
 }
 
-// Send Message
 function sendMessage(groupName) {
     const messageInput = document.getElementById('message-input');
     const message = messageInput ? messageInput.value.trim() : '';
@@ -137,7 +155,6 @@ function sendMessage(groupName) {
         alert('Message cannot be empty.');
         return;
     }
-    console.log("GroupName: ", groupName);
     connection.invoke('SendMessage', groupName, message)
         .then(() => {
             if (messageInput) {
@@ -151,6 +168,5 @@ function attachSendButtonListener(groupName) {
     const sendButton = document.getElementById('send-button');
     sendButton.onclick = function () {
         sendMessage(groupName);
-
     };
 }

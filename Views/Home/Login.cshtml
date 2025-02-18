@@ -1,43 +1,450 @@
-﻿@model GCTConnect.Models.User
+﻿ @model GCTConnect.Models.User
 
 @{
     ViewData["Title"] = "Login";
+    Layout = null;
 }
 
 
+@*
+<style>
 
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header text-center">
-                <h4 asp-for="">Login</h4>
-            </div>
-            <div class="card-body">
-                <form asp-controller="Home" asp-action="Login" method="post">
-                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                    <div class="form-group mb-3">
-                        <label asp-for="Username">User Name</label>
-                        <input asp-for="Username" class="form-control" placeholder="Enter User Name" />
-                        <span asp-validation-for="Username"></span>
-                    </div>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Poppins', sans-serif;
+    }
 
-                    <div class="form-group mb-3">
-                        <label asp-for="Password"></label>
-                        <input asp-for="Password" type="password" class="form-control" placeholder="Enter Password" />
-                        <span asp-validation-for="Password"></span>
-                    </div>
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background: blue;
+        overflow: hidden;
+        position: relative;
+/*         background-image: url("/images/background.png");
+ */    }
 
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary">Login</button>
-                    </div>
-                </form>
 
-            </div>
+
+    /* Main Container */
+    .container {
+        display: flex;
+/*         width: 80%; */
+        max-width: 900px;
+        background: rgba(255, 255, 255, 0.05);
+        padding: 40px;
+        border-radius: 15px;
+        position: relative;
+        z-index: 10;
+    }
+
+    /* Left Section */
+    .welcome-section {
+        flex: 1;
+        color: white;
+        padding: 30px;
+        position: relative;
+    }
+
+    .logo {
+        font-size: 30px;
+        font-weight: bold;
+    }
+
+    h1 {
+        font-size: 36px;
+        margin: 10px 0;
+    }
+
+    p {
+        font-size: 14px;
+        margin-bottom: 20px;
+        opacity: 0.8;
+    }
+
+    .learn-more {
+        background: #ff5f6d;
+        padding: 10px 15px;
+        border: none;
+        color: white;
+        font-weight: bold;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+        .learn-more:hover {
+            background: #ff9966;
+        }
+
+    /* Right Section (Glassmorphism Login Box) */
+    .login-box {
+        flex: 1;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        padding: 40px;
+        border-radius: 10px;
+        color: white;
+        text-align: center;
+        position: relative;
+    }
+
+    h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+
+    form {
+        display: flex;
+        flex-direction: column;
+        text-align: left;
+
+    }
+
+    label {
+        font-size: 14px;
+        margin-bottom: 5px;
+    }
+
+    input {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: none;
+        border-radius: 5px;
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        margin-top: 5px;
+    }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+    .submit-btn {
+        background: linear-gradient(45deg, #ff7a18, #ff2a2a);
+        padding: 10px;
+        border: none;
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+        border-radius: 5px;
+        transition: 0.3s;
+        width: 100%;
+    }
+
+        .submit-btn:hover {
+            background: linear-gradient(45deg, #ff9966, #ff3d3d);
+        }
+
+    /* Responsive Design */
+    @@media (max-width: 768px) {
+        .container {
+            flex-direction: column;
+            width: 90%;
+            text-align: center;
+        }
+
+        .welcome-section, .login-box {
+            width: 100%;
+            padding: 20px;
+        }
+
+        .logo {
+            text-align: center;
+        }
+    }
+</style>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glassmorphism Login</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+
+    <!-- Background Shapes -->
+
+    <div class="container">
+        <div class="welcome-section">
+            <h1>Welcome!</h1>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+            <button class="learn-more">Learn More</button>
+        </div>
+
+        <div class="login-box">
+            <h2>Sign in</h2>
+            <form asp-controller="Home" asp-action="Login" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Username">User Name</label>
+                    <input asp-for="Username" class="form-control" placeholder="Enter User Name" />
+                    <span asp-validation-for="Username"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Password"></label>
+                    <input asp-for="Password" type="password" class="form-control" placeholder="Enter Password" />
+                    <span asp-validation-for="Password"></span>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="submit-btn">Login</button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+
+</body>
+</html>
+ *@
+
+<style>
+    /* Import Google Font */
+    @@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background: black;
+        overflow: hidden;
+    }
+
+    /* Animated Background */
+    .background-animation {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(-45deg, #002147, #000000, #007bff);
+        background-size: 400% 400%;
+        animation: gradientMove 8s infinite alternate ease-in-out;
+        z-index: -1;
+    }
+
+    /* Background Color Animation */
+    @@keyframes gradientMove {
+        0% {
+            background-position: 0% 50%;
+        }
+
+        100% {
+            background-position: 100% 50%;
+        }
+    }
+
+    /* Slide-in Animation */
+    @@keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Login Box */
+    .container {
+        width: 400px;
+        padding: 40px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: 0px 4px 15px rgba(255, 255, 255, 0.2);
+        position: relative;
+    }
+
+    h2 {
+        color: white;
+        font-size: 26px;
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+
+    p {
+        color: #ddd;
+        font-size: 14px;
+        margin-bottom: 20px;
+    }
+
+    /* Floating Label Effect */
+    .input-box {
+        position: relative;
+        margin-bottom: 20px;
+    }
+
+        .input-box input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 5px;
+            background: transparent;
+/*             color: white;
+ */            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        /* Label Color Animation */
+        .input-box label {
+            position: absolute;
+            /*     top: 50%; */
+            left: 12px;
+            transform: translateY(-50%);
+            font-size: 14px;
+            color: #13274F;
+            transition: 0.3s ease-in-out;
+            pointer-events: none;
+            background: transparent;
+            padding: 0 5px;
+            animation: labelColorChange 8s infinite alternate ease-in-out;
+        }
+
+        /* Floating effect when input is focused or has text */
+        /* .input-box input:focus ~ label,
+    .input-box input:valid ~ label {
+        top: 0px;
+        font-size: 12px;
+        background: transparent;
+    }  */
+
+        /* Label Animation (Changes Color with Background) */
+        /* @@keyframes labelColorChange {
+        0% { color: white; }
+        50% { color: black; }
+        100% { color: white; }
+    } */
+
+        /* Input Focus Effect */
+        .input-box input:focus {
+            border-color: #00c3ff;
+            box-shadow: 0px 0px 8px rgba(0, 195, 255, 0.5);
+        }
+
+    /* Options */
+    .options {
+        display: flex;
+        justify-content: space-between;
+        font-size: 13px;
+        color: #ccc;
+        margin-bottom: 20px;
+    }
+
+        .options input {
+            margin-right: 5px;
+        }
+
+        .options a {
+            text-decoration: none;
+            color: #007bff;
+            transition: 0.3s;
+        }
+
+            .options a:hover {
+                color: #fff;
+            }
+
+    /* Button with Hover Effect */
+    .next-btn {
+        width: 100%;
+        padding: 12px;
+        border: none;
+        background: linear-gradient(to right, #007bff, #00c3ff);
+        color: white;
+        font-size: 16px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: 0.4s ease-in-out;
+        position: relative;
+        overflow: hidden;
+    }
+
+        /* Button Hover Animation */
+        .next-btn:hover {
+            transform: scale(1.05);
+            background: linear-gradient(to right, #0056b3, #0099ff);
+        }
+
+    /* Create Account */
+    .create-account {
+        text-align: center;
+        margin-top: 15px;
+        font-size: 14px;
+        color: #ddd;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+        .create-account:hover {
+            color: #007bff;
+        }
+
+    /* Responsive Design */
+    @@media (max-width: 450px) {
+        .container {
+            width: 90%;
+            padding: 30px;
+        }
+    }
+
+</style>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Animated Login</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="background-animation"></div> <!-- Animated Background -->
+
+    <div class="container">
+        <div class="login-box">
+            <h2 class="slide-in">HELLO!</h2>
+            <p class="slide-in">Welcome back! Please login to your account.</p>
+
+
+
+            <form asp-controller="Home" asp-action="Login" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="input-box slide-in">
+                    <input id="email" asp-for="Username" class="form-control" placeholder="Enter User Name" />
+                    <span asp-validation-for="Username"></span>
+                </div>
+
+                <div class="input-box slide-in">
+                    <input id="password" asp-for="Password" type="password" class="form-control" placeholder="Enter Password" />
+                    <span asp-validation-for="Password"></span>
+                </div>
+
+                    <button type="submit" class="next-btn slide-in">Login</button>
+
+            </form>
         </div>
     </div>
-</div>
-
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}
+</body>
+</html>

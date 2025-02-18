@@ -67,7 +67,6 @@ public class ChatHub : Hub
         }
 
         await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
-        await Clients.Caller.SendAsync("ReceiveMessage");
     }
 
     // Leave a group
@@ -80,7 +79,6 @@ public class ChatHub : Hub
         }
 
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupName);
-        await Clients.Caller.SendAsync("ReceiveMessage", "System", $"You left the group: {groupName}.");
     }
 
     // Send a message to a group
@@ -114,11 +112,11 @@ public class ChatHub : Hub
             Content = message,
             Timestamp = DateTime.UtcNow
         };
-        Console.WriteLine(user.Username);
         _context.Messages.Add(newMessage);
         await _context.SaveChangesAsync();
 
-        // Broadcast the message to the group
-        await Clients.Group(groupName).SendAsync("ReceiveMessage", user.Username, message, DateTime.UtcNow);
+        // Broadcast the message to the group along with the sender's profile picture.
+        // Note: The client-side code should now expect (user, message, profilePic) as parameters.
+        await Clients.Group(groupName).SendAsync("ReceiveMessage", user.Username, message, user.ProfilePic);
     }
 }

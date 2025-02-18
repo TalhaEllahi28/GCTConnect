@@ -5,12 +5,20 @@
       "PackagePath": "staticwebassets\\GCTConnect.bundle.scp.css"
     },
     {
+      "Id": "D:\\Talha\\GCTConnect\\wwwroot\\css\\Dashboard.css",
+      "PackagePath": "staticwebassets\\css\\Dashboard.css"
+    },
+    {
       "Id": "D:\\Talha\\GCTConnect\\wwwroot\\css\\site.css",
       "PackagePath": "staticwebassets\\css\\site.css"
     },
     {
       "Id": "D:\\Talha\\GCTConnect\\wwwroot\\favicon.ico",
       "PackagePath": "staticwebassets\\favicon.ico"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect\\wwwroot\\images\\background.png",
+      "PackagePath": "staticwebassets\\images\\background.png"
     },
     {
       "Id": "D:\\Talha\\GCTConnect\\wwwroot\\js\\ChatWindow.js",
