@@ -15,6 +15,9 @@
                 </li>`;
             });
             document.querySelector('#groups-ul').innerHTML = groupList;
+            const chatContainer = document.getElementById('messages-container');
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+
         })
         .catch(error => console.error('Error fetching groups:', error));
 });

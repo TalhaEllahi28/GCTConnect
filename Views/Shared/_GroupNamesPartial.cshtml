@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<dynamic>
 
 <!-- The bounce-in class triggers the pop (bounce) animation on load -->
-<div class="group-container ">
+<div class="group-container">
     <!-- Search Bar -->
     <div class="group-header">
         <input type="text" id="group-search" placeholder="Search groups..." onkeyup="filterGroups()" />
@@ -16,7 +16,21 @@
 
 <script src="~/js/GetGroupsAndMessages.js"></script>
 <script>
-    // Simple filtering function for the search bar
+
+    document.addeventlistener("domcontentloaded", function () {
+        // ensure the script runs after the dom is fully loaded
+
+        // correct audio file path
+        const hoversound = new audio('/sounds/pop-1-35897.mp3'); // update the correct file path
+
+        // use event delegation for dynamically loaded elements
+        document.getelementbyid("groups-ul").addeventlistener("mouseover", function (event) {
+            if (event.target.classlist.contains("group-item")) {
+                hoversound.play();
+            }
+        });
+    });
+
     function filterGroups() {
         var input = document.getElementById("group-search");
         var filter = input.value.toLowerCase();
