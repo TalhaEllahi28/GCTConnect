@@ -2,8 +2,13 @@
 using GCTConnect.Services;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.IdentityModel.Tokens;
+using NuGet.Protocol.Plugins;
 using System.Collections.Concurrent;
 using System.Security.Claims;
+using System.Text.RegularExpressions;
+using Message = GCTConnect.Models.Message;
 
 public class ChatHub : Hub
 {
@@ -19,7 +24,6 @@ public class ChatHub : Hub
         _userService = userService;
     }
 
-    // Called when a client connects to the hub
     public override async Task OnConnectedAsync()
     {
         var claimsIdentity = Context.User?.Identity as ClaimsIdentity;
@@ -50,23 +54,45 @@ public class ChatHub : Hub
         await base.OnDisconnectedAsync(exception);
     }
 
-    // Join a specific group
-    public async Task JoinGroup(string groupName)
+    public async Task JoinGroup(int identifier, bool isPrivate)
     {
-        if (string.IsNullOrEmpty(groupName))
-        {
-            await Clients.Caller.SendAsync("ReceiveMessage", "System", "Group name cannot be empty.");
-            return;
-        }
+        string groupName;
 
-        var group = await _context.Groups.FirstOrDefaultAsync(g => g.GroupName == groupName);
-        if (group == null)
+        if (isPrivate)
         {
-            await Clients.Caller.SendAsync("ReceiveMessage", "System", $"Group '{groupName}' does not exist.");
-            return;
+            var freind = await _context.Users.FirstOrDefaultAsync(u => u.UserId == identifier);
+            if (!UserConnections.TryGetValue(Context.ConnectionId, out var currentUser) && freind != null)
+            {
+                await Clients.Caller.SendAsync("ReceiveMessage", "System", "Unauthorized action.");
+                return;
+            }
+
+            // Generate private group name using sorted user IDs
+            groupName = GeneratePrivateGroupName(Convert.ToString(currentUser.UserId), Convert.ToString(identifier));
+        }
+        else
+        {
+
+            var group = await _context.Groups.FirstOrDefaultAsync(g => g.GroupId == identifier);
+
+            // Public/group chat
+            if (group == null)
+            {
+                await Clients.Caller.SendAsync("ReceiveMessage", "System", $"Group '{identifier}' does not exist.");
+                return;
+            }
+            groupName = Convert.ToString(identifier) + "_" + group.GroupName;
         }
 
         await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
+    }
+
+
+    private string GeneratePrivateGroupName(string userId1, string userId2)
+    {
+        var ids = new[] { userId1, userId2 };
+        Array.Sort(ids);
+        return $"private_{ids[0]}_{ids[1]}";
     }
 
     // Leave a group
@@ -81,10 +107,21 @@ public class ChatHub : Hub
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupName);
     }
 
-    // Send a message to a group
-    public async Task SendMessage(string groupName, string message)
+    // Send a message to a group with optional file or audio attachment
+    public async Task SendMessage(string chatType, int GroupIdOrRecieverId, string message, string? fileUrl = null, string? fileType = null, string? fileName = null, string? audioUrl = null)
     {
-        if (string.IsNullOrEmpty(groupName) || string.IsNullOrEmpty(message))
+        var sender = _userService.GetCurrentUser();
+        if (sender == null)
+        {
+            return;
+        }
+        string groupName = chatType == "friends"
+            ? GeneratePrivateGroupName(Convert.ToString(sender.UserId), Convert.ToString(GroupIdOrRecieverId))
+            : $"{GroupIdOrRecieverId}_{(_context.Groups.Find(GroupIdOrRecieverId)?.GroupName ?? "group")}";
+
+        // Allow empty message if there's a file or audio attachment
+        if (GroupIdOrRecieverId == 0 || string.IsNullOrEmpty(chatType) ||
+            (string.IsNullOrEmpty(message) && string.IsNullOrEmpty(fileUrl) && string.IsNullOrEmpty(audioUrl)))
         {
             await Clients.Caller.SendAsync("ReceiveMessage", "System", "Message or group name cannot be empty.");
             return;
@@ -97,26 +134,91 @@ public class ChatHub : Hub
             return;
         }
 
-        var group = await _context.Groups.FirstOrDefaultAsync(g => g.GroupName == groupName);
-        if (group == null)
+
+        string senderFullName = $"{user.Name} {user.LastName}".Trim();
+
+
+        if (chatType == "group")
         {
-            await Clients.Caller.SendAsync("ReceiveMessage", "System", $"Group '{groupName}' does not exist.");
-            return;
+            var group = await _context.Groups.FirstOrDefaultAsync(g => g.GroupId == GroupIdOrRecieverId);
+            if (group == null)
+            {
+                await Clients.Caller.SendAsync("ReceiveMessage", "System", $"Group Id: '{GroupIdOrRecieverId}' does not exist.");
+                return;
+            }
+
+
+            // Save the message to the database with file/audio information
+            var newMessage = new Message
+            {
+                GroupId = group.GroupId,
+                SenderId = user.UserId,
+                Content = message,
+                FileUrl = fileUrl,
+                FileType = fileType,
+                FileName = fileName,
+                AudioUrl = audioUrl,
+                Timestamp = DateTime.Now
+            };
+            _context.Messages.Add(newMessage);
+
+            if (group.CourseId != null)
+            {
+                var newFile = new GCTConnect.Models.File
+                {
+                    FileUrl = fileUrl,
+                    FileType = fileType,
+                    FileName = fileName,
+                    CourseId = group.CourseId,
+                    UploaderId = sender.UserId,
+                    UploadedAt = DateTime.Now
+                };
+
+                _context.Files.Add(newFile);
+            }
+
+            await _context.SaveChangesAsync();
+
+            try
+            {
+                await Clients.Group(groupName).SendAsync("ReceiveMessage", user.Username, message, user.ProfilePic, fileUrl, fileType, fileName, audioUrl);
+                //await Clients.Group(groupName).SendAsync("ReceiveMessage", user.Username, message, user.ProfilePic, fileUrl, fileType, fileName, audioUrl, senderFullName);
+
+            }
+            catch (Exception ex)
+            {
+                // Log the exception or handle it appropriately
+            }
         }
-
-        // Save the message to the database
-        var newMessage = new Message
+        else if (chatType == "friends")
         {
-            GroupId = group.GroupId,
-            SenderId = user.UserId,
-            Content = message,
-            Timestamp = DateTime.UtcNow
-        };
-        _context.Messages.Add(newMessage);
-        await _context.SaveChangesAsync();
+            var reciver = await _context.Users.FirstOrDefaultAsync(g => g.UserId == GroupIdOrRecieverId);
+            if (reciver == null)
+            {
+                await Clients.Caller.SendAsync("ReceiveMessage", "System", $"Reciver Id: '{GroupIdOrRecieverId}' does not exist.");
+                return;
+            }
 
-        // Broadcast the message to the group along with the sender's profile picture.
-        // Note: The client-side code should now expect (user, message, profilePic) as parameters.
-        await Clients.Group(groupName).SendAsync("ReceiveMessage", user.Username, message, user.ProfilePic);
+            // Save the message to the database with file/audio information
+            var newMessage = new Message
+            {
+                ReceiverId = reciver.UserId,
+                SenderId = user.UserId,
+                Content = message,
+                FileUrl = fileUrl,
+                FileType = fileType,
+                FileName = fileName,
+                AudioUrl = audioUrl,
+                Timestamp = DateTime.Now
+            };
+            _context.Messages.Add(newMessage);
+            await _context.SaveChangesAsync();
+            await Clients.Group(groupName).SendAsync("ReceiveMessage", user.Username, message, user.ProfilePic, fileUrl, fileType, fileName, audioUrl);
+            //await Clients.Group(groupName).SendAsync("ReceiveMessage", user.Username, message, user.ProfilePic, fileUrl, fileType, fileName, audioUrl, senderFullName);
+
+        }
     }
 }
+
+
+

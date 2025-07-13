@@ -15,6 +15,8 @@ public partial class Department
 
     public virtual ICollection<Batch> Batches { get; set; } = new List<Batch>();
 
+    public virtual ICollection<Course> Courses { get; set; } = new List<Course>();
+
     public virtual ICollection<Group> Groups { get; set; } = new List<Group>();
 
     public virtual User? Hod { get; set; }

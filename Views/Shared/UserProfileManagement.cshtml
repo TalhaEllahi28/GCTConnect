@@ -1,0 +1,1264 @@
+﻿@model UserProfileViewModel
+
+@* @{
+	ViewData["Title"] = "Profile Settings";
+	Layout = null;
+}
+
+<style>
+	/* Purple Theme Colors */
+	:root {
+		--purple-50: #F8F7FF;
+		--purple-100: #F3F0FF;
+		--purple-200: #E9DFFF;
+		--purple-300: #D6BCFA;
+		--purple-400: #B794F4;
+		--purple-500: #9B87F5;
+		--purple-600: #7E69AB;
+		--purple-700: #6E59A5;
+		--purple-800: #553C9A;
+		--purple-900: #1A1F2C;
+	}
+
+	body {
+		background-color: #FAFAFA;
+		font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+	}
+
+	/* Main Container Styling */
+	.profile-container {
+		background-color: white;
+		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+		overflow: hidden;
+	}
+
+	/* Header Section with Gradient */
+	.profile-header {
+		background: linear-gradient(135deg, var(--purple-500) 0%, var(--purple-700) 100%);
+		color: white;
+		padding: 2rem;
+		position: relative;
+	}
+
+		.profile-header h1 {
+			margin: 0;
+			font-size: 1.8rem;
+			font-weight: 600;
+		}
+
+		.profile-header p {
+			margin: 0.5rem 0 0;
+			opacity: 0.9;
+			font-size: 1rem;
+		}
+
+	/* Tab Navigation */
+	.profile-nav {
+		background-color: white;
+		padding: 0 1.5rem;
+		display: flex;
+		border-bottom: 1px solid var(--purple-200);
+	}
+
+	.tab-button {
+		padding: 1rem 1.5rem;
+		background: none;
+		border: none;
+		font-size: 1rem;
+		font-weight: 500;
+		color: var(--purple-700);
+		cursor: pointer;
+		border-bottom: 3px solid transparent;
+		transition: all 0.3s ease;
+	}
+
+		.tab-button.active {
+			color: var(--purple-600);
+			border-bottom-color: var(--purple-600);
+		}
+
+		.tab-button:hover:not(.active) {
+			background-color: var(--purple-50);
+		}
+
+	/* Form Content */
+	.profile-content {
+		padding: 2rem;
+	}
+
+	.form-section {
+		margin-bottom: 2rem;
+	}
+
+	.section-title {
+		font-size: 1.2rem;
+		color: var(--purple-800);
+		margin-bottom: 1rem;
+		border-bottom: 1px solid var(--purple-200);
+		padding-bottom: 0.5rem;
+	}
+
+	/* Form Groups */
+	.form-group {
+		margin-bottom: 1.2rem;
+	}
+
+		.form-group label {
+			display: block;
+			margin-bottom: 0.5rem;
+			font-weight: 500;
+			color: var(--purple-800);
+			font-size: 0.95rem;
+		}
+
+		.form-group input,
+		.form-group select,
+		.form-group textarea {
+			width: 100%;
+			padding: 0.75rem 1rem;
+			border: 1px solid var(--purple-300);
+			border-radius: 6px;
+			font-size: 1rem;
+			color: #333;
+			transition: border-color 0.3s ease, box-shadow 0.3s ease;
+		}
+
+			.form-group input:focus,
+			.form-group select:focus,
+			.form-group textarea:focus {
+				outline: none;
+				border-color: var(--purple-500);
+				box-shadow: 0 0 0 3px var(--purple-200);
+			}
+
+			.form-group input[readonly] {
+				background-color: var(--purple-50);
+				border-color: var(--purple-200);
+				color: var(--purple-700);
+			}
+
+		.form-group textarea {
+			min-height: 100px;
+			resize: vertical;
+		}
+
+	/* Profile Picture Section */
+	.profile-picture-container {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		margin-bottom: 2rem;
+	}
+
+	.profile-picture {
+		position: relative;
+		width: 150px;
+		height: 150px;
+		border-radius: 50%;
+		overflow: hidden;
+		margin-bottom: 1rem;
+		border: 4px solid white;
+		box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+	}
+
+	#profilePreview {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.profile-picture-overlay {
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		background-color: rgba(0, 0, 0, 0.5);
+		padding: 0.5rem;
+		text-align: center;
+		color: white;
+		font-size: 0.8rem;
+		cursor: pointer;
+		opacity: 0;
+		transition: opacity 0.3s ease;
+	}
+
+	.profile-picture:hover .profile-picture-overlay {
+		opacity: 1;
+	}
+
+	.file-input-container {
+		position: relative;
+		cursor: pointer;
+	}
+
+	.file-input-label {
+		display: inline-block;
+		padding: 0.6rem 1.2rem;
+		background-color: var(--purple-500);
+		color: white;
+		border-radius: 4px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: background-color 0.3s ease;
+	}
+
+		.file-input-label:hover {
+			background-color: var(--purple-600);
+		}
+
+	#ProfilePicFile {
+		position: absolute;
+		left: -9999px;
+	}
+
+	/* Two Column Layout for Form */
+	.form-row {
+		display: flex;
+		flex-wrap: wrap;
+		margin: 0 -10px;
+	}
+
+	.form-col {
+		padding: 0 10px;
+		box-sizing: border-box;
+	}
+
+	.form-col-6 {
+		width: 50%;
+	}
+
+	@@media screen and (max-width: 768px) {
+		.form-col-6 {
+			width: 100%;
+		}
+	}
+
+	/* Card Styling for Read-Only Information */
+	.info-card {
+		background-color: var(--purple-50);
+		border-radius: 8px;
+		border-left: 4px solid var(--purple-400);
+		padding: 1rem;
+		margin-bottom: 1.5rem;
+	}
+
+	.info-card-title {
+		font-size: 0.9rem;
+		font-weight: 600;
+		color: var(--purple-700);
+		margin: 0 0 0.3rem 0;
+	}
+
+	.info-card-value {
+		font-size: 1.1rem;
+		color: var(--purple-900);
+		margin: 0;
+	}
+
+	/* Button Styling */
+	.btn {
+		display: inline-block;
+		padding: 0.75rem 1.5rem;
+		border-radius: 6px;
+		font-size: 1rem;
+		font-weight: 500;
+		text-align: center;
+		cursor: pointer;
+		transition: all 0.3s ease;
+		border: none;
+	}
+
+	.btn-primary {
+		background-color: var(--purple-600);
+		color: white;
+	}
+
+		.btn-primary:hover {
+			background-color: var(--purple-700);
+			box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+		}
+
+	.btn-secondary {
+		background-color: white;
+		border: 1px solid var(--purple-600);
+		color: var(--purple-600);
+	}
+
+		.btn-secondary:hover {
+			background-color: var(--purple-50);
+		}
+
+	.btn-group {
+		margin-top: 1.5rem;
+		text-align: right;
+	}
+
+		.btn-group button {
+			margin-left: 0.5rem;
+		}
+
+	/* Social Links Styling */
+	.social-links-container {
+		position: relative;
+	}
+
+	.social-links-hint {
+		position: absolute;
+		right: 10px;
+		top: 40px;
+		color: var(--purple-600);
+		font-size: 0.8rem;
+	}
+</style>
+
+<div class="profile-container">
+	<partial name="_NavPartial" />
+
+	<div class="profile-header">
+		<h1>My Profile</h1>
+		<p>Manage your personal information and account settings</p>
+	</div>
+
+	<div class="profile-nav">
+		<button class="tab-button active">Profile Information</button>
+		<button class="tab-button">Account Settings</button>
+		<button class="tab-button">Notifications</button>
+	</div>
+
+	<div class="profile-content">
+		<form asp-action="UserProfileManagement" asp-controller="UserProfile" method="post" enctype="multipart/form-data">
+
+			<!-- Profile Picture Section -->
+			<div class="profile-picture-container">
+				<div class="profile-picture">
+					<img id="profilePreview" src="@Model.CurrentProfilePicPath" alt="Profile Picture" />
+					<div class="profile-picture-overlay">Change Photo</div>
+				</div>
+				<div class="file-input-container">
+					<label for="ProfilePicFile" class="file-input-label">Upload New Photo</label>
+					<input type="file" id="ProfilePicFile" accept="image/*" class="form-control-file" />
+				</div>
+			</div>
+
+			<!-- Read-Only Fields Section -->
+			<div class="form-section">
+				<h3 class="section-title">Account Information</h3>
+				<div class="form-row">
+					<div class="form-col form-col-6">
+						<div class="info-card">
+							<div class="info-card-title">Username</div>
+							<div class="info-card-value">@Model.Username</div>
+						</div>
+					</div>
+					<div class="form-col form-col-6">
+						<div class="info-card">
+							<div class="info-card-title">Role</div>
+							<div class="info-card-value">@Model.Role</div>
+						</div>
+					</div>
+				</div>
+				<div class="form-row">
+					<div class="form-col form-col-6">
+						<div class="info-card">
+							<div class="info-card-title">Department</div>
+							<div class="info-card-value">@Model.DepartmentName</div>
+						</div>
+					</div>
+					<div class="form-col form-col-6">
+						<div class="info-card">
+							<div class="info-card-title">Batch</div>
+							<div class="info-card-value">@Model.BatchName</div>
+						</div>
+					</div>
+				</div>
+				<div class="form-row">
+					<div class="form-col form-col-6">
+						<div class="info-card">
+							<div class="info-card-title">Roll Number</div>
+							<div class="info-card-value">@Model.RollNumber</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Editable Fields Section -->
+			<div class="form-section">
+				<h3 class="section-title">Personal Information</h3>
+
+				<div class="form-row">
+					<div class="form-col form-col-6">
+						<div class="form-group">
+							<label for="Name">First Name</label>
+							<input asp-for="Name" class="form-control" />
+						</div>
+					</div>
+					<div class="form-col form-col-6">
+						<div class="form-group">
+							<label for="LastName">Last Name</label>
+							<input asp-for="LastName" class="form-control" />
+						</div>
+					</div>
+				</div>
+
+				<div class="form-row">
+					<div class="form-col form-col-6">
+						<div class="form-group">
+							<label for="Email">Email Address</label>
+							<input asp-for="Email" class="form-control" type="email" />
+						</div>
+					</div>
+					<div class="form-col form-col-6">
+						<div class="form-group">
+							<label for="PhoneNumber">Phone Number</label>
+							<input asp-for="PhoneNumber" class="form-control" />
+						</div>
+					</div>
+				</div>
+
+				<div class="form-row">
+					<div class="form-col form-col-6">
+						<div class="form-group">
+							<label for="Gender">Gender</label>
+							<select asp-for="Gender" class="form-control">
+								<option value="">-- Select --</option>
+								<option>Male</option>
+								<option>Female</option>
+								<option>Other</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-col form-col-6">
+						<div class="form-group">
+							<label for="Subject">Subject</label>
+							<input asp-for="Subject" class="form-control" />
+						</div>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label for="Bio">Bio</label>
+					<textarea asp-for="Bio" class="form-control" placeholder="Tell us about yourself..."></textarea>
+				</div>
+
+				<div class="form-group social-links-container">
+					<label for="SocialLinks">Social Links</label>
+					<input asp-for="SocialLinks" class="form-control" placeholder="https://linkedin.com/in/yourprofile, https://twitter.com/username" />
+					<span class="social-links-hint">Separate multiple links with commas</span>
+				</div>
+
+				<input type="hidden" asp-for="CurrentProfilePicPath" id="Base64ProfilePic" />
+			</div>
+
+			<div class="btn-group">
+				<button type="button" class="btn btn-secondary" id="resetBtn">Reset</button>
+				<button type="submit" class="btn btn-primary">Save Changes</button>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script>
+	// Preview image before upload
+	document.getElementById("ProfilePicFile").addEventListener("change", function() {
+		const file = this.files[0];
+		const reader = new FileReader();
+
+		reader.onload = function(e) {
+			const base64 = e.target.result;
+			document.getElementById("Base64ProfilePic").value = base64;
+			document.getElementById("profilePreview").src = base64;
+		};
+
+		if (file) {
+			reader.readAsDataURL(file);
+		}
+	});
+
+	// Click on profile picture to trigger file input
+	document.querySelector(".profile-picture").addEventListener("click", function() {
+		document.getElementById("ProfilePicFile").click();
+	});
+
+	// Tab navigation functionality
+	const tabButtons = document.querySelectorAll(".tab-button");
+	tabButtons.forEach(button => {
+		button.addEventListener("click", function() {
+			tabButtons.forEach(btn => btn.classList.remove("active"));
+			this.classList.add("active");
+			// In a real implementation, you would show/hide different sections here
+		});
+	});
+
+	// Reset form button
+	document.getElementById("resetBtn").addEventListener("click", function(e) {
+		e.preventDefault();
+		if (confirm("Are you sure you want to reset all changes?")) {
+			window.location.reload();
+		}
+	});
+
+	// Form validation and submission animation
+	document.querySelector("form").addEventListener("submit", function(e) {
+		const requiredFields = this.querySelectorAll('input[required]');
+		let isValid = true;
+
+		requiredFields.forEach(field => {
+			if (!field.value.trim()) {
+				isValid = false;
+				field.classList.add('error');
+			} else {
+				field.classList.remove('error');
+			}
+		});
+
+		if (!isValid) {
+			e.preventDefault();
+			alert("Please fill in all required fields");
+		} else {
+			const submitBtn = this.querySelector('button[type="submit"]');
+			submitBtn.innerHTML = "Saving...";
+			submitBtn.disabled = true;
+			// Form will submit naturally
+		}
+	});
+
+	// Enhanced user experience - smooth scrolling
+	document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+		anchor.addEventListener('click', function(e) {
+			e.preventDefault();
+			document.querySelector(this.getAttribute('href')).scrollIntoView({
+				behavior: 'smooth'
+			});
+		});
+	});
+</script>
+
+ *@
+
+
+
+
+
+
+
+
+
+
+
+
+@* @{
+	ViewData["Title"] = "Profile Settings";
+	Layout = null;
+}
+
+<style>
+	/* Purple Theme Colors */
+	:root {
+		--purple-50: #F8F7FF;
+		--purple-100: #F3F0FF;
+		--purple-200: #E9DFFF;
+		--purple-300: #D6BCFA;
+		--purple-400: #B794F4;
+		--purple-500: #9B87F5;
+		--purple-600: #7E69AB;
+		--purple-700: #6E59A5;
+		--purple-800: #553C9A;
+		--purple-900: #1A1F2C;
+	}
+
+	body {
+		background-color: #FAFAFA;
+		font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+		margin: 0;
+		padding: 0;
+	}
+
+	/* Layout for sidebar integration */
+	.page-container {
+		display: flex;
+		min-height: 100vh;
+		width: 100%;
+	}
+	
+	.content-area {
+		flex: 1;
+		width: calc(100% - 76px); /* Account for sidebar width */
+	}
+	
+	/* Main Container Styling */
+	.profile-container {
+		background-color: white;
+		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+		overflow: hidden;
+	}
+
+	
+	/* Responsive adjustments */
+	@@media screen and (max-width: 768px) {
+		.page-container {
+			flex-direction: column;
+		}
+		
+		.content-area {
+			width: 100%;
+			margin-bottom: 60px; /* Space for bottom nav on mobile */
+		}
+		
+		.profile-container {
+			margin: 10px;
+		}
+	}
+</style>
+
+<div class="page-container">
+	<!-- Include the sidebar navigation partial -->
+	<partial name="_NavPartial" />
+	
+	<div class="content-area">
+		<div class="profile-container">
+			<div class="profile-header">
+				<h1>My Profile</h1>
+				<p>Manage your personal information and account settings</p>
+			</div>
+
+			<div class="profile-nav">
+				<button class="tab-button active">Profile Information</button>
+				<button class="tab-button">Account Settings</button>
+				<button class="tab-button">Notifications</button>
+			</div>
+
+			<div class="profile-content">
+				<form asp-action="UserProfileManagement" asp-controller="UserProfile" method="post" enctype="multipart/form-data">
+
+					<!-- Profile Picture Section -->
+					<div class="profile-picture-container">
+						<div class="profile-picture">
+							<img id="profilePreview" src="@Model.CurrentProfilePicPath" alt="Profile Picture" />
+							<div class="profile-picture-overlay">Change Photo</div>
+						</div>
+						<div class="file-input-container">
+							<label for="ProfilePicFile" class="file-input-label">Upload New Photo</label>
+							<input type="file" id="ProfilePicFile" accept="image/*" class="form-control-file" />
+						</div>
+					</div>
+
+					
+
+					<div class="btn-group">
+						<button type="button" class="btn btn-secondary" id="resetBtn">Reset</button>
+						<button type="submit" class="btn btn-primary">Save Changes</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+ *@
+
+
+
+
+
+
+@{
+	ViewData["Title"] = "Profile Settings";
+	Layout = null;
+}
+
+<style>
+	/* Purple Theme Colors */
+	:root {
+		--purple-50: #F8F7FF;
+		--purple-100: #F3F0FF;
+		--purple-200: #E9DFFF;
+		--purple-300: #D6BCFA;
+		--purple-400: #B794F4;
+		--purple-500: #9B87F5;
+		--purple-600: #7E69AB;
+		--purple-700: #6E59A5;
+		--purple-800: #553C9A;
+		--purple-900: #1A1F2C;
+	}
+
+	body {
+		background-color: #FAFAFA;
+		font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+		margin: 0;
+		padding: 0;
+	}
+	
+	/* Layout for fixed navigation */
+	.page-container {
+		display: flex;
+		min-height: 100vh;
+		width: 100%;
+	}
+	
+	/* Fixed navigation styling */
+	.nav-wrapper {
+		position: fixed;
+		top: 0;
+		left: 0;
+		height: 100vh;
+		z-index: 100;
+	}
+	
+	/* Content area styling */
+	.content-wrapper {
+		flex: 1;
+		margin-left: 76px; /* Adjust based on your navigation width */
+		width: calc(100% - 76px);
+		overflow-y: auto;
+		height: 100vh;
+	}
+
+	/* Main Container Styling */
+	.profile-container {
+		background-color: white;
+		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+		overflow: hidden;
+	}
+
+
+	/* Header Section with Gradient */
+	.profile-header {
+		background: linear-gradient(135deg, var(--purple-500) 0%, var(--purple-700) 100%);
+		color: white;
+		padding: 2rem;
+		position: relative;
+	}
+
+		.profile-header h1 {
+			margin: 0;
+			font-size: 1.8rem;
+			font-weight: 600;
+		}
+
+		.profile-header p {
+			margin: 0.5rem 0 0;
+			opacity: 0.9;
+			font-size: 1rem;
+		}
+
+	/* Tab Navigation */
+	.profile-nav {
+		background-color: white;
+		padding: 0 1.5rem;
+		display: flex;
+		border-bottom: 1px solid var(--purple-200);
+	}
+
+	.tab-button {
+		padding: 1rem 1.5rem;
+		background: none;
+		border: none;
+		font-size: 1rem;
+		font-weight: 500;
+		color: var(--purple-700);
+		cursor: pointer;
+		border-bottom: 3px solid transparent;
+		transition: all 0.3s ease;
+	}
+
+		.tab-button.active {
+			color: var(--purple-600);
+			border-bottom-color: var(--purple-600);
+		}
+
+		.tab-button:hover:not(.active) {
+			background-color: var(--purple-50);
+		}
+
+	/* Form Content */
+	.profile-content {
+		padding: 2rem;
+	}
+
+	.form-section {
+		margin-bottom: 2rem;
+	}
+
+	.section-title {
+		font-size: 1.2rem;
+		color: var(--purple-800);
+		margin-bottom: 1rem;
+		border-bottom: 1px solid var(--purple-200);
+		padding-bottom: 0.5rem;
+	}
+
+	/* Form Groups */
+	.form-group {
+		margin-bottom: 1.2rem;
+	}
+
+		.form-group label {
+			display: block;
+			margin-bottom: 0.5rem;
+			font-weight: 500;
+			color: var(--purple-800);
+			font-size: 0.95rem;
+		}
+
+		.form-group input,
+		.form-group select,
+		.form-group textarea {
+			width: 100%;
+			padding: 0.75rem 1rem;
+			border: 1px solid var(--purple-300);
+			border-radius: 6px;
+			font-size: 1rem;
+			color: #333;
+			transition: border-color 0.3s ease, box-shadow 0.3s ease;
+		}
+
+			.form-group input:focus,
+			.form-group select:focus,
+			.form-group textarea:focus {
+				outline: none;
+				border-color: var(--purple-500);
+				box-shadow: 0 0 0 3px var(--purple-200);
+			}
+
+			.form-group input[readonly] {
+				background-color: var(--purple-50);
+				border-color: var(--purple-200);
+				color: var(--purple-700);
+			}
+
+		.form-group textarea {
+			min-height: 100px;
+			resize: vertical;
+		}
+
+	/* Profile Picture Section */
+	.profile-picture-container {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		margin-bottom: 2rem;
+	}
+
+	.profile-picture {
+		position: relative;
+		width: 150px;
+		height: 150px;
+		border-radius: 50%;
+		overflow: hidden;
+		margin-bottom: 1rem;
+		border: 4px solid white;
+		box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+	}
+
+	#profilePreview {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.profile-picture-overlay {
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		background-color: rgba(0, 0, 0, 0.5);
+		padding: 0.5rem;
+		text-align: center;
+		color: white;
+		font-size: 0.8rem;
+		cursor: pointer;
+		opacity: 0;
+		transition: opacity 0.3s ease;
+	}
+
+	.profile-picture:hover .profile-picture-overlay {
+		opacity: 1;
+	}
+
+	.file-input-container {
+		position: relative;
+		cursor: pointer;
+	}
+
+	.file-input-label {
+		display: inline-block;
+		padding: 0.6rem 1.2rem;
+		background-color: var(--purple-500);
+		color: white;
+		border-radius: 4px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: background-color 0.3s ease;
+	}
+
+		.file-input-label:hover {
+			background-color: var(--purple-600);
+		}
+
+	#ProfilePicFile {
+		position: absolute;
+		left: -9999px;
+	}
+
+	/* Two Column Layout for Form */
+	.form-row {
+		display: flex;
+		flex-wrap: wrap;
+		margin: 0 -10px;
+	}
+
+	.form-col {
+		padding: 0 10px;
+		box-sizing: border-box;
+	}
+
+	.form-col-6 {
+		width: 50%;
+	}
+
+	@@media screen and (max-width: 768px) {
+		.form-col-6 {
+			width: 100%;
+		}
+	}
+
+	/* Card Styling for Read-Only Information */
+	.info-card {
+		background-color: var(--purple-50);
+		border-radius: 8px;
+		border-left: 4px solid var(--purple-400);
+		padding: 1rem;
+		margin-bottom: 1.5rem;
+	}
+
+	.info-card-title {
+		font-size: 0.9rem;
+		font-weight: 600;
+		color: var(--purple-700);
+		margin: 0 0 0.3rem 0;
+	}
+
+	.info-card-value {
+		font-size: 1.1rem;
+		color: var(--purple-900);
+		margin: 0;
+	}
+
+	/* Button Styling */
+	.btn {
+		display: inline-block;
+		padding: 0.75rem 1.5rem;
+		border-radius: 6px;
+		font-size: 1rem;
+		font-weight: 500;
+		text-align: center;
+		cursor: pointer;
+		transition: all 0.3s ease;
+		border: none;
+	}
+
+	.btn-primary {
+		background-color: var(--purple-600);
+		color: white;
+	}
+
+		.btn-primary:hover {
+			background-color: var(--purple-700);
+			box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+		}
+
+	.btn-secondary {
+		background-color: white;
+		border: 1px solid var(--purple-600);
+		color: var(--purple-600);
+	}
+
+		.btn-secondary:hover {
+			background-color: var(--purple-50);
+		}
+
+	.btn-group {
+		margin-top: 1.5rem;
+		text-align: right;
+	}
+
+		.btn-group button {
+			margin-left: 0.5rem;
+		}
+
+	/* Social Links Styling */
+	.social-links-container {
+		position: relative;
+	}
+
+	.social-links-hint {
+		position: absolute;
+		right: 10px;
+		top: 40px;
+		color: var(--purple-600);
+		font-size: 0.8rem;
+	}
+	/* Tab Navigation */
+	.profile-nav {
+		background-color: white;
+		padding: 0 1.5rem;
+		display: flex;
+		border-bottom: 1px solid var(--purple-200);
+	}
+
+	/* Form Content */
+	.profile-content {
+		padding: 2rem;
+	}
+
+	/* Responsive adjustments */
+	@@media screen and (max-width: 768px) {
+		.page-container {
+			flex-direction: column;
+		}
+		
+		.nav-wrapper {
+			position: fixed;
+			bottom: 0;
+			top: auto;
+			left: 0;
+			width: 100%;
+			height: auto;
+			z-index: 100;
+		}
+		
+		.content-wrapper {
+			margin-left: 0;
+			width: 100%;
+			margin-bottom: 60px; /* Space for bottom nav on mobile */
+		}
+	}
+</style>
+
+<div class="page-container">
+	<!-- Fixed navigation wrapper -->
+	<div class="nav-wrapper">
+		<partial name="_NavPartial" />
+	</div>
+
+	<!-- Scrollable content area -->
+	<div class="content-wrapper">
+		<div class="profile-container">
+			<div class="profile-header">
+				<h1>My Profile</h1>
+				<p>Manage your personal information and account settings</p>
+			</div>
+
+			<div class="profile-nav">
+				<button class="tab-button active">Profile Information</button>
+				<button class="tab-button">Account Settings</button>
+				<button class="tab-button">Notifications</button>
+			</div>
+
+			<div class="profile-content">
+				<form asp-action="UserProfileManagement" asp-controller="UserProfile" method="post" enctype="multipart/form-data">
+
+					<!-- Profile Picture Section -->
+					<div class="profile-picture-container">
+						<div class="profile-picture">
+							<img id="profilePreview" src="@Model.CurrentProfilePicPath" alt="Profile Picture" />
+							<div class="profile-picture-overlay">Change Photo</div>
+						</div>
+						<div class="file-input-container">
+							<label for="ProfilePicFile" class="file-input-label">Upload New Photo</label>
+							<input type="file" id="ProfilePicFile" accept="image/*" class="form-control-file" />
+						</div>
+					</div>
+					<!-- Read-Only Fields Section -->
+					<div class="form-section">
+						<h3 class="section-title">Account Information</h3>
+						<div class="form-row">
+							<div class="form-col form-col-6">
+								<div class="info-card">
+									<div class="info-card-title">Username</div>
+									<div class="info-card-value">@Model.Username</div>
+								</div>
+							</div>
+							<div class="form-col form-col-6">
+								<div class="info-card">
+									<div class="info-card-title">Role</div>
+									<div class="info-card-value">@Model.Role</div>
+								</div>
+							</div>
+						</div>
+						<div class="form-row">
+							<div class="form-col form-col-6">
+								<div class="info-card">
+									<div class="info-card-title">Department</div>
+									<div class="info-card-value">@Model.DepartmentName</div>
+								</div>
+							</div>
+							<div class="form-col form-col-6">
+								<div class="info-card">
+									<div class="info-card-title">Batch</div>
+									<div class="info-card-value">@Model.BatchName</div>
+								</div>
+							</div>
+						</div>
+						<div class="form-row">
+							<div class="form-col form-col-6">
+								<div class="info-card">
+									<div class="info-card-title">Roll Number</div>
+									<div class="info-card-value">@Model.RollNumber</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Editable Fields Section -->
+					<div class="form-section">
+						<h3 class="section-title">Personal Information</h3>
+
+						<div class="form-row">
+							<div class="form-col form-col-6">
+								<div class="form-group">
+									<label for="Name">First Name</label>
+									<input asp-for="Name" class="form-control" />
+								</div>
+							</div>
+							<div class="form-col form-col-6">
+								<div class="form-group">
+									<label for="LastName">Last Name</label>
+									<input asp-for="LastName" class="form-control" />
+								</div>
+							</div>
+						</div>
+
+						<div class="form-row">
+							<div class="form-col form-col-6">
+								<div class="form-group">
+									<label for="Email">Email Address</label>
+									<input asp-for="Email" class="form-control" type="email" />
+								</div>
+							</div>
+							<div class="form-col form-col-6">
+								<div class="form-group">
+									<label for="PhoneNumber">Phone Number</label>
+									<input asp-for="PhoneNumber" class="form-control" />
+								</div>
+							</div>
+						</div>
+
+						<div class="form-row">
+							<div class="form-col form-col-6">
+								<div class="form-group">
+									<label for="Gender">Gender</label>
+									<select asp-for="Gender" class="form-control">
+										<option value="">-- Select --</option>
+										<option>Male</option>
+										<option>Female</option>
+										<option>Other</option>
+									</select>
+								</div>
+							</div>
+							<div class="form-col form-col-6">
+								<div class="form-group">
+									<label for="Subject">Subject</label>
+									<input asp-for="Subject" class="form-control" />
+								</div>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label for="Bio">Bio</label>
+							<textarea asp-for="Bio" class="form-control" placeholder="Tell us about yourself..."></textarea>
+						</div>
+
+						<div class="form-group social-links-container">
+							<label for="SocialLinks">Social Links</label>
+							<input asp-for="SocialLinks" class="form-control" placeholder="https://linkedin.com/in/yourprofile, https://twitter.com/username" />
+							<span class="social-links-hint">Separate multiple links with commas</span>
+						</div>
+
+						<input type="hidden" asp-for="CurrentProfilePicPath" id="Base64ProfilePic" />
+					</div>
+					<div class="btn-group">
+						<button type="button" class="btn btn-secondary" id="resetBtn">Reset</button>
+						<button type="submit" class="btn btn-primary">Save Changes</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<script>
+	// Preview image before upload
+	document.getElementById("ProfilePicFile").addEventListener("change", function() {
+		const file = this.files[0];
+		const reader = new FileReader();
+
+		reader.onload = function(e) {
+			const base64 = e.target.result;
+			document.getElementById("Base64ProfilePic").value = base64;
+			document.getElementById("profilePreview").src = base64;
+		};
+
+		if (file) {
+			reader.readAsDataURL(file);
+		}
+	});
+
+	// Click on profile picture to trigger file input
+	document.querySelector(".profile-picture").addEventListener("click", function() {
+		document.getElementById("ProfilePicFile").click();
+	});
+
+	// Tab navigation functionality
+	const tabButtons = document.querySelectorAll(".tab-button");
+	tabButtons.forEach(button => {
+		button.addEventListener("click", function() {
+			tabButtons.forEach(btn => btn.classList.remove("active"));
+			this.classList.add("active");
+			// In a real implementation, you would show/hide different sections here
+		});
+	});
+
+	// Reset form button
+	document.getElementById("resetBtn").addEventListener("click", function(e) {
+		e.preventDefault();
+		if (confirm("Are you sure you want to reset all changes?")) {
+			window.location.reload();
+		}
+	});
+
+	// Form validation and submission animation
+	document.querySelector("form").addEventListener("submit", function(e) {
+		const requiredFields = this.querySelectorAll('input[required]');
+		let isValid = true;
+
+		requiredFields.forEach(field => {
+			if (!field.value.trim()) {
+				isValid = false;
+				field.classList.add('error');
+			} else {
+				field.classList.remove('error');
+			}
+		});
+
+		if (!isValid) {
+			e.preventDefault();
+			alert("Please fill in all required fields");
+		} else {
+			const submitBtn = this.querySelector('button[type="submit"]');
+			submitBtn.innerHTML = "Saving...";
+			submitBtn.disabled = true;
+			// Form will submit naturally
+		}
+	});
+
+	// Enhanced user experience - smooth scrolling
+	document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+		anchor.addEventListener('click', function(e) {
+			e.preventDefault();
+			document.querySelector(this.getAttribute('href')).scrollIntoView({
+				behavior: 'smooth'
+			});
+		});
+	});
+</script>

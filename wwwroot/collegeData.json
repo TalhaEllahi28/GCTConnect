@@ -1,0 +1,309 @@
+
+{
+  "basicInfo": {
+    "name": "Government Graduate College for Boys Township, Lahore",
+    "phone": "(042) 99262112",
+    "email": "gcbtownship@gmail.com",
+    "address": "Township, Lahore, Punjab, Pakistan",
+    "establishedYear": "1972",
+    "campusArea": "35 acres",
+    "totalStudents": "3500+",
+    "totalFaculty": "120+"
+  },
+  "principalMessage": {
+    "name": "Dr. Farooq Ahmad Gujar",
+    "title": "Principal",
+    "message": "I am honored to serve as the newly appointed Principal of Government Graduate College, Township, Lahore, by the Higher Education Department, Government of the Punjab. As we embark on this journey together, my paramount focus is to elevate academic standards and create a congenial environment to nurture intellectual growth for a comprehensive and enriching educational experience that prepares our students for future challenges. In addition to academic excellence, I am committed to fostering a culture of sports and healthy activities, as physical well-being and holistic development are vital for our youth. I invite all stakeholders to join hands in this endeavor for creating an environment where every student can flourish academically and lead a healthy, balanced lifestyle. I am excited about the possibilities that lie ahead and hereby reiterate my commitment to make Government Graduate College a center of academic brilliance and holistic development.",
+    "office": "Principal Office, Admin Block",
+    "officeHours": "Monday-Friday, 9:00 AM - 3:00 PM",
+    "achievements": [
+      "PhD in Educational Leadership",
+      "20+ years of academic experience",
+      "Published researcher in education management",
+      "Member of Punjab Higher Education Commission"
+    ]
+  },
+  "academicPrograms": {
+    "intermediate": [
+      "F.Sc. Pre-Medical",
+      "F.Sc. Pre-Engineering",
+      "ICS"
+    ],
+    "associate": [
+      "ADP Mass Communication"
+    ],
+    "bachelors": [
+      "BS IT",
+      "BS Botany",
+      "BS Chemistry",
+      "BS English"
+    ],
+    "shortCourses": "No admission right now. Keep visiting for updates",
+    "programDetails": {
+      "premedical": {
+        "duration": "2 years",
+        "seats": 200,
+        "eligibility": "Minimum 60% marks in Matric",
+        "subjects": ["Biology", "Chemistry", "Physics", "English", "Urdu"]
+      },
+      "preengineering": {
+        "duration": "2 years",
+        "seats": 180,
+        "eligibility": "Minimum 60% marks in Matric",
+        "subjects": ["Mathematics", "Chemistry", "Physics", "English", "Urdu"]
+      },
+      "bsit": {
+        "duration": "4 years",
+        "creditHours": 136,
+        "seats": 100,
+        "eligibility": "Minimum 50% marks in FSc/ICS"
+      }
+    }
+  },
+  "features": [
+    {
+      "title": "Scholarships",
+      "description": "Scholarships of the Government, Board, University and Local Bodies will be available in college.",
+      "types": [
+        "HEC Need-Based Scholarship",
+        "Punjab Educational Endowment Fund",
+        "Chief Minister Merit Scholarship",
+        "Ehsaas Undergraduate Scholarship"
+      ],
+      "coverage": "Tuition fee, Books allowance, Monthly stipend"
+    },
+    {
+      "title": "Faculty",
+      "description": "About one fourth of the highly qualified, competent faculty members are either Ph.D or M.Phil.",
+      "statistics": {
+        "phd": 25,
+        "mphil": 45,
+        "masters": 50
+      }
+    },
+    {
+      "title": "Equipped Labs",
+      "description": "Our laboratories and library are adequately equipped to cater the needs of the students.",
+      "facilities": [
+        "Advanced Computer Labs",
+        "Chemistry Research Lab",
+        "Physics Lab",
+        "Biology Lab",
+        "Language Lab"
+      ]
+    }
+  ],
+  "recentEvents": [
+    "HED Kabaddi Match",
+    "Breast Cancer Walk",
+    "Seed Farming by Botany",
+    "Girls Volleyball Match",
+    "Mohtasib Punjab Visit"
+  ],
+  "announcements": [
+    "CTI's Interview Schedule 2024",
+    "Punjab Govt Education Notice Board",
+    "My Punjab Smog Free Campaign"
+  ],
+  "departmentInfo": {
+    "IT": {
+      "courses": [
+        "Introduction to Programming",
+        "Database Systems",
+        "Web Development",
+        "Data Structures",
+        "Software Engineering",
+        "Computer Networks",
+        "Operating Systems",
+        "Mobile App Development"
+      ],
+      "faculty": [
+        "Dr. Ahmed Khan",
+        "Ms. Ayesha Ali",
+        "Mr. Bilal Ahmed",
+        "Dr. Saad Malik",
+        "Ms. Sana Javaid"
+      ],
+      "facilities": [
+        "Computer Lab 1",
+        "Computer Lab 2",
+        "Digital Library",
+        "Project Lab",
+        "Networking Lab"
+      ],
+      "projects": [
+        "Smart Campus Management System",
+        "IoT-based Smart Agriculture",
+        "Mobile Learning Platform"
+      ]
+    },
+    "Botany": {
+      "courses": [
+        "Plant Biology",
+        "Ecology",
+        "Taxonomy",
+        "Plant Physiology",
+        "Microbiology",
+        "Genetics"
+      ],
+      "faculty": [
+        "Dr. Fatima Zahra",
+        "Dr. Hamid Mehmood",
+        "Ms. Sarah Malik",
+        "Dr. Asif Khan",
+        "Ms. Rabia Nawaz"
+      ],
+      "facilities": [
+        "Botanical Garden",
+        "Research Lab",
+        "Herbarium",
+        "Greenhouse",
+        "Tissue Culture Lab"
+      ],
+      "research": [
+        "Plant Conservation",
+        "Medicinal Plants Study",
+        "Urban Ecology"
+      ]
+    },
+    "Chemistry": {
+      "courses": [
+        "Organic Chemistry",
+        "Inorganic Chemistry",
+        "Physical Chemistry",
+        "Analytical Chemistry",
+        "Biochemistry",
+        "Industrial Chemistry"
+      ],
+      "faculty": [
+        "Prof. Rashid Ali",
+        "Dr. Nadia Hassan",
+        "Dr. Yasir Mahmood",
+        "Dr. Shahid Malik",
+        "Ms. Amna Khalid"
+      ],
+      "facilities": [
+        "Chemistry Lab 1",
+        "Chemistry Lab 2",
+        "Analytical Lab",
+        "Instrumental Analysis Lab",
+        "Research Lab"
+      ]
+    },
+    "English": {
+      "courses": [
+        "English Literature",
+        "Communication Skills",
+        "Creative Writing",
+        "Linguistics",
+        "English for Academic Purposes",
+        "Business Communication"
+      ],
+      "faculty": [
+        "Prof. Zainab Khalid",
+        "Dr. Omar Farooq",
+        "Ms. Hina Siddiqui",
+        "Dr. Asad Ali",
+        "Ms. Fatima Hassan"
+      ],
+      "facilities": [
+        "Language Lab",
+        "Library Section",
+        "Drama Studio",
+        "Multimedia Room",
+        "Discussion Room"
+      ],
+      "activities": [
+        "Literary Society",
+        "Debating Club",
+        "Annual Literary Festival"
+      ]
+    }
+  },
+  "admissionInfo": {
+    "process": "Applications are submitted online through the college portal or in person at the admissions office.",
+    "requirements": [
+      "Completed application form",
+      "Previous academic records",
+      "Entrance test results",
+      "Interview (for selected programs)",
+      "ID card copy",
+      "Photographs",
+      "Character certificate from previous institution",
+      "Medical fitness certificate"
+    ],
+    "fees": {
+      "intermediate": "As per government policy",
+      "bachelors": "Varies by program, please contact admissions office",
+      "semester": {
+        "bsPrograms": "Rs. 25,000 - 35,000",
+        "adPrograms": "Rs. 20,000 - 25,000",
+        "intermediate": "Rs. 15,000 - 20,000"
+      }
+    },
+    "deadlines": {
+      "fallSemester": "August 15th",
+      "springSemester": "January 15th"
+    },
+    "contact": {
+      "email": "admissions@gctownship.edu.pk",
+      "phone": "(042) 99262112 Ext. 123",
+      "whatsapp": "+92-300-1234567",
+      "timing": "Monday to Friday, 9:00 AM to 2:00 PM"
+    }
+  },
+  "facilities": {
+    "library": {
+      "name": "Central Library",
+      "books": "50,000+",
+      "journals": "100+",
+      "timings": "8:00 AM - 4:00 PM",
+      "facilities": [
+        "Digital Catalog",
+        "Reading Halls",
+        "Research Sections",
+        "Online Journals Access"
+      ]
+    },
+    "sports": {
+      "indoor": [
+        "Table Tennis",
+        "Badminton",
+        "Chess",
+        "Gymnasium"
+      ],
+      "outdoor": [
+        "Cricket Ground",
+        "Football Field",
+        "Basketball Court",
+        "Tennis Court"
+      ],
+      "achievements": [
+        "Inter-College Cricket Champions 2023",
+        "District Level Football Runners-up",
+        "Provincial Table Tennis Winners"
+      ]
+    },
+    "cafeteria": {
+      "seating": "200 persons",
+      "timings": "8:00 AM - 3:00 PM",
+      "menu": [
+        "Pakistani Cuisine",
+        "Fast Food",
+        "Beverages",
+        "Snacks"
+      ]
+    },
+    "transport": {
+      "routes": 5,
+      "buses": 8,
+      "areas": [
+        "Johar Town",
+        "Iqbal Town",
+        "Gulberg",
+        "DHA",
+        "Bahria Town"
+      ]
+    }
+  }
+}

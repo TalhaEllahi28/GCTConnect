@@ -15,15 +15,13 @@ public partial class Group
 
     public int? DepartmentId { get; set; }
 
-    public bool? IsPrivate { get; set; }
-
     public DateTime? CreatedAt { get; set; }
+
+    public int? CourseId { get; set; }
 
     public virtual User CreatedByNavigation { get; set; } = null!;
 
     public virtual Department? Department { get; set; }
-
-    public virtual ICollection<File> Files { get; set; } = new List<File>();
 
     public virtual ICollection<GroupMember> GroupMembers { get; set; } = new List<GroupMember>();
 

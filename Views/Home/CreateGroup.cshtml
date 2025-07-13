@@ -61,7 +61,9 @@
 
         <div class="mb-3">
             <label for="Subject" class="form-label">Subject</label>
-            <input list="subject-list" id="Subject" class="form-control" placeholder="Enter or select a subject" disabled />
+            <select id="Subject" name="Subject" class="form-select" disabled>
+                <option value="" disabled selected>--Select Course--</option>
+            </select>
             <datalist id="subject-list"></datalist>
         </div>
 
@@ -106,6 +108,38 @@
                 .catch(error => console.error('Error fetching teachers and subjects:', error));
         });
 
+
+        document.getElementById('studentDepartmentId').addEventListener('change', function () {
+            const deptId = this.value;
+            const courseSelect = document.getElementById('Subject');
+            courseSelect.innerHTML = ''; // Clear previous options
+            courseSelect.disabled = false;
+            if (!deptId) return;
+
+            fetch(`/api/GetCourses?departmentId=${deptId}`)
+                .then(response => {
+                    if (!response.ok) throw new Error("Network error");
+                    return response.json();
+                })
+                .then(data => {
+                    courseSelect.innerHTML = '<option value="">Select Course</option>';
+                    data.forEach(course => {
+                        const option = document.createElement('option');
+                        option.value = course.id;
+                        option.textContent = course.name;
+                        courseSelect.appendChild(option);
+                    });
+                    courseSelect.disabled = false;
+                })
+                .catch(error => {
+                    console.error("Error fetching courses:", error);
+                });
+        });
+
+
+
+
+
         function submitForm() {
             const batchId = document.getElementById("BatchId").value;
             console.log("batchId: ", batchId);
@@ -136,7 +170,7 @@
                     TeacherDepartmentId: teacherDeptId,
                     StudentDepartmentId: studentDeptId,
                     TeacherId: teacherId,
-                    Subject: subject
+                    SubjectId: subject
                 }),
                 success: function (response) {
                     if (response.success) {

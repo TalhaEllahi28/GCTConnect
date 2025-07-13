@@ -79,7 +79,6 @@ public class AdminController : Controller
                 Description = $"A group only for students batch: {newBatch} & department: {department.Name}",
                 CreatedBy = currentUser.UserId,
                 DepartmentId = department.DepartmentId,
-                IsPrivate = false,
                 CreatedAt = DateTime.UtcNow
             };
             GCTConnect.Models.Group studentsTeachersHodGroup = new GCTConnect.Models.Group
@@ -88,7 +87,6 @@ public class AdminController : Controller
                 Description = $"A group only for students, teachers, and Hod of batch: {newBatch} & department: {department.Name}",
                 CreatedBy = currentUser.UserId,
                 DepartmentId = department.DepartmentId,
-                IsPrivate = false,
                 CreatedAt = DateTime.UtcNow
             };
             _context.Groups.AddRange(studentsOnlyGroup, studentsTeachersHodGroup);

@@ -1,0 +1,49 @@
+﻿@{
+    ViewData["Title"] = "College Chatbot";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Chatbot</title>
+    <link rel="stylesheet" href="~/css/chatbot.css">
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <div class="header-content">
+                <svg class="bot-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z"></path>
+                    <path d="M7 7h.01"></path>
+                </svg>
+                <div>
+                    <h1>College Hive</h1>
+                    <p>Your College AI Assistant</p>
+                </div>
+            </div>
+        </div>
+        <div class="messages-container" id="messages">
+            <div class="message bot-message">
+                <div class="message-content">
+                    <p>Hello! I'm College Hive, your AI assistant for Government Graduate College for Boys Township. Ask me anything about our college!</p>
+                </div>
+            </div>
+        </div>
+        <div class="input-container">
+            <form id="chat-form">
+                <input type="text" id="user-input" placeholder="Ask about your college..." />
+                <button type="submit" id="send-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m22 2-7 20-4-9-9-4Z"></path>
+                        <path d="m22 2-7 20-4-9-9-4Z"></path>
+                    </svg>
+                </button>
+            </form>
+        </div>
+    </div>
+    <script src="~/js/chatbot.js"></script>
+</body>
+</html>

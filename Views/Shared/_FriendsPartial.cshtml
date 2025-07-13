@@ -1,0 +1,88 @@
+﻿@model IEnumerable<dynamic>
+@{
+	Layout = null;
+}
+<style>
+	.conversation-item {
+		margin: 5px;
+	}
+
+	img {
+		width: 42px;
+		height: 42px;
+		object-fit: cover;
+	}
+
+
+	/* Group List Styling */
+	.group-container {
+		height: 100%;
+		overflow: hidden;
+		background-color: transparent;
+	}
+
+	.group-list {
+		height: 100%;
+		overflow-y: auto;
+		padding: 10px 0;
+		scrollbar-width: thin;
+		scrollbar-color: #9b87f5 rgba(155, 135, 245, 0.1);
+	}
+
+		.group-list::-webkit-scrollbar {
+			width: 6px;
+		}
+
+		.group-list::-webkit-scrollbar-track {
+			background: rgba(155, 135, 245, 0.1);
+		}
+
+		.group-list::-webkit-scrollbar-thumb {
+			background-color: #9b87f5;
+		}
+
+	.conversation-item.active .conversation-name,
+	.conversation-item.active .conversation-time,
+	.conversation-item.active .conversation-last-message {
+		color: white !important;
+	}
+
+</style>
+
+<div class="group-container">
+
+	<div class="group-list">
+		<ul id="friends-ul">
+		</ul>
+	</div>
+</div>
+
+<script src="~/js/GetGroupsAndMessages.js"></script>
+<script>
+
+	// document.addeventlistener("domcontentloaded", function () {
+	//     // ensure the script runs after the dom is fully loaded
+
+	//     // correct audio file path
+	//     const hoversound = new audio('/sounds/pop-1-35897.mp3'); // update the correct file path
+
+	//     // use event delegation for dynamically loaded elements
+	//     document.getelementbyid("friends-ul").addeventlistener("mouseover", function (event) {
+	//         if (event.target.classlist.contains("group-item")) {
+	//             hoversound.play();
+	//         }
+	//     });
+	// });
+
+	function filterGroups() {
+		var input = document.getElementById("group-search");
+		var filter = input.value.toLowerCase();
+		var ul = document.getElementById("friends-ul");
+		var li = ul.getElementsByTagName("li");
+		for (var i = 0; i < li.length; i++) {
+			var btn = li[i].getElementsByTagName("button")[0];
+			var txtValue = btn.textContent || btn.innerText;
+			li[i].style.display = txtValue.toLowerCase().indexOf(filter) > -1 ? "" : "none";
+		}
+	}
+</script>

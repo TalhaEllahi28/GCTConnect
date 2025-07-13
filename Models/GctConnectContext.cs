@@ -21,9 +21,13 @@ public partial class GctConnectContext : DbContext
 
     public virtual DbSet<ChatbotQuery> ChatbotQueries { get; set; }
 
+    public virtual DbSet<Course> Courses { get; set; }
+
     public virtual DbSet<Department> Departments { get; set; }
 
     public virtual DbSet<File> Files { get; set; }
+
+    public virtual DbSet<Friend> Friends { get; set; }
 
     public virtual DbSet<Group> Groups { get; set; }
 
@@ -35,9 +39,6 @@ public partial class GctConnectContext : DbContext
 
     public virtual DbSet<UserProfile> UserProfiles { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=DESKTOP-1VNNIKF;Database=GCT Connect;Trusted_Connection=True; TrustServerCertificate=True");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -98,6 +99,28 @@ public partial class GctConnectContext : DbContext
                 .HasConstraintName("FK_QueryUser");
         });
 
+        modelBuilder.Entity<Course>(entity =>
+        {
+            entity.HasKey(e => e.CourseId).HasName("PK__Course__2AA84FD19E9B3AED");
+
+            entity.ToTable("Course");
+
+            entity.Property(e => e.CourseId).HasColumnName("courseId");
+            entity.Property(e => e.CourseCode)
+                .HasMaxLength(50)
+                .HasColumnName("courseCode");
+            entity.Property(e => e.CourseName)
+                .HasMaxLength(255)
+                .HasColumnName("courseName");
+            entity.Property(e => e.DepartmentId).HasColumnName("departmentId");
+            entity.Property(e => e.FileId).HasColumnName("fileId");
+
+            entity.HasOne(d => d.Department).WithMany(p => p.Courses)
+                .HasForeignKey(d => d.DepartmentId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_CourseDepartment");
+        });
+
         modelBuilder.Entity<Department>(entity =>
         {
             entity.HasKey(e => e.DepartmentId).HasName("PK__Departme__C223242258F5AE52");
@@ -115,34 +138,43 @@ public partial class GctConnectContext : DbContext
 
         modelBuilder.Entity<File>(entity =>
         {
-            entity.HasKey(e => e.FileId).HasName("PK__Files__07D884C61A79B769");
+            entity.HasKey(e => e.FileId).HasName("PK__File__6F0F98BF4C9CBD18");
 
-            entity.Property(e => e.FileId).HasColumnName("file_id");
-            entity.Property(e => e.FileName)
-                .HasMaxLength(255)
-                .HasColumnName("file_name");
-            entity.Property(e => e.FilePath)
-                .HasMaxLength(255)
-                .HasColumnName("file_path");
-            entity.Property(e => e.FileType)
-                .HasMaxLength(50)
-                .HasColumnName("file_type");
-            entity.Property(e => e.GroupId).HasColumnName("group_id");
-            entity.Property(e => e.SenderId).HasColumnName("sender_id");
-            entity.Property(e => e.UploadedAt)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime")
-                .HasColumnName("uploaded_at");
+            entity.ToTable("File");
 
-            entity.HasOne(d => d.Group).WithMany(p => p.Files)
-                .HasForeignKey(d => d.GroupId)
+            entity.Property(e => e.FileName).HasMaxLength(255);
+            entity.Property(e => e.FileType).HasMaxLength(100);
+            entity.Property(e => e.FileUrl).HasMaxLength(500);
+            entity.Property(e => e.UploadedAt).HasColumnType("datetime");
+
+            entity.HasOne(d => d.Course).WithMany(p => p.Files)
+                .HasForeignKey(d => d.CourseId)
+                .HasConstraintName("FK_File_Course");
+
+            entity.HasOne(d => d.Uploader).WithMany(p => p.Files)
+                .HasForeignKey(d => d.UploaderId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_FileGroup");
+                .HasConstraintName("FK_File_User");
+        });
 
-            entity.HasOne(d => d.Sender).WithMany(p => p.Files)
+        modelBuilder.Entity<Friend>(entity =>
+        {
+            entity.HasKey(e => e.FriendRequestId).HasName("PK__Friends__0CCD2A79A1FF8637");
+
+            entity.Property(e => e.SentDate)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Status).HasMaxLength(20);
+
+            entity.HasOne(d => d.Receiver).WithMany(p => p.FriendReceivers)
+                .HasForeignKey(d => d.ReceiverId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Friends_Receiver");
+
+            entity.HasOne(d => d.Sender).WithMany(p => p.FriendSenders)
                 .HasForeignKey(d => d.SenderId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_FileSender");
+                .HasConstraintName("FK_Friends_Sender");
         });
 
         modelBuilder.Entity<Group>(entity =>
@@ -150,6 +182,7 @@ public partial class GctConnectContext : DbContext
             entity.HasKey(e => e.GroupId).HasName("PK__Groups__D57795A035C1DB83");
 
             entity.Property(e => e.GroupId).HasColumnName("group_id");
+            entity.Property(e => e.CourseId).HasColumnName("course_id");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime")
@@ -160,9 +193,6 @@ public partial class GctConnectContext : DbContext
             entity.Property(e => e.GroupName)
                 .HasMaxLength(255)
                 .HasColumnName("group_name");
-            entity.Property(e => e.IsPrivate)
-                .HasDefaultValue(true)
-                .HasColumnName("is_private");
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.Groups)
                 .HasForeignKey(d => d.CreatedBy)
@@ -202,12 +232,12 @@ public partial class GctConnectContext : DbContext
 
         modelBuilder.Entity<Message>(entity =>
         {
-            entity.HasKey(e => e.MessageId).HasName("PK__Messages__0BBF6EE673D7BE26");
+            entity.HasKey(e => e.MessageId).HasName("PK__Messages__0BBF6EE6B8835E67");
 
             entity.Property(e => e.MessageId).HasColumnName("message_id");
             entity.Property(e => e.Content).HasColumnName("content");
             entity.Property(e => e.GroupId).HasColumnName("group_id");
-            entity.Property(e => e.IsCurrentUser).HasDefaultValue(false);
+            entity.Property(e => e.ReceiverId).HasColumnName("receiver_id");
             entity.Property(e => e.SenderId).HasColumnName("sender_id");
             entity.Property(e => e.Timestamp)
                 .HasDefaultValueSql("(getdate())")
@@ -216,7 +246,6 @@ public partial class GctConnectContext : DbContext
 
             entity.HasOne(d => d.Group).WithMany(p => p.Messages)
                 .HasForeignKey(d => d.GroupId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_MessageGroup");
 
             entity.HasOne(d => d.Sender).WithMany(p => p.Messages)
@@ -256,9 +285,7 @@ public partial class GctConnectContext : DbContext
             entity.Property(e => e.PhoneNumber)
                 .HasMaxLength(15)
                 .HasColumnName("phone_number");
-            entity.Property(e => e.ProfilePic)
-                .HasMaxLength(255)
-                .HasColumnName("profile_pic");
+            entity.Property(e => e.ProfilePic).HasColumnName("profile_pic");
             entity.Property(e => e.Role)
                 .HasMaxLength(50)
                 .HasColumnName("role");
@@ -266,7 +293,8 @@ public partial class GctConnectContext : DbContext
                 .HasMaxLength(50)
                 .HasColumnName("roll_number");
             entity.Property(e => e.Subject)
-                .HasMaxLength(255)
+                .HasMaxLength(50)
+                .IsUnicode(false)
                 .HasColumnName("subject");
             entity.Property(e => e.Username)
                 .HasMaxLength(255)

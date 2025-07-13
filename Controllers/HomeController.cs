@@ -12,6 +12,7 @@ using System.Text;
 using GCTConnect.Services;
 using System.Linq;
 using GCTConnect.Models.ViewModels;
+using Microsoft.AspNetCore.Identity;
 
 
 namespace GCTConnect.Controllers
@@ -34,6 +35,18 @@ namespace GCTConnect.Controllers
 
 
 
+
+
+
+
+
+        [HttpGet]
+        public IActionResult ChatbotView()
+        {
+
+            return View();
+        }
+
         [HttpGet("api/teachers-and-subjects")]
         public IActionResult GetTeachersAndSubjects(int departmentId)
         {
@@ -49,6 +62,19 @@ namespace GCTConnect.Controllers
                 .ToList();
 
             return Json(new { teachers, subjects });
+        }
+
+
+        [HttpGet("api/GetCourses")]
+        public JsonResult GetCourses(int departmentId)
+        {
+            var courses = _context.Courses
+                .Where(c => c.DepartmentId == departmentId)
+                .Select(c => new {
+                    id = c.CourseId,
+                    name = c.CourseName
+                }).ToList();
+            return Json(courses);
         }
 
 
@@ -86,19 +112,20 @@ namespace GCTConnect.Controllers
             {
                 int batch = _context.Batches.FirstOrDefault(b => b.BatchId == newGroup.BatchId).BatchYear;
                 string department = _context.Departments.FirstOrDefault(d => d.DepartmentId == newGroup.StudentDepartmentId).Name;
+                string subjectName = _context.Courses.FirstOrDefault(c => c.CourseId == newGroup.SubjectId).CourseName;
                 Group group = new Group
                 {
                     CreatedBy = currentUser.UserId,
-                    IsPrivate = false,
-                    GroupName = $"{batch}_{department}_{newGroup.Subject}",
+                    GroupName = $"{batch}_{department}_{subjectName}",
+                    CourseId = newGroup.SubjectId,
                     CreatedAt = DateTime.UtcNow
                 };
 
-                _context.Groups.Add(group); 
+                _context.Groups.Add(group);
                 _context.SaveChanges();
-                
 
-                List<User> user = _context.Users.Where(u => u.BatchId==newGroup.BatchId && u.DepartmentId == newGroup.StudentDepartmentId).ToList();
+
+                List<User> user = _context.Users.Where(u => u.BatchId == newGroup.BatchId && u.DepartmentId == newGroup.StudentDepartmentId).ToList();
                 var Teacher = _context.Users.Where(u => u.UserId == newGroup.TeacherId && u.DepartmentId == newGroup.TeacherDepartmentId).FirstOrDefault();
 
                 foreach (var item in user)
@@ -208,7 +235,8 @@ namespace GCTConnect.Controllers
                 Email = newUser.Email,
                 Gender = newUser.Gender,
                 CreatedAt = DateTime.UtcNow,
-                Password = GenerateComplexRandomPassword(8)
+                Password = GenerateComplexRandomPassword(8),
+                ProfilePic = "https://thumbs.dreamstime.com/b/default-avatar-profile-icon-vector-social-media-user-image-182145777.jpg"
             };
 
             if (newUser.PhoneNumber != null)

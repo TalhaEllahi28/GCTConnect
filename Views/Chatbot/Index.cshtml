@@ -1,0 +1,63 @@
+﻿@{
+    ViewData["Title"] = "College Chatbot";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>College Chatbot</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        #chatWindow {
+            border: 1px solid #ccc;
+            height: 300px;
+            overflow-y: scroll;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .message {
+            margin-bottom: 10px;
+        }
+
+        .user {
+            color: blue;
+        }
+
+        .bot {
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <h2>College Chatbot</h2>
+    <div id="chatWindow"></div>
+    <input type="text" id="userQuery" placeholder="Type your question here" style="width:80%;" />
+    <button id="sendBtn">Send</button>
+
+    <script>
+        $(document).ready(function () {
+            $("#sendBtn").click(function () {
+                var query = $("#userQuery").val().trim();
+                if (query === "") return;
+
+                // Append user's query
+                $("#chatWindow").append("<div class='message user'><strong>You:</strong> " + query + "</div>");
+
+                // Send query to the backend
+                $.post('/Chat/GetResponse', { userQuery: query }, function (data) {
+                    $("#chatWindow").append("<div class='message bot'><strong>Bot:</strong> " + data.response + "</div>");
+                    $("#userQuery").val("");
+                    // Auto scroll to the bottom
+                    $("#chatWindow").scrollTop($("#chatWindow")[0].scrollHeight);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

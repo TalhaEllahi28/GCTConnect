@@ -134,13 +134,26 @@ CREATE TABLE Group_Members (
 -- Messages Table: Stores messages sent within groups (text).
 CREATE TABLE Messages (
     message_id INT IDENTITY(1,1) PRIMARY KEY,
-    group_id INT NOT NULL,
+    group_id INT NULL,
     sender_id INT NOT NULL,
+    receiver_id INT NULL,
     content NVARCHAR(MAX) NOT NULL,
     timestamp DATETIME DEFAULT GETDATE(),
+    FileUrl NVARCHAR(MAX) NULL,
+    FileType NVARCHAR(MAX) NULL,
+    FileName NVARCHAR(MAX) NULL,
+    AudioUrl NVARCHAR(MAX) NULL;
+
+
+CONSTRAINT CK_Message_GroupOrReceiver
+CHECK (
+    (Group_ID = 0 AND Receiver_ID <> 0) OR
+    (Group_ID <> 0 AND Receiver_ID = 0)
+),
     CONSTRAINT FK_MessageGroup FOREIGN KEY (group_id) REFERENCES Groups(group_id),
     CONSTRAINT FK_MessageSender FOREIGN KEY (sender_id) REFERENCES Users(user_id)
 );
+
 
 -- Files Table: Stores file uploads (PDF, PPT, etc.)
 CREATE TABLE Files (
@@ -182,4 +195,16 @@ CREATE TABLE Chatbot_Queries (
     response NVARCHAR(MAX),
     timestamp DATETIME DEFAULT GETDATE(),
     CONSTRAINT FK_QueryUser FOREIGN KEY (user_id) REFERENCES Users(user_id)
+);
+
+
+CREATE TABLE Friends (
+    FriendRequestId INT PRIMARY KEY IDENTITY(1,1),
+    SenderId NVARCHAR(450) NOT NULL,
+    ReceiverId NVARCHAR(450) NOT NULL,
+    Status NVARCHAR(20) NOT NULL CHECK (Status IN ('Waiting', 'Accepted', 'Rejected')),
+    SentDate DATETIME NOT NULL DEFAULT GETDATE(),
+
+    CONSTRAINT FK_Friends_Sender FOREIGN KEY (SenderId) REFERENCES Users(user_Id),
+    CONSTRAINT FK_Friends_Receiver FOREIGN KEY (ReceiverId) REFERENCES Users(user_Id)
 );

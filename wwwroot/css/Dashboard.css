@@ -3,13 +3,14 @@ body {
     margin: 0;
     padding: 0;
     height: 100%;
+    background-color: #0f1117;
 }
 /* Grid container spanning full viewport height with four columns:
-                                                       1. Vertical Nav Bar
-                                                       2. Groups
-                                                       3. Chat Window
-                                                       4. AI Chatbot
-                                                    */
+                                                                                           1. Vertical Nav Bar
+                                                                                           2. Groups
+                                                                                           3. Chat Window
+                                                                                           4. AI Chatbot
+                                                                                        */
 .grid-container {
     display: grid;
     grid-template-columns: 60px 1fr 1.7fr 1fr;
@@ -18,12 +19,12 @@ body {
 /* Styling for each grid item */
 .grid-item {
     box-sizing: border-box;
-    border: 1px solid #ccc; /* For visual separation */
-    overflow-y: auto;
+    /*         border: 1px solid #ccc; /* For visual separation */
+    */ overflow-y: auto;
 }
 /* Vertical Navigation Bar */
 .nav-bar {
-    background-color: #6D5AE6;
+    background-color: #0f1117;
     color: #fff;
     display: flex;
     flex-direction: column;
@@ -32,16 +33,71 @@ body {
     padding: 10px 0;
 }
 
-.nav-item {
+.nav-items {
+    list-style: none;
     margin: 15px 0;
     font-size: 20px;
     cursor: pointer;
-    transition: transform 0.3s;
+    color: #666;
+    transition: .5s;
+    line-height: 63px;
+    background: #333;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    position: relative;
+    display: block;
 }
 
-    .nav-item:hover {
-        transform: scale(1.1);
+    .nav-items::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: #007bff;
+        transition: .5s;
+        transform: scale(.9);
+        z-index: -1;
     }
+
+
+    .nav-items:hover {
+        color: #007bff;
+        box-shadow: 0 0 40px #007bff;
+        text-shadow: 0 0 5px #007bff;
+    }
+
+.nav-item {
+    font-size: 20px;
+    cursor: pointer;
+}
+
+svg#nav-item-1 {
+    margin-left: 3px;
+    margin-top: 2px;
+}
+
+svg#nav-item-3 {
+    margin-left: 3px;
+    margin-top: 2px;
+}
+
+svg#nav-item-4 {
+    margin-left: 4px;
+    margin-top: 3px;
+}
+
+svg#nav-item-2 {
+    margin-left: 3px;
+    margin-top: 3px;
+}
+
+.nav-item:hover {
+    transform: scale(1.1);
+}
 
 h2 {
     text-align: center;
@@ -67,6 +123,7 @@ h2 {
     display: flex;
     flex-direction: column;
     height: 100%;
+    background-color: #1f1f1e;
 }
 
 .group-header {
@@ -114,166 +171,24 @@ h2 {
 }
 
     .group-item:hover {
-        background: #e6e6e6;
+        background: #007bff;
         border-color: black;
         transform: scale(1.05);
+        box-shadow: 0 0 15px #007bff;
+        text-shadow: 0 0 5px #007bff;
     }
 
+    /*Chat bot partial view styling */
 
 
-
-
-
-
-
-
-
-
-
-
-
-/* Import Google Font */
-/*@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Poppins', sans-serif;
-}*/
-
-/* Background Animation */
-/*body {
-    height: 100vh;
-    background: linear-gradient(-45deg, #002147, #000000, #007bff);
-    background-size: 400% 400%;
-    animation: gradientMove 8s infinite alternate ease-in-out;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}*/
-
-/* Background Animation Keyframes */
-/*@keyframes gradientMove {
-    0% {
-        background-position: 0% 50%;
-    }
-
-    100% {
-        background-position: 100% 50%;
-    }
-}*/
-
-/* Grid Container */
-/*.grid-container {
-    display: grid;
-    grid-template-columns: 60px 1fr 1.7fr 1fr;
-    height: 100%;
-}*/
-
-/* Grid Items */
-/*.grid-item {
-    box-sizing: border-box;
-    overflow-y: auto;
-    padding: 15px;
-}*/
-
-    /* Scrollbar Hide */
-    /*.grid-item::-webkit-scrollbar {
+/* Responsive Layout */
+@media (max-width: 940px) {
+    /* Hide the AI Chatbot partial view */
+    #ai-chatbot {
         display: none;
-    }*/
-
-/* Sidebar Navigation */
-/*.nav-bar {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 15px 0;
-    box-shadow: 0px 4px 15px rgba(255, 255, 255, 0.2);
-}*/
-
-/* Navigation Icons */
-/*.nav-item {
-    color: white;
-    font-size: 22px;
-    cursor: pointer;
-    margin: 20px 0;
-    transition: transform 0.3s, color 0.3s;
-}
-
-    .nav-item:hover {
-        transform: scale(1.2);
-        color: #00c3ff;
-    }*/
-
-/* Group Section */
-/*#group-names {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    color: white;
-    border-radius: 10px;
-    padding: 20px;
-}*/
-
-/* Group Header */
-/*.group-header {
-    font-size: 18px;
-    font-weight: 600;
-    text-align: center;
-    color: white;
-    margin-bottom: 10px;
-}*/
-
-/* Group List */
-/*.group-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-}*/
-
-/* Group Items */
-/*.group-item {
-    flex: 1 1 calc(50% - 10px);
-    background: rgba(255, 255, 255, 0.1);
-    padding: 12px;
-    border-radius: 6px;
-    text-align: center;
-    color: white;
-    cursor: pointer;
-    transition: transform 0.3s, background-color 0.3s, border-color 0.3s;
-}
-
-    .group-item:hover {
-        background: rgba(0, 195, 255, 0.2);
-        border-color: white;
-        transform: scale(1.05);
-    }*/
-
-/* Chat Window */
-/*#chat-window {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    border-radius: 10px;
-    padding: 20px;
-    color: white;
-}*/
-
-/* AI Chatbot Section */
-/*#ai-chatbot {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    border-radius: 10px;
-    padding: 20px;
-    color: white;
-    text-align: center;
-}*/
-
-/* Responsive Design */
-/*@media (max-width: 768px) {
-    .grid-container {
-        grid-template-columns: 1fr;
-        grid-template-rows: 60px 1fr 1fr 1fr;
     }
-}*/
+    /* Adjust the grid to remove the chatbot column and let the chat window expand */
+    .grid-container {
+        grid-template-columns: 60px 1fr 2.7fr;
+    }
+}

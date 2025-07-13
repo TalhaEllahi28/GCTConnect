@@ -1,0 +1,50 @@
+[
+  {
+    "ContainingType": "CollegeChatbot.Controllers.ChatbotController",
+    "Method": "Ask",
+    "RelativePath": "api/Chatbot/ask",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "query",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GCTConnect.Controllers.HomeController",
+    "Method": "GetCourses",
+    "RelativePath": "api/GetCourses",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "departmentId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GCTConnect.Controllers.HomeController",
+    "Method": "GetTeachersAndSubjects",
+    "RelativePath": "api/teachers-and-subjects",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "departmentId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  }
+]

@@ -19,6 +19,11 @@ namespace GCTConnect.Controllers
         }
         public IActionResult Dashboard()
         {
+            var user=_userService.GetCurrentUser();
+            ViewData["CurrentUserRole"]= user.Role;
+            ViewBag.ProfilePic = user.ProfilePic;
+
+
             return View();
         }
         public IActionResult Index()

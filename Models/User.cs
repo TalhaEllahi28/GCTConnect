@@ -17,8 +17,6 @@ public partial class User
 
     public int? BatchId { get; set; }
 
-    public string? ProfilePic { get; set; }
-
     public string Email { get; set; } = null!;
 
     public string? PhoneNumber { get; set; }
@@ -35,11 +33,17 @@ public partial class User
 
     public string? Subject { get; set; }
 
+    public string? ProfilePic { get; set; }
+
     public virtual ICollection<ChatbotQuery> ChatbotQueries { get; set; } = new List<ChatbotQuery>();
 
     public virtual ICollection<Department> Departments { get; set; } = new List<Department>();
 
     public virtual ICollection<File> Files { get; set; } = new List<File>();
+
+    public virtual ICollection<Friend> FriendReceivers { get; set; } = new List<Friend>();
+
+    public virtual ICollection<Friend> FriendSenders { get; set; } = new List<Friend>();
 
     public virtual ICollection<GroupMember> GroupMembers { get; set; } = new List<GroupMember>();
 
