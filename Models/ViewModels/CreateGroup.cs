@@ -3,6 +3,7 @@
     public class CreateGroup
     {
         public int BatchId { get; set; }
+        public int BatchYear { get; set; }
         public int StudentDepartmentId { get; set; }
         public int TeacherDepartmentId { get; set; }
         public int SubjectId { get; set; }

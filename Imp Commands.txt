@@ -8,6 +8,21 @@ Scaffold-DbContext "Server=DESKTOP-1VNNIKF;Database=GCT Connect;Trusted_Connecti
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("gtconnectdbcs")));
 
+  Gemini Key:  AIzaSyC5hIN4bKJDCHglriYZtuc3X7VQjPq_8B0
+  Qdrant: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIn0.QYDRcZVfd90fFPoZqMpEPT2KL7lqOWVz43YxAfe0c9o
 
+  Qdrant usage way: "using Qdrant.Client;
+
+var client = new QdrantClient(
+  host: "b5919fdc-6bab-48eb-a6f0-0b220a3ea1c6.europe-west3-0.gcp.cloud.qdrant.io",
+  https: true,
+  apiKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIn0.QYDRcZVfd90fFPoZqMpEPT2KL7lqOWVz43YxAfe0c9o"
+);
+
+var collections = await client.ListCollectionsAsync();
+
+foreach (var collection in collections) {
+    Console.WriteLine(collection);
+}"
 
 

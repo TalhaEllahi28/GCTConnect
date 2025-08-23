@@ -13,6 +13,9 @@ using GCTConnect.Services;
 using System.Linq;
 using GCTConnect.Models.ViewModels;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
+using System.Data;
 
 
 namespace GCTConnect.Controllers
@@ -33,12 +36,47 @@ namespace GCTConnect.Controllers
             _userService = userService;
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetUnreadAnnouncements()
+        {
+            var user = _userService.GetCurrentUser();
+            if (user == null) return Unauthorized();
 
+            var announcements = await _context.AnnouncementRecipients
+                .Include(ar => ar.Announcement)
+                .Where(ar => ar.UserId == user.UserId && ar.IsRead == false)
+                .OrderByDescending(ar => ar.Announcement.CreatedAt)
+                .Select(ar => new
+                {
+                    ar.Announcement.Title,
+                    ar.Announcement.Content,
+                    Priority = ar.Announcement.Priority == 1 ? "Low" :
+                              ar.Announcement.Priority == 2 ? "Medium" : "High",
+                    ar.Announcement.CreatedAt
+                }).Take(3)
+                .ToListAsync();
 
+            return Ok(announcements);
+        }
 
+        [HttpPost]
+        public async Task<IActionResult> MarkAsRead()
+        {
+            var user = _userService.GetCurrentUser();
+            if (user == null) return Unauthorized();
 
+            var unread = await _context.AnnouncementRecipients
+                .Where(ar => ar.UserId == user.UserId && ar.IsRead == false)
+                .ToListAsync();
 
+            foreach (var item in unread)
+            {
+                item.IsRead = true;
+            }
 
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
 
         [HttpGet]
         public IActionResult ChatbotView()
@@ -47,7 +85,9 @@ namespace GCTConnect.Controllers
             return View();
         }
 
-        [HttpGet("api/teachers-and-subjects")]
+        [HttpGet]
+        //[Route("GetTeachersAndSubjects")]
+        //[Route("api/teachers-and-subjects")]
         public IActionResult GetTeachersAndSubjects(int departmentId)
         {
             var teachers = _context.Users
@@ -64,13 +104,15 @@ namespace GCTConnect.Controllers
             return Json(new { teachers, subjects });
         }
 
-
-        [HttpGet("api/GetCourses")]
+        [HttpGet]
+        //[Route("GetCourses")]
+        //[Route("api/GetCourses")]
         public JsonResult GetCourses(int departmentId)
         {
             var courses = _context.Courses
                 .Where(c => c.DepartmentId == departmentId)
-                .Select(c => new {
+                .Select(c => new
+                {
                     id = c.CourseId,
                     name = c.CourseName
                 }).ToList();
@@ -124,9 +166,21 @@ namespace GCTConnect.Controllers
                 _context.Groups.Add(group);
                 _context.SaveChanges();
 
+                newGroup.BatchYear = _context.Batches
+                                           .Where(b => b.BatchId == newGroup.BatchId)
+                                           .Select(b => b.BatchYear)
+                                           .FirstOrDefault();                // First, find all BatchIds that correspond to the desired BatchYear.
+                // This handles the case where multiple batches might exist for the same year.
+                var batchIds = _context.Batches
+                                       .Where(b => b.BatchYear == newGroup.BatchYear && b.DepartmentId == newGroup.StudentDepartmentId)
+                                       .Select(b => b.BatchId)
+                                       .ToList();
 
-                List<User> user = _context.Users.Where(u => u.BatchId == newGroup.BatchId && u.DepartmentId == newGroup.StudentDepartmentId).ToList();
-                var Teacher = _context.Users.Where(u => u.UserId == newGroup.TeacherId && u.DepartmentId == newGroup.TeacherDepartmentId).FirstOrDefault();
+                // Now, query the Users table to find users who have a BatchId that is in the list of batchIds,
+                // and also match the StudentDepartmentId.
+                List<User> user = _context.Users
+                                           .Where(u => batchIds.Contains((int)u.BatchId) && u.DepartmentId == newGroup.StudentDepartmentId)
+                                           .ToList(); var Teacher = _context.Users.Where(u => u.UserId == newGroup.TeacherId && u.DepartmentId == newGroup.TeacherDepartmentId).FirstOrDefault();
 
                 foreach (var item in user)
                 {
@@ -253,6 +307,8 @@ namespace GCTConnect.Controllers
                 {
                     ModelState.AddModelError("RollNumber", "Roll Number is required");
                     return View(newUser);
+                    //return RedirectToAction("UserManagement", "Admin", newUser);
+
                 }
 
                 if (newUser.DepartmentId == null)
@@ -347,13 +403,17 @@ namespace GCTConnect.Controllers
                 ModelState.AddModelError("", $"Failed to send email. Error: {ex.Message}");
                 return View(newUser); // Redirect back to view in case of email failure
             }
-
+            TempData["Success"] = "ok";
             // Redirect to appropriate dashboard
-            return currentUser.Role == "Admin" ? RedirectToAction("Dashboard", "Admin") : RedirectToAction("Dashboard", "Hod");
+            return currentUser.Role == "Admin" ? RedirectToAction("UserManagement", "Admin") : RedirectToAction("Dashboard", "Hod");
         }
-
-        public IActionResult Login()
+        [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
+        public async Task<IActionResult> Login()
         {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            HttpContext.Session.Clear();
+
             return View();
         }
 
@@ -427,7 +487,43 @@ namespace GCTConnect.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
+        private void addUserInSubjectGroups(User user)
+        {
+            var departement = _context.Departments
+                .Where(d => d.DepartmentId == user.DepartmentId)
+                .Select(u => u.Name)
+                .FirstOrDefault();
 
+            var batchYear = _context.Batches
+                .Where(u => u.BatchId == user.BatchId)
+                .Select(b => b.BatchYear)
+                .FirstOrDefault();
+
+            var groups = _context.Groups
+                .AsEnumerable() // needed because EF Core cannot translate Split to SQL
+                .Where(g =>
+                {
+                    var parts = g.GroupName.Split('_');
+                    return parts.Length >= 3 &&
+                           parts[0] == batchYear.ToString() &&
+                           parts[1] == departement;
+                })
+                .ToList();
+            foreach( var group in groups)
+            {
+                GroupMember newMember = new GroupMember
+                {
+                    GroupId = group.GroupId,
+                    UserId = user.UserId,
+                    JoinedAt = DateTime.Now,
+                    Role = "group_member",
+
+                };
+
+                _context.GroupMembers.Add(newMember);
+                _context.SaveChanges();
+            }
+        }
         private void addUserInGroup(Batch batch, Department department, User user, string groupType)
         {
             var Group = _context.Groups.FirstOrDefault(u => u.GroupName == $"{batch.BatchYear}_{department.Name}_{groupType}");
@@ -447,7 +543,8 @@ namespace GCTConnect.Controllers
             // Get all groups where the department and groupType match after splitting the GroupName
             var groups = _context.Groups
                                  .AsEnumerable() // Switch to LINQ to Objects for string.Split
-                                 .Where(g => {
+                                 .Where(g =>
+                                 {
                                      var parts = g.GroupName.Split('_');
                                      return parts.Length >= 3
                                             && parts[1].Equals(department.Name, StringComparison.OrdinalIgnoreCase)
@@ -485,6 +582,75 @@ namespace GCTConnect.Controllers
             _context.SaveChanges();
         }
 
+        private void addUserToAppropriateGroups(User user, User currentUser)
+        {
+            if (user.Role == "Students" && (currentUser.Role == "Admin" || currentUser.Role == "Hod"))
+            {
+                var batch = _context.Batches.FirstOrDefault(b => b.BatchId == user.BatchId);
+                var department = _context.Departments.FirstOrDefault(d => d.DepartmentId == user.DepartmentId);
+
+                if (batch != null && department != null)
+                {
+                    //addUserInGroup(batch, department, user, "StudentsOnly");
+                    //addUserInGroup(batch, department, user, "StudentsTeachersHod");
+                    addUserInSubjectGroups(user);
+                }
+            }
+            else if (user.Role == "Teachers" && (currentUser.Role == "Admin" || currentUser.Role == "Hod"))
+            {
+                var department = _context.Departments.FirstOrDefault(d => d.DepartmentId == user.DepartmentId);
+                if (department != null)
+                {
+                    addUserInGroup(department, user, "StudentsTeachersHod");
+                    addUserInGroup(department, user, "TeachersHod");
+                }
+            }
+            else if ((user.Role == "Principal" || user.Role == "Hod" || user.Role == "Admin") && currentUser.Role == "Admin")
+            {
+                if (user.Role == "Hod")
+                {
+                    var department = _context.Departments.FirstOrDefault(d => d.DepartmentId == user.DepartmentId);
+                    if (department != null)
+                    {
+                        addUserInGroup(department, user, "StudentsTeachersHod");
+                        addUserInGroup(department, user, "TeachersHod");
+                    }
+                    addUserInGroup(user, "PrincipalHod");
+                }
+                else if (user.Role == "Principal")
+                {
+                    addUserInGroup(user, "PrincipalOnly");
+                    addUserInGroup(user, "PrincipalHod");
+                }
+            }
+        }
+
+        private void removeUserFromAllGroups(int userId)
+        {
+            var userGroupMemberships = _context.GroupMembers.Where(gm => gm.UserId == userId).ToList();
+
+            foreach (var membership in userGroupMemberships)
+            {
+                _context.GroupMembers.Remove(membership);
+            }
+            _context.SaveChanges();
+        }
+
+
+        private void removeUserFromGroupsByType(int userId, List<string> groupTypes)
+        {
+            var userGroupMemberships = _context.GroupMembers
+                .Where(gm => gm.UserId == userId)
+                .Include(gm => gm.Group)
+                .Where(gm => groupTypes.Any(gt => gm.Group.GroupName.Contains(gt)))
+                .ToList();
+
+            foreach (var membership in userGroupMemberships)
+            {
+                _context.GroupMembers.Remove(membership);
+            }
+            _context.SaveChanges();
+        }
         public static string GenerateComplexRandomPassword(int length)
         {
             if (length < 8 || length > 16)
@@ -529,5 +695,289 @@ namespace GCTConnect.Controllers
 
         //    return BadRequest("Email sending failed.");
         //}
+
+
+        // Add these methods to your existing controller
+
+        // Method to remove user from all current groups
+
+
+        // Extracted method to add user to appropriate groups based on role
+
+
+        // GET method for Edit User
+        [HttpGet]
+        [Authorize(Roles = "Admin,Hod")]
+        public async Task<IActionResult> EditUser(int id)
+        {
+            var user = _context.Users.FirstOrDefault(u => u.UserId == id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var currentUser = _userService.GetCurrentUser();
+            if (currentUser == null)
+            {
+                return RedirectToAction("Login");
+            }
+
+            // Check permissions
+            if (currentUser.Role == "Hod" && user.Role != "Students" && user.Role != "Teachers")
+            {
+                return Forbid(); // HOD can only edit Students and Teachers
+            }
+
+            // Populate ViewBag data
+            ViewBag.Batches = _context.Batches
+                .Select(b => new { Id = b.BatchId, Year = b.BatchYear, DepartmentId = b.DepartmentId })
+                .ToList();
+            ViewBag.Departments = _context.Departments
+                .Select(d => new { Id = d.DepartmentId, Name = d.Name })
+                .ToList();
+            ViewBag.Subjects = _context.Users
+                .Where(u => u.Subject != null)
+                .Select(u => u.Subject)
+                .Distinct()
+                .ToList();
+
+            return View(user);
+        }
+
+
+        // GET method to fetch user data for editing (AJAX endpoint)
+        [HttpGet]
+        [Authorize(Roles = "Admin,Hod")]
+        public async Task<IActionResult> GetUserForEdit(int id)
+        {
+            var user = _context.Users.FirstOrDefault(u => u.UserId == id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var currentUser = _userService.GetCurrentUser();
+            if (currentUser == null)
+            {
+                return Unauthorized();
+            }
+
+
+
+            // Return user data as JSON
+            var userData = new
+            {
+                userId = user.UserId,
+                name = user.Name,
+                lastName = user.LastName,
+                email = user.Email,
+                phoneNumber = user.PhoneNumber,
+                gender = user.Gender,
+                role = user.Role,
+                rollNumber = user.RollNumber,
+                subject = user.Subject,
+                departmentId = user.DepartmentId,
+                batchId = user.BatchId,
+               
+            };
+
+            return Json(userData);
+        }
+
+
+        // POST method for Edit User
+        [HttpPost]
+        [Authorize(Roles = "Admin,Hod")]
+        public async Task<IActionResult> EditUser(User updatedUser)
+        {
+            // Reload dropdown data in case of validation errors
+            ViewBag.Batches = _context.Batches
+                .Select(b => new { Id = b.BatchId, Year = b.BatchYear, DepartmentId = b.DepartmentId })
+                .ToList();
+            ViewBag.Departments = _context.Departments
+                .Select(d => new { Id = d.DepartmentId, Name = d.Name })
+                .ToList();
+            ViewBag.Subjects = _context.Users
+                .Where(u => u.Subject != null)
+                .Select(u => u.Subject)
+                .Distinct()
+                .ToList();
+
+            var currentUser = _userService.GetCurrentUser();
+            if (currentUser == null)
+            {
+                return RedirectToAction("Login");
+            }
+
+            // Get the existing user from database
+            var existingUser = _context.Users.FirstOrDefault(u => u.UserId == updatedUser.UserId);
+            if (existingUser == null)
+            {
+                return NotFound();
+            }
+
+            // Check permissions
+            if (currentUser.Role == "Hod" && existingUser.Role != "Students" && existingUser.Role != "Teachers")
+            {
+                return Forbid();
+            }
+
+            // Remove validation for Username and Password since they shouldn't be edited directly
+            ModelState.Remove("Username");
+            ModelState.Remove("Password");
+
+            if (!ModelState.IsValid)
+            {
+                return View(updatedUser);
+            }
+
+            // Check if email already exists (excluding current user)
+            if (_context.Users.Any(u => u.Email == updatedUser.Email && u.UserId != updatedUser.UserId))
+            {
+                ModelState.AddModelError("Email", "This email already exists.");
+                return View(updatedUser);
+            }
+
+            // Store old values for comparison
+            var oldRole = existingUser.Role;
+            var oldDepartmentId = existingUser.DepartmentId;
+            var oldBatchId = existingUser.BatchId;
+
+            // Update basic user information
+            existingUser.Name = updatedUser.Name;
+            existingUser.LastName = updatedUser.LastName;
+            existingUser.Email = updatedUser.Email;
+            existingUser.Gender = updatedUser.Gender;
+            existingUser.PhoneNumber = updatedUser.PhoneNumber;
+            existingUser.Subject = updatedUser.Subject;
+
+            // Role-based validation and updates
+            bool roleChanged = oldRole != updatedUser.Role;
+            bool departmentChanged = oldDepartmentId != updatedUser.DepartmentId;
+            bool batchChanged = oldBatchId != updatedUser.BatchId;
+
+            if (updatedUser.Role == "Students" && (currentUser.Role == "Admin" || currentUser.Role == "Hod"))
+            {
+                // Validation for students
+                if (updatedUser.RollNumber == null)
+                {
+                    ModelState.AddModelError("RollNumber", "Roll Number is required");
+                    return View(updatedUser);
+                }
+
+                if (updatedUser.DepartmentId == null)
+                {
+                    ModelState.AddModelError("DepartmentId", "Department is required");
+                    return View(updatedUser);
+                }
+
+                if (updatedUser.BatchId == null)
+                {
+                    ModelState.AddModelError("BatchId", "Batch is required");
+                    return View(updatedUser);
+                }
+
+                // Check if roll number already exists (excluding current user)
+                if (_context.Users.Any(u => u.RollNumber == updatedUser.RollNumber && u.UserId != updatedUser.UserId))
+                {
+                    ModelState.AddModelError("RollNumber", "This roll number already exists.");
+                    return View(updatedUser);
+                }
+
+                existingUser.Role = updatedUser.Role;
+                existingUser.RollNumber = updatedUser.RollNumber;
+                existingUser.Username = $"{updatedUser.Name}-{updatedUser.RollNumber}";
+                existingUser.BatchId = updatedUser.BatchId;
+                existingUser.DepartmentId = updatedUser.DepartmentId;
+                existingUser.Subject = null; // Students don't have subjects
+            }
+            else if (updatedUser.Role == "Teachers" && (currentUser.Role == "Admin" || currentUser.Role == "Hod"))
+            {
+                if (updatedUser.DepartmentId == null)
+                {
+                    ModelState.AddModelError("DepartmentId", "Department is required");
+                    return View(updatedUser);
+                }
+
+                existingUser.Role = updatedUser.Role;
+                existingUser.Username = updatedUser.Name;
+                existingUser.BatchId = null;
+                existingUser.DepartmentId = updatedUser.DepartmentId;
+                existingUser.Subject = updatedUser.Subject;
+                existingUser.RollNumber = null; // Teachers don't have roll numbers
+            }
+            else if ((updatedUser.Role == "Principal" || updatedUser.Role == "Hod" || updatedUser.Role == "Admin") &&
+                     currentUser.Role == "Admin")
+            {
+                existingUser.Role = updatedUser.Role;
+                existingUser.Username = updatedUser.Name;
+                existingUser.BatchId = null;
+                existingUser.RollNumber = null;
+                existingUser.Subject = null;
+
+                if (updatedUser.Role == "Hod")
+                {
+                    if (updatedUser.DepartmentId == null)
+                    {
+                        ModelState.AddModelError("DepartmentId", "Department is required for HOD");
+                        return View(updatedUser);
+                    }
+                    existingUser.DepartmentId = updatedUser.DepartmentId;
+                }
+                else
+                {
+                    existingUser.DepartmentId = null;
+                }
+            }
+
+            // Handle batch count adjustments for students
+            if (oldRole == "Students" && batchChanged)
+            {
+                // Decrease count from old batch
+                if (oldBatchId.HasValue)
+                {
+                    var oldBatch = _context.Batches.FirstOrDefault(b => b.BatchId == oldBatchId.Value);
+                    if (oldBatch != null && oldBatch.StudentsCount > 0)
+                    {
+                        oldBatch.StudentsCount -= 1;
+                    }
+                }
+
+                // Increase count in new batch
+                if (updatedUser.BatchId.HasValue)
+                {
+                    var newBatch = _context.Batches.FirstOrDefault(b => b.BatchId == updatedUser.BatchId.Value);
+                    if (newBatch != null)
+                    {
+                        newBatch.StudentsCount += 1;
+                    }
+                }
+            }
+
+            // Handle group membership changes
+            if (roleChanged || departmentChanged || batchChanged)
+            {
+                // Remove user from all current groups
+                removeUserFromAllGroups(existingUser.UserId);
+
+                // Add user to new appropriate groups
+                addUserToAppropriateGroups(existingUser, currentUser);
+            }
+
+            // Save changes
+            try
+            {
+                _context.SaveChanges();
+                TempData["Success"] = "User updated successfully";
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", $"Error updating user: {ex.Message}");
+                return View(updatedUser);
+            }
+
+            // Redirect to appropriate dashboard
+            return currentUser.Role == "Admin" ? RedirectToAction("UserManagement", "Admin") : RedirectToAction("Dashboard", "Hod");
+        }
     }
 }

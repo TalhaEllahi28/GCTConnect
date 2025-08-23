@@ -1,0 +1,138 @@
+﻿@model List<GCTConnect.ViewModel.Admin.GroupViewModel>
+@{
+    ViewBag.Title = "Group Management";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GCT Connect - Group Management</title>
+    <link rel="stylesheet" href="/css/adminDashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <partial name="_AdminNavBarPartial" />
+
+    <main class="main-content">
+        <header class="header">
+            <div class="header-left">
+                <button class="sidebar-toggle" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="page-title">Group Management</h1>
+            </div>
+            <div class="header-right">
+                <div class="admin-profile">
+                    <img src="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?w=40&h=40" alt="Admin" class="profile-img">
+                    <span class="admin-name">Admin User</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+        </header>
+
+        <div class="page-content">
+            <div id="groups" class="page">
+                <div class="page-header">
+                    <button class="btn btn-primary" onclick="showModal('addGroupModal')">
+                        <i class="fas fa-plus"></i> Create Group
+                    </button>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Group Name</th>
+                                        <th>Department</th>
+                                        <th>Members</th>
+                                        <th>Created</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var group in Model)
+                                    {
+                                        <tr>
+                                            <td>@group.GroupName</td>
+                                            <td>@group.DepartmentName</td>
+                                            <td>@group.MembersCount</td>
+                                            <td>@group.CreatedAt.ToString("yyyy-MM-dd")</td>
+                                            <td>
+                                                <div class="action-buttons">
+                                                    <a href="@Url.Action("ViewGroup", "Admin", new { id = group.GroupId })" class="btn-action view" title="View">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <a href="@Url.Action("EditGroup", "Admin", new { id = group.GroupId })" class="btn-action edit" title="Edit">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <a href="@Url.Action("DeleteGroup", "Admin", new { id = group.GroupId })" class="btn-action delete" title="Delete">
+                                                        <i class="fas fa-trash"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <partial name="_CreateGroup" model="new GCTConnect.Models.ViewModels.CreateGroup()" />
+
+@*         <div id="addGroupModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Create New Group</h3>
+                    <button class="modal-close" onclick="hideModal('addGroupModal')">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form class="group-form">
+                        <div class="form-group">
+                            <label>Group Name</label>
+                            <input type="text" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Group Type</label>
+                            <select class="form-select" required>
+                                <option value="">Select Type</option>
+                                <option value="students">Students Only</option>
+                                <option value="mixed">Students & Teachers</option>
+                                <option value="staff">Staff Only</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Department</label>
+                            <select class="form-select" required>
+                                <option value="">Select Department</option>
+                                <option value="cs">Computer Science</option>
+                                <option value="ec">Electronics</option>
+                                <option value="me">Mechanical</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea class="form-textarea" rows="3" placeholder="Group description"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-outline" onclick="hideModal('addGroupModal')">Cancel</button>
+                    <button class="btn btn-primary">Create Group</button>
+                </div>
+            </div>
+        </div>
+ *@    </main>
+    <script src="/js/adminDashboard.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+
+</body>
+</html>

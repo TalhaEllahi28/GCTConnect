@@ -21,6 +21,9 @@ namespace GCTConnect.Controllers.Api
         public async Task<IActionResult> UserProfileManagement()
         {
             var user = _userService.GetCurrentUser();
+            ViewBag.User = "Student";
+            ViewData["CurrentUserRole"] = user.Role;
+            ViewBag.ProfilePic = user.ProfilePic;
 
             if (user == null)
             {

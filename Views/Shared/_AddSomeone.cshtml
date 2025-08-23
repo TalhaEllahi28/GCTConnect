@@ -1,0 +1,120 @@
+﻿@model GCTConnect.Models.User
+
+<div id="addUserModal" class="modal">
+    <div class="modal-content">
+        <form asp-action="AddSomeone" asp-controller="Home" method="post">
+            <div class="modal-header">
+                <h3>Add New User</h3>
+                <button type="button" class="modal-close" onclick="hideModal('addUserModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="form-group">
+                    <label asp-for="Name">First Name</label>
+                    <input asp-for="Name" class="form-input" placeholder="Enter first name" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="LastName">Last Name</label>
+                    <input asp-for="LastName" class="form-input" placeholder="Enter last name" />
+                    <span asp-validation-for="LastName" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Email">Email Address</label>
+                    <input asp-for="Email" class="form-input" placeholder="Enter email" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="PhoneNumber">Phone Number</label>
+                    <input asp-for="PhoneNumber" class="form-input" placeholder="Enter phone number" />
+                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Gender">Gender</label>
+                    <select asp-for="Gender" class="form-select">
+                        <option value="">Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <span asp-validation-for="Gender" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Role">Role</label>
+                    <div id="roleOptionsForAdmin" style="display:none">
+                        <select asp-for="Role" class="form-select" id="roleOptionsForAdminSelect">
+                            <option value="">Select Role</option>
+                            <option value="Students">Student</option>
+                            <option value="Teachers">Teacher</option>
+                            <option value="Hod">Hod</option>
+                            <option value="Principal">Principal</option>
+                            <option value="Admin">Admin</option>
+                        </select>
+                    </div>
+
+                    <div id="roleOptionsForHod" style="display:none">
+                        <select asp-for="Role" class="form-select" id="roleOptionsForHodSelect">
+                            <option value="">Select Role</option>
+                            <option value="Students">Student</option>
+                            <option value="Teachers">Teacher</option>
+                        </select>
+                    </div>
+                    <span asp-validation-for="Role" class="text-danger"></span>
+                </div>
+
+                <div class="form-group" id="department" style="display:none">
+                    <label asp-for="DepartmentId">Department Name</label>
+                    <select asp-for="DepartmentId" asp-items="@(new SelectList(ViewBag.Departments, "Id", "Name"))" class="form-select">
+                        <option value="">Select Department</option>
+                    </select>
+                    <span asp-validation-for="DepartmentId" class="text-danger"></span>
+                </div>
+
+                <div class="form-group" id="subject" style="display:none">
+                    <label asp-for="Subject">Subject</label>
+                    <input asp-for="Subject" list="subject-options" id="subject-input" class="form-input" placeholder="Type to search or add a new subject" autocomplete="off" />
+                    <span asp-validation-for="Subject" class="text-danger"></span>
+                    <datalist id="subject-options">
+                        @foreach (var subject in ViewBag.Subjects)
+                        {
+                            <option value="@subject"></option>
+                        }
+                    </datalist>
+                </div>
+
+                <div class="form-group" id="rollno" style="display:none">
+                    <label asp-for="RollNumber">Roll Number (for Students only)</label>
+                    <input asp-for="RollNumber" class="form-input" placeholder="Enter roll number" />
+                    <span asp-validation-for="RollNumber" class="text-danger"></span>
+                </div>
+
+                <div class="form-group" id="batch" style="display:none">
+                    <label asp-for="BatchId">Batch Year (for Students only)</label>
+                    <select asp-for="BatchId" asp-items="@(new SelectList(ViewBag.Batches, "Id", "Year"))" class="form-select">
+                        <option value="">Select Batch</option>
+                    </select>
+                    <span asp-validation-for="BatchId" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" onclick="hideModal('addUserModal')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+}

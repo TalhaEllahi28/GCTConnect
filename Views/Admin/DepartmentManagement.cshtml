@@ -1,0 +1,71 @@
+﻿@model List<GCTConnect.ViewModel.Admin.DepartmentViewModel>
+@{
+	ViewBag.Title = "Department Management";
+	Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>GCT Connect - Department Management</title>
+	<link rel="stylesheet" href="/css/adminDashboard.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+	<partial name="_AdminNavBarPartial" />
+
+	<main class="main-content">
+		<header class="header">
+			<div class="header-left">
+				<button class="sidebar-toggle" onclick="toggleSidebar()">
+					<i class="fas fa-bars"></i>
+				</button>
+				<h1 class="page-title">Departement Management</h1>
+			</div>
+			<div class="header-right">
+				<div class="admin-profile">
+					<img src="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?w=40&h=40" alt="Admin" class="profile-img">
+					<span class="admin-name">Admin User</span>
+					<i class="fas fa-chevron-down"></i>
+				</div>
+			</div>
+		</header>
+
+		<div class="page-content">
+			<div id="departments" class="page">
+				<div class="page-header">
+					<button class="btn btn-primary" onclick="showModal('addDepartmentModal')">
+						<i class="fas fa-plus"></i> Add Department
+					</button>
+				</div>
+
+				<div class="department-grid">
+					@foreach (var dept in Model)
+					{
+						<div class="department-card">
+							<div class="department-icon">
+								<i class="@dept.IconClass"></i>
+							</div>
+							<div class="department-info">
+								<h3>@dept.DepartmentName</h3>
+								<p>HOD: @dept.HodName</p>
+								<div class="department-stats">
+									<span>Students: @dept.StudentsCount</span>
+									<span>Teachers: @dept.TeachersCount</span>
+								</div>
+							</div>
+							<div class="department-actions">
+								<button class="btn-action edit"><i class="fas fa-edit"></i></button>
+								<button class="btn-action delete"><i class="fas fa-trash"></i></button>
+							</div>
+						</div>
+					}
+				</div>
+			</div>
+		</div>
+	</main>
+	<script src="/js/adminDashboard.js"></script>
+
+</body>
+</html>

@@ -16,7 +16,7 @@ function loadUserGroups() {
                         <div class="conversation-item" onclick="selectGroup(this); loadMessages(${group.groupId}, '${group.groupName}')">
                             <div class="conversation-avatar">
                                 <div class="avatar">
-                                    <div class="avatar-placeholder">${getInitials(group.groupName)}</div>
+                                    <div class="avatar-placeholder"><img src="/images/groupLogo.jpg" alt="Logo"></div>
                                     <div class="status-indicator online"></div>
                                 </div>
                             </div>
@@ -130,12 +130,12 @@ function openChatWithFriend(friendId, friendName) {
         .catch(error => console.error('Error loading friend chat:', error));
 }
 
-let connection;
+/*let connection;*/
 let mediaRecorder;
 let audioChunks = [];
 let isRecording = false;
 let currentChatId = null;
-let currentChatType = null;
+let currentChatType = null/*;*/
 let selectedFileType = null;
 let selectedFile = null; // Store the selected file object
 let activeTab = 'documents'; // Track active tab
@@ -151,6 +151,7 @@ function setupSignalR(identifier, isPrivate) {
     connection = new signalR.HubConnectionBuilder()
         .withUrl('/Services/ChatHub')
         .configureLogging(signalR.LogLevel.Information)
+        .withAutomaticReconnect()
         .build();
 
     connection.on('ReceiveMessage', function (user, message, profilePic, fileUrl, fileType, fileName, audioUrl) {
@@ -228,6 +229,16 @@ function setupSignalR(identifier, isPrivate) {
         chatContainer.scrollTop = chatContainer.scrollHeight;
     });
 
+    connection.on("receiveannouncement", (title, content, priority) => {
+        console.log("New announcement:", title);
+
+        // Update badge
+        announcementCount++;
+        updateAnnouncementBadge();
+
+        // Show modal notification
+        window.showAnnouncementModal(title, content, priority);
+    });
     connection.start()
         .then(function () {
             console.log("SignalR Connected.");

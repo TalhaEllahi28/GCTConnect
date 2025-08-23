@@ -2,7 +2,15 @@
   "Files": [
     {
       "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\GCTConnect.bundle.scp.css",
-      "PackagePath": "staticwebassets\\GCTConnect.94mvfubllf.bundle.scp.css"
+      "PackagePath": "staticwebassets\\GCTConnect.bundle.scp.css"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\assets\\index-B-BDgSEf.js",
+      "PackagePath": "staticwebassets\\assets\\index-B-BDgSEf.js"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\assets\\index-CLIhQJuU.css",
+      "PackagePath": "staticwebassets\\assets\\index-CLIhQJuU.css"
     },
     {
       "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\collegeData.json",
@@ -19,6 +27,10 @@
     {
       "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\css\\chatbot.css",
       "PackagePath": "staticwebassets\\css\\chatbot.css"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\css\\main.css",
+      "PackagePath": "staticwebassets\\css\\main.css"
     },
     {
       "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\css\\site.css",
@@ -73,6 +85,26 @@
       "PackagePath": "staticwebassets\\images\\chat_background.jpeg"
     },
     {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\images\\chatbotIcon(1).png",
+      "PackagePath": "staticwebassets\\images\\chatbotIcon(1).png"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\images\\chatbotIcon(2).jpeg",
+      "PackagePath": "staticwebassets\\images\\chatbotIcon(2).jpeg"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\images\\chatbotIcon(3).jpeg",
+      "PackagePath": "staticwebassets\\images\\chatbotIcon(3).jpeg"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\images\\chatbotIcon(4).jpeg",
+      "PackagePath": "staticwebassets\\images\\chatbotIcon(4).jpeg"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\images\\chatbotIcon.jpeg",
+      "PackagePath": "staticwebassets\\images\\chatbotIcon.jpeg"
+    },
+    {
       "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\images\\dashboard_background.jpg",
       "PackagePath": "staticwebassets\\images\\dashboard_background.jpg"
     },
@@ -81,12 +113,20 @@
       "PackagePath": "staticwebassets\\images\\file.svg"
     },
     {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\images\\groupLogo.jpg",
+      "PackagePath": "staticwebassets\\images\\groupLogo.jpg"
+    },
+    {
       "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\images\\logo.png",
       "PackagePath": "staticwebassets\\images\\logo.png"
     },
     {
       "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\images\\~$py-of-Introduction-to-Fourier-Transform-Infrared-Spectroscopy-FTIR (1).docx",
       "PackagePath": "staticwebassets\\images\\~$py-of-Introduction-to-Fourier-Transform-Infrared-Spectroscopy-FTIR (1).docx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\index.html",
+      "PackagePath": "staticwebassets\\index.html"
     },
     {
       "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\js\\ChatWindow.js",
@@ -103,6 +143,10 @@
     {
       "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\js\\chatbot.js",
       "PackagePath": "staticwebassets\\js\\chatbot.js"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\js\\main.js",
+      "PackagePath": "staticwebassets\\js\\main.js"
     },
     {
       "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\js\\signalr\\README.md",
@@ -1177,12 +1221,368 @@
       "PackagePath": "staticwebassets\\lib\\jquery\\dist\\jquery.min.map"
     },
     {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\placeholder.svg",
+      "PackagePath": "staticwebassets\\placeholder.svg"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\.gitignore",
+      "PackagePath": "staticwebassets\\react\\.gitignore"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\README.md",
+      "PackagePath": "staticwebassets\\react\\README.md"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\bun.lockb",
+      "PackagePath": "staticwebassets\\react\\bun.lockb"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\components.json",
+      "PackagePath": "staticwebassets\\react\\components.json"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\dist\\assets\\index-B-BDgSEf.js",
+      "PackagePath": "staticwebassets\\react\\dist\\assets\\index-B-BDgSEf.js"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\dist\\assets\\index-CLIhQJuU.css",
+      "PackagePath": "staticwebassets\\react\\dist\\assets\\index-CLIhQJuU.css"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\dist\\favicon.ico",
+      "PackagePath": "staticwebassets\\react\\dist\\favicon.ico"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\dist\\index.html",
+      "PackagePath": "staticwebassets\\react\\dist\\index.html"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\dist\\placeholder.svg",
+      "PackagePath": "staticwebassets\\react\\dist\\placeholder.svg"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\dist\\robots.txt",
+      "PackagePath": "staticwebassets\\react\\dist\\robots.txt"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\eslint.config.js",
+      "PackagePath": "staticwebassets\\react\\eslint.config.js"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\index.html",
+      "PackagePath": "staticwebassets\\react\\index.html"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\package-lock.json",
+      "PackagePath": "staticwebassets\\react\\package-lock.json"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\package.json",
+      "PackagePath": "staticwebassets\\react\\package.json"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\postcss.config.js",
+      "PackagePath": "staticwebassets\\react\\postcss.config.js"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\public\\favicon.ico",
+      "PackagePath": "staticwebassets\\react\\public\\favicon.ico"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\public\\placeholder.svg",
+      "PackagePath": "staticwebassets\\react\\public\\placeholder.svg"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\public\\robots.txt",
+      "PackagePath": "staticwebassets\\react\\public\\robots.txt"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\App.css",
+      "PackagePath": "staticwebassets\\react\\src\\App.css"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\App.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\App.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\components\\ChatInterface.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\components\\ChatInterface.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\components\\ChatMessage.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\components\\ChatMessage.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\components\\TypingIndicator.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\components\\TypingIndicator.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\components\\ui\\accordion.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\components\\ui\\accordion.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\components\\ui\\alert-dialog.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\components\\ui\\alert-dialog.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\components\\ui\\alert.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\components\\ui\\alert.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\components\\ui\\aspect-ratio.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\components\\ui\\aspect-ratio.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\components\\ui\\avatar.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\components\\ui\\avatar.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\components\\ui\\badge.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\components\\ui\\badge.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\components\\ui\\breadcrumb.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\components\\ui\\breadcrumb.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\components\\ui\\button.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\components\\ui\\button.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\components\\ui\\calendar.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\components\\ui\\calendar.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\components\\ui\\card.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\components\\ui\\card.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\components\\ui\\carousel.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\components\\ui\\carousel.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\components\\ui\\chart.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\components\\ui\\chart.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\components\\ui\\checkbox.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\components\\ui\\checkbox.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\components\\ui\\collapsible.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\components\\ui\\collapsible.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\components\\ui\\command.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\components\\ui\\command.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\components\\ui\\context-menu.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\components\\ui\\context-menu.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\components\\ui\\dialog.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\components\\ui\\dialog.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\components\\ui\\drawer.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\components\\ui\\drawer.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\components\\ui\\dropdown-menu.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\components\\ui\\dropdown-menu.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\components\\ui\\form.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\components\\ui\\form.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\components\\ui\\hover-card.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\components\\ui\\hover-card.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\components\\ui\\input-otp.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\components\\ui\\input-otp.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\components\\ui\\input.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\components\\ui\\input.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\components\\ui\\label.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\components\\ui\\label.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\components\\ui\\menubar.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\components\\ui\\menubar.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\components\\ui\\navigation-menu.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\components\\ui\\navigation-menu.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\components\\ui\\pagination.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\components\\ui\\pagination.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\components\\ui\\popover.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\components\\ui\\popover.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\components\\ui\\progress.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\components\\ui\\progress.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\components\\ui\\radio-group.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\components\\ui\\radio-group.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\components\\ui\\resizable.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\components\\ui\\resizable.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\components\\ui\\scroll-area.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\components\\ui\\scroll-area.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\components\\ui\\select.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\components\\ui\\select.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\components\\ui\\separator.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\components\\ui\\separator.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\components\\ui\\sheet.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\components\\ui\\sheet.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\components\\ui\\sidebar.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\components\\ui\\sidebar.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\components\\ui\\skeleton.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\components\\ui\\skeleton.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\components\\ui\\slider.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\components\\ui\\slider.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\components\\ui\\sonner.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\components\\ui\\sonner.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\components\\ui\\switch.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\components\\ui\\switch.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\components\\ui\\table.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\components\\ui\\table.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\components\\ui\\tabs.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\components\\ui\\tabs.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\components\\ui\\textarea.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\components\\ui\\textarea.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\components\\ui\\toast.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\components\\ui\\toast.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\components\\ui\\toaster.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\components\\ui\\toaster.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\components\\ui\\toggle-group.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\components\\ui\\toggle-group.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\components\\ui\\toggle.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\components\\ui\\toggle.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\components\\ui\\tooltip.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\components\\ui\\tooltip.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\components\\ui\\use-toast.ts",
+      "PackagePath": "staticwebassets\\react\\src\\components\\ui\\use-toast.ts"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\data\\chatbotData.ts",
+      "PackagePath": "staticwebassets\\react\\src\\data\\chatbotData.ts"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\hooks\\use-mobile.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\hooks\\use-mobile.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\hooks\\use-toast.ts",
+      "PackagePath": "staticwebassets\\react\\src\\hooks\\use-toast.ts"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\index.css",
+      "PackagePath": "staticwebassets\\react\\src\\index.css"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\lib\\utils.ts",
+      "PackagePath": "staticwebassets\\react\\src\\lib\\utils.ts"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\main.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\main.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\pages\\Index.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\pages\\Index.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\pages\\NotFound.tsx",
+      "PackagePath": "staticwebassets\\react\\src\\pages\\NotFound.tsx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\src\\vite-env.d.ts",
+      "PackagePath": "staticwebassets\\react\\src\\vite-env.d.ts"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\tailwind.config.ts",
+      "PackagePath": "staticwebassets\\react\\tailwind.config.ts"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\tsconfig.app.json",
+      "PackagePath": "staticwebassets\\react\\tsconfig.app.json"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\tsconfig.json",
+      "PackagePath": "staticwebassets\\react\\tsconfig.json"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\tsconfig.node.json",
+      "PackagePath": "staticwebassets\\react\\tsconfig.node.json"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\react\\vite.config.ts",
+      "PackagePath": "staticwebassets\\react\\vite.config.ts"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\robots.txt",
+      "PackagePath": "staticwebassets\\robots.txt"
+    },
+    {
       "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\sounds\\pick-92276.mp3",
       "PackagePath": "staticwebassets\\sounds\\pick-92276.mp3"
     },
     {
       "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\sounds\\pop-1-35897.mp3",
       "PackagePath": "staticwebassets\\sounds\\pop-1-35897.mp3"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\uploads\\00e3afff-fabe-4f15-94f1-9ef9795167fb_download.jpeg",
+      "PackagePath": "staticwebassets\\uploads\\00e3afff-fabe-4f15-94f1-9ef9795167fb_download.jpeg"
     },
     {
       "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\uploads\\0f368d04-d09a-4f16-a21e-1c602952a43f_Operations Engineer.docx",
@@ -1197,8 +1597,24 @@
       "PackagePath": "staticwebassets\\uploads\\257c9438-2b47-4b36-a3e7-4deb783a10a5_Operations Engineer.docx"
     },
     {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\uploads\\2787900d-a73a-4c68-a8b7-a48fb7b06419_download (1).jpeg",
+      "PackagePath": "staticwebassets\\uploads\\2787900d-a73a-4c68-a8b7-a48fb7b06419_download (1).jpeg"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\uploads\\291fa87c-b8d2-4ed0-965b-98335d2f172c_download.jpeg",
+      "PackagePath": "staticwebassets\\uploads\\291fa87c-b8d2-4ed0-965b-98335d2f172c_download.jpeg"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\uploads\\2fd1947d-c4b9-4676-84d1-0c177ccb3cc9_44bbee94-f173-4aa1-8ed8-2065b564b49f.tmp",
+      "PackagePath": "staticwebassets\\uploads\\2fd1947d-c4b9-4676-84d1-0c177ccb3cc9_44bbee94-f173-4aa1-8ed8-2065b564b49f.tmp"
+    },
+    {
       "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\uploads\\441c415b-a680-4fbc-a3ec-2508fa79d5e0_Operations Engineer.docx",
       "PackagePath": "staticwebassets\\uploads\\441c415b-a680-4fbc-a3ec-2508fa79d5e0_Operations Engineer.docx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\uploads\\47a8fc3d-4039-4593-a71b-c8da7d946485_44bbee94-f173-4aa1-8ed8-2065b564b49f.tmp",
+      "PackagePath": "staticwebassets\\uploads\\47a8fc3d-4039-4593-a71b-c8da7d946485_44bbee94-f173-4aa1-8ed8-2065b564b49f.tmp"
     },
     {
       "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\uploads\\47dea46e-3f86-47ed-b89c-955386a62d79_Operations Engineer.docx",
@@ -1305,12 +1721,36 @@
       "PackagePath": "staticwebassets\\uploads\\audio\\1e0dee54-4deb-4cc1-a4e5-2585ccc7ba42.wav"
     },
     {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\uploads\\audio\\254d4726-f4f0-4e1f-bf18-9210bd8caa06.wav",
+      "PackagePath": "staticwebassets\\uploads\\audio\\254d4726-f4f0-4e1f-bf18-9210bd8caa06.wav"
+    },
+    {
       "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\uploads\\audio\\2a4d8fed-537f-443a-a5d0-3ca2a30a72b3.wav",
       "PackagePath": "staticwebassets\\uploads\\audio\\2a4d8fed-537f-443a-a5d0-3ca2a30a72b3.wav"
     },
     {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\uploads\\audio\\2f5152ec-052b-42ab-88fa-a4d3fc944efc.wav",
+      "PackagePath": "staticwebassets\\uploads\\audio\\2f5152ec-052b-42ab-88fa-a4d3fc944efc.wav"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\uploads\\audio\\44066937-f2ec-46e2-a1d4-40c429468c18.wav",
+      "PackagePath": "staticwebassets\\uploads\\audio\\44066937-f2ec-46e2-a1d4-40c429468c18.wav"
+    },
+    {
       "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\uploads\\audio\\4dd27b03-e82c-4085-a3a7-ca103b8fe9b9.wav",
       "PackagePath": "staticwebassets\\uploads\\audio\\4dd27b03-e82c-4085-a3a7-ca103b8fe9b9.wav"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\uploads\\audio\\63483180-607f-42b3-9e5b-f7eb7831e6a8.wav",
+      "PackagePath": "staticwebassets\\uploads\\audio\\63483180-607f-42b3-9e5b-f7eb7831e6a8.wav"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\uploads\\audio\\6a5eaf9a-321d-448a-b83f-1d3b551e680b.wav",
+      "PackagePath": "staticwebassets\\uploads\\audio\\6a5eaf9a-321d-448a-b83f-1d3b551e680b.wav"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\uploads\\audio\\95e47394-62ce-4a36-bfb3-45e1ba7aebd0.wav",
+      "PackagePath": "staticwebassets\\uploads\\audio\\95e47394-62ce-4a36-bfb3-45e1ba7aebd0.wav"
     },
     {
       "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\uploads\\b0d114c5-e726-464d-b86a-34b4580cfc32_Operations Engineer.docx",
@@ -1353,8 +1793,16 @@
       "PackagePath": "staticwebassets\\uploads\\c1b8fd67-4e55-446d-90b3-5f665b7806ab_Operations Engineer.docx"
     },
     {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\uploads\\c6cbd891-2861-4e3a-8f50-75ce37ca7915_44bbee94-f173-4aa1-8ed8-2065b564b49f.tmp",
+      "PackagePath": "staticwebassets\\uploads\\c6cbd891-2861-4e3a-8f50-75ce37ca7915_44bbee94-f173-4aa1-8ed8-2065b564b49f.tmp"
+    },
+    {
       "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\uploads\\c724c0e6-7a89-4d55-b914-67ceb483952b_Operations Engineer.docx",
       "PackagePath": "staticwebassets\\uploads\\c724c0e6-7a89-4d55-b914-67ceb483952b_Operations Engineer.docx"
+    },
+    {
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\uploads\\c9ddee2c-5fac-4d03-9eab-0b8c369ca115_download.jpeg",
+      "PackagePath": "staticwebassets\\uploads\\c9ddee2c-5fac-4d03-9eab-0b8c369ca115_download.jpeg"
     },
     {
       "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\uploads\\d2d75a25-e682-434c-af5c-5d9d656d6adb_Operations Engineer.docx",
@@ -1397,8 +1845,8 @@
       "PackagePath": "staticwebassets\\uploads\\ff457be8-aca0-47b5-a4f6-f09aacc595ec_RFID_Implementation_Style_Textile.pptx"
     },
     {
-      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.GCTConnect.Microsoft.AspNetCore.StaticWebAssetEndpoints.props",
-      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssetEndpoints.props"
+      "Id": "D:\\Talha\\GCTConnect (1)\\GCTConnect\\wwwroot\\wwwroot\\favicon.ico",
+      "PackagePath": "staticwebassets\\wwwroot\\favicon.ico"
     },
     {
       "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.GCTConnect.Microsoft.AspNetCore.StaticWebAssets.props",

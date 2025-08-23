@@ -90,7 +90,7 @@
             if (!departmentId) return;
 
             // Load teachers and subjects based on the selected department
-            fetch(`/api/teachers-and-subjects?departmentId=${departmentId}`)
+            fetch(`/Home/GetTeachersAndSubjects?departmentId=${departmentId}`)
                 .then(response => response.json())
                 .then(data => {
                     teacherSelect.innerHTML = '<option value="" disabled selected>-- Select a Teacher --</option>';

@@ -1,0 +1,179 @@
+﻿@model GCTConnect.Models.ViewModels.CreateGroup
+
+@{
+    var batches = ViewBag.Batches as IEnumerable<dynamic>;
+    var departments = ViewBag.Departments as IEnumerable<dynamic>;
+}
+
+<div id="addGroupModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Create New Group</h3>
+            <button type="button" class="modal-close" onclick="hideModal('addGroupModal')">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="modal-body">
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+            }
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+            }
+
+            <form id="create-group-form" class="group-form">
+                <div class="form-group">
+                    <label for="BatchId">Batch</label>
+                    <select id="BatchId" class="form-select">
+                        <option value="" disabled selected>-- Select a Batch --</option>
+                        @foreach (var batch in batches)
+                        {
+                            <option value="@batch.Id">@batch.Year</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="studentDepartmentId">Student Department</label>
+                    <select id="studentDepartmentId" class="form-select">
+                        <option value="" disabled selected>-- Select a Department for Students --</option>
+                        @foreach (var department in departments)
+                        {
+                            <option value="@department.Id">@department.Name</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="teacherDepartmentId">Teacher Department</label>
+                    <select id="teacherDepartmentId" class="form-select">
+                        <option value="" disabled selected>-- Select a Department for Teacher --</option>
+                        @foreach (var department in departments)
+                        {
+                            <option value="@department.Id">@department.Name</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="TeacherId">Teacher</label>
+                    <select id="TeacherId" class="form-select" disabled>
+                        <option value="" disabled selected>-- Select a Teacher --</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="Subject">Subject</label>
+                    <select id="Subject" name="Subject" class="form-select" disabled>
+                        <option value="" disabled selected>-- Select Course --</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" class="btn btn-outline" onclick="hideModal('addGroupModal')">Cancel</button>
+            <button type="button" class="btn btn-primary" onclick="submitForm()">Create Group</button>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+<script>
+    // Get all the relevant select fields
+    const studentDepartmentSelect = document.getElementById('studentDepartmentId');
+    const teacherDepartmentSelect = document.getElementById('teacherDepartmentId');
+    const teacherSelect = document.getElementById('TeacherId');
+    const subjectSelect = document.getElementById('Subject');
+
+    // Event listener for the Student Department selection
+    studentDepartmentSelect.addEventListener('change', function () {
+        const deptId = this.value;
+        subjectSelect.innerHTML = '<option value="" disabled selected>-- Select a Course --</option>'; // Clear and reset
+        subjectSelect.disabled = true; // Disable until data is fetched
+        if (!deptId) return;
+
+        fetch(`/Home/GetCourses?departmentId=${deptId}`)
+            .then(response => {
+                if (!response.ok) throw new Error("Network error");
+                return response.json();
+            })
+            .then(data => {
+                data.forEach(course => {
+                    const option = document.createElement('option');
+                    option.value = course.id;
+                    option.textContent = course.name;
+                    subjectSelect.appendChild(option);
+                });
+                subjectSelect.disabled = false;
+            })
+            .catch(error => {
+                console.error("Error fetching courses:", error);
+            });
+    });
+
+    // Event listener for the Teacher Department selection
+    teacherDepartmentSelect.addEventListener('change', function () {
+        const departmentId = this.value;
+        teacherSelect.innerHTML = '<option value="" disabled selected>-- Select a Teacher --</option>'; // Clear and reset
+        teacherSelect.disabled = true; // Disable until data is fetched
+        if (!departmentId) return;
+
+        // Load teachers based on the selected department
+        fetch(`/Home/GetTeachersAndSubjects?departmentId=${departmentId}`)
+            .then(response => response.json())
+            .then(data => {
+                data.teachers.forEach(teacher => {
+                    teacherSelect.innerHTML += `<option value="${teacher.id}">${teacher.name}</option>`;
+                });
+                teacherSelect.disabled = false;
+            })
+            .catch(error => console.error('Error fetching teachers:', error));
+    });
+
+    function submitForm() {
+        // Your existing submit form logic
+        const batchId = document.getElementById("BatchId").value;
+        const teacherDeptId = document.getElementById("teacherDepartmentId").value;
+        const studentDeptId = document.getElementById("studentDepartmentId").value;
+        const teacherId = document.getElementById("TeacherId").value;
+        const subject = document.getElementById("Subject").value;
+
+        // Validations
+        if (!batchId || !teacherDeptId || !studentDeptId || !teacherId || !subject) {
+            alert("Please fill all the fields.");
+            return;
+        }
+
+        $.ajax({
+            url: '/Home/CreateGroups',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                
+                BatchId: batchId,
+                TeacherDepartmentId: teacherDeptId,
+                StudentDepartmentId: studentDeptId,
+                TeacherId: teacherId,
+                SubjectId: subject
+            }),
+            success: function (response) {
+                if (response.success) {
+                    location.reload();
+                    alert("Group created successfully!");
+                } else {
+                    alert("Failed to create group. Please try again.");
+                }
+            },
+            error: function () {
+                alert("An error occurred while creating the group.");
+            }
+        });
+    }
+</script>

@@ -17,6 +17,8 @@ public partial class GctConnectContext : DbContext
 
     public virtual DbSet<Announcement> Announcements { get; set; }
 
+    public virtual DbSet<AnnouncementRecipient> AnnouncementRecipients { get; set; }
+
     public virtual DbSet<Batch> Batches { get; set; }
 
     public virtual DbSet<ChatbotQuery> ChatbotQueries { get; set; }
@@ -47,6 +49,7 @@ public partial class GctConnectContext : DbContext
             entity.HasKey(e => e.AnnouncementId).HasName("PK__Announce__C640A82DA184780E");
 
             entity.Property(e => e.AnnouncementId).HasColumnName("announcement_id");
+            entity.Property(e => e.Audience).HasMaxLength(100);
             entity.Property(e => e.Content).HasColumnName("content");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
@@ -60,6 +63,34 @@ public partial class GctConnectContext : DbContext
             entity.HasOne(d => d.Department).WithMany(p => p.Announcements)
                 .HasForeignKey(d => d.DepartmentId)
                 .HasConstraintName("FK_AnnouncementDepartment");
+        });
+
+        modelBuilder.Entity<AnnouncementRecipient>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Announce__3213E83F43280488");
+
+            entity.ToTable("Announcement_Recipients");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.AnnouncementId).HasColumnName("announcement_id");
+            entity.Property(e => e.IsRead)
+                .HasDefaultValue(false)
+                .HasColumnName("is_read");
+            entity.Property(e => e.SentAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime")
+                .HasColumnName("sent_at");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+
+            entity.HasOne(d => d.Announcement).WithMany(p => p.AnnouncementRecipients)
+                .HasForeignKey(d => d.AnnouncementId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Announcement");
+
+            entity.HasOne(d => d.User).WithMany(p => p.AnnouncementRecipients)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_AnnouncementUser");
         });
 
         modelBuilder.Entity<Batch>(entity =>

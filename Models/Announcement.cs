@@ -15,5 +15,15 @@ public partial class Announcement
 
     public DateTime? CreatedAt { get; set; }
 
+    public int? Priority { get; set; }
+
+    public string? Audience { get; set; }
+
+    public int UserId { get; set; }
+
+    public bool IsRead { get; set; }
+
+    public virtual ICollection<AnnouncementRecipient> AnnouncementRecipients { get; set; } = new List<AnnouncementRecipient>();
+
     public virtual Department? Department { get; set; }
 }

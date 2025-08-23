@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("GCTConnect")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7a308f4d05d813aca748b3dba396854e6f0431b2")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bfa58a143394420eb592cc00dc6d0cbb0561f96e")]
 [assembly: System.Reflection.AssemblyProductAttribute("GCTConnect")]
 [assembly: System.Reflection.AssemblyTitleAttribute("GCTConnect")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -1,8 +1,108 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    Layout = null;
 }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GCTConnect - Smart College Communication Platform</title>
+    <link rel="icon" type="image/png" href="~/images/logo.png">
+    <link rel="stylesheet" href="~/css/main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo">
+                <h1>GCTConnect</h1>
+            </div>
+        </header>
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+        <main class="main">
+            <div class="content-wrapper">
+                <div class="left-section">
+                    <div class="hero-content">
+                        <div class="badge">Smart Communication Platform</div>
+                        <h1 class="main-title">Welcome to <span class="brand-highlight">GCTConnect</span></h1>
+                        <p class="main-description">
+                            Transform your college communication experience with our intelligent platform.
+                            Connect with your entire college community, access resources instantly, and never miss important updates again.
+                        </p>
+
+                        <div class="stats-container">
+                            <div class="stat-item">
+                                <div class="stat-number">100%</div>
+                                <div class="stat-label">Instant Delivery</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">24/7</div>
+                                <div class="stat-label">AI Support</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">∞</div>
+                                <div class="stat-label">Storage</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="right-section">
+                    <div class="login-container">
+                        <div class="login-card">
+                            <h2 class="login-title">Access Your Hub</h2>
+                            <p class="login-description">Connect with your college community</p>
+
+                            <a asp-controller="Home" asp-action="Login">
+                            <button class="login-btn" id="">
+                                <span>Login to GCTConnect</span>
+                                <div class="btn-glow"></div>
+                            </button>
+                            </a>
+                            <div class="features-list">
+                                <div class="feature-item">
+                                    <div class="feature-dot"></div>
+                                    <span>Direct messaging from administration</span>
+                                </div>
+                                <div class="feature-item">
+                                    <div class="feature-dot"></div>
+                                    <span>AI-powered instant support</span>
+                                </div>
+                                <div class="feature-item">
+                                    <div class="feature-dot"></div>
+                                    <span>Permanent document storage</span>
+                                </div>
+                                <div class="feature-item">
+                                    <div class="feature-dot"></div>
+                                    <span>Smart group management</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="floating-elements">
+                            <div class="floating-card card-1">
+                                <div class="card-header">New Message</div>
+                                <div class="card-content">Principal's Office</div>
+                            </div>
+                            <div class="floating-card card-2">
+                                <div class="card-header">AI Assistant</div>
+                                <div class="card-content">How can I help?</div>
+                            </div>
+                            <div class="floating-card card-3">
+                                <div class="card-header">Documents</div>
+                                <div class="card-content">Syllabus.pdf</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>&copy; 2025 GCTConnect. Made for better college communication.</p>
+        </footer>
+    </div>
+
+    <script src="~/js/main.js"></script>
+</body>
+</html>

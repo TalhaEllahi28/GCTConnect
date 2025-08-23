@@ -1,0 +1,63 @@
+﻿<div id="settings" class="page">
+    <div class="page-header">
+        <h2>System Settings</h2>
+    </div>
+
+    <div class="settings-grid">
+        <div class="setting-card">
+            <div class="setting-header">
+                <h3>General Settings</h3>
+            </div>
+            <div class="setting-content">
+                <div class="setting-item">
+                    <label>Platform Name</label>
+                    <input type="text" value="GCT Connect" class="setting-input">
+                </div>
+                <div class="setting-item">
+                    <label>Max File Size (MB)</label>
+                    <input type="number" value="50" class="setting-input">
+                </div>
+                <div class="setting-item">
+                    <label>User Registration</label>
+                    <select class="setting-select">
+                        <option value="open">Open</option>
+                        <option value="admin">Admin Approval</option>
+                        <option value="closed">Closed</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="setting-card">
+            <div class="setting-header">
+                <h3>Security Settings</h3>
+            </div>
+            <div class="setting-content">
+                <div class="setting-item">
+                    <label>Password Policy</label>
+                    <select class="setting-select">
+                        <option value="weak">Weak</option>
+                        <option value="medium">Medium</option>
+                        <option value="strong">Strong</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <label>Session Timeout (minutes)</label>
+                    <input type="number" value="30" class="setting-input">
+                </div>
+                <div class="setting-item">
+                    <label>Two-Factor Authentication</label>
+                    <label class="toggle-switch">
+                        <input type="checkbox">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="settings-actions">
+        <button class="btn btn-primary">Save Changes</button>
+        <button class="btn btn-outline">Reset to Default</button>
+    </div>
+</div>

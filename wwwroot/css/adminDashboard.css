@@ -20,7 +20,7 @@ body {
     --accent-green: #10b981;
     --accent-gold: #f59e0b;
     --accent-blue: #3b82f6;
-    --bg-light: #f8fafc;
+    --bg-light: rgba(139, 92, 246, 0.35);
     --bg-white: #ffffff;
     --text-primary: #1e293b;
     --text-secondary: #64748b;
@@ -48,7 +48,7 @@ body {
     }
 
 .sidebar-header {
-    padding: 1.5rem;
+    padding: 1rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -109,7 +109,9 @@ body {
     }
 
 .nav-item.active .nav-link {
-    background: rgba(139, 92, 246, 0.2);
+    /*background: rgba(139, 92, 246, 0.2);*/
+    background: rgba(139, 92, 246, 0.4); /* medium-dark */
+
     color: white;
     border-left-color: var(--accent-purple);
 }
@@ -208,9 +210,7 @@ body {
     padding: 2rem;
 }
 
-.page {
-    display: none;
-}
+
 
     .page.active {
         display: block;
@@ -330,7 +330,7 @@ body {
 }
 
     .activity-item:hover {
-        background: rgba(139, 92, 246, 0.05);
+        background: rgba(139, 92, 246, 0.4);
     }
 
 .activity-icon {

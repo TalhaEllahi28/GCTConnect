@@ -17,42 +17,136 @@ public class ChatHub : Hub
 
     // Static dictionary to map ConnectionIds to Users
     private static readonly ConcurrentDictionary<string, User> UserConnections = new();
-
+    private static readonly ConcurrentDictionary<int, List<string>> UserConnectionsMap = new();
     public ChatHub(GctConnectContext context, IUserService userService)
     {
         _context = context;
         _userService = userService;
     }
-
     public override async Task OnConnectedAsync()
     {
-        var claimsIdentity = Context.User?.Identity as ClaimsIdentity;
-        if (claimsIdentity != null && claimsIdentity.IsAuthenticated)
+        try
         {
-            var username = claimsIdentity.FindFirst(ClaimTypes.Name)?.Value;
-            var email = claimsIdentity.FindFirst(ClaimTypes.Email)?.Value;
-
-            if (!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(email))
+            var claimsIdentity = Context.User?.Identity as ClaimsIdentity;
+            if (claimsIdentity?.IsAuthenticated == true)
             {
-                // Fetch the user from the database
-                var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username && u.Email == email);
-                if (user != null)
+                var username = claimsIdentity.FindFirst(ClaimTypes.Name)?.Value;
+                var email = claimsIdentity.FindFirst(ClaimTypes.Email)?.Value;
+
+                if (!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(email))
                 {
-                    // Map the ConnectionId to the authenticated user
-                    UserConnections[Context.ConnectionId] = user;
+                    var user = await _context.Users
+                        .AsNoTracking()
+                        .FirstOrDefaultAsync(u => u.Username == username && u.Email == email);
+
+                    if (user != null)
+                    {
+                        UserConnections[Context.ConnectionId] = user;
+                        // Track user connections
+                        UserConnectionsMap.AddOrUpdate(user.UserId,
+                            new List<string> { Context.ConnectionId },
+                            (_, connections) =>
+                            {
+                                lock (connections)
+                                {
+                                    if (!connections.Contains(Context.ConnectionId))
+                                    {
+                                        connections.Add(Context.ConnectionId);
+                                    }
+                                }
+                                return connections;
+                            });
+
+                        await SendUnreadAnnouncementsToUser(user.UserId);
+                    }
+                }
+            }
+            await base.OnConnectedAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ OnConnectedAsync error: {ex}");
+            await base.OnConnectedAsync();
+        }
+    }
+
+    public override async Task OnDisconnectedAsync(Exception? exception)
+    {
+        try
+        {
+            foreach (var kvp in UserConnectionsMap)
+            {
+                lock (kvp.Value)
+                {
+                    if (kvp.Value.Remove(Context.ConnectionId))
+                    {
+                        if (kvp.Value.Count == 0)
+                        {
+                            UserConnectionsMap.TryRemove(kvp.Key, out _);
+                        }
+                        break;
+                    }
                 }
             }
         }
-
-        await base.OnConnectedAsync();
-    }
-
-    // Called when a client disconnects from the hub
-    public override async Task OnDisconnectedAsync(Exception? exception)
-    {
-        UserConnections.TryRemove(Context.ConnectionId, out _);
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ OnDisconnectedAsync error: {ex}");
+        }
         await base.OnDisconnectedAsync(exception);
     }
+
+    public static async Task SendAnnouncementToMultipleUsers(
+        IHubContext<ChatHub> hubContext,
+        GctConnectContext dbContext,
+        int announcementId,
+        List<int> userIds,
+        string title,
+        string content,
+        string priority)
+    {
+
+
+        // Send to connected clients
+        foreach (var userId in userIds)
+        {
+            if (UserConnectionsMap.TryGetValue(userId, out var connections))
+            {
+                foreach (var connectionId in connections.ToList()) // Use ToList for thread safety
+                {
+                    await hubContext.Clients.Client(connectionId)
+                        .SendAsync("receiveannouncement", title, content, priority);
+                }
+            }
+        }
+    }
+    public async Task SendAnnouncementToUser(int userId, string title, string content, string priority)
+    {
+        await Clients.User(userId.ToString()).SendAsync("receiveannouncement", title, content, priority);
+    }
+
+
+        // Fix the SendUnreadAnnouncementsToUser method
+    public async Task SendUnreadAnnouncementsToUser(int userId)
+        {
+            var unread = await _context.AnnouncementRecipients
+                .Include(ar => ar.Announcement)
+                .Where(ar => ar.UserId == userId && ar.IsRead == false)
+                .Select(ar => new {
+                    ar.Announcement.Title,
+                    ar.Announcement.Content,
+                    Priority = ar.Announcement.Priority == 1 ? "Low" :
+                              ar.Announcement.Priority == 2 ? "Medium" : "High"
+                })
+                .ToListAsync();
+
+            foreach (var ann in unread)
+            {
+                await Clients.User(userId.ToString())
+                    .SendAsync("receiveannouncement", ann.Title, ann.Content, ann.Priority);
+            }
+        }
+
 
     public async Task JoinGroup(int identifier, bool isPrivate)
     {
@@ -94,7 +188,13 @@ public class ChatHub : Hub
         Array.Sort(ids);
         return $"private_{ids[0]}_{ids[1]}";
     }
-
+    // In ChatHub class
+    public async Task<string> EchoTest(string message)
+    {
+        Console.WriteLine($"Echo test received: {message}");
+        await Clients.Caller.SendAsync("EchoResponse", $"Echo: {message}");
+        return $"Processed: {message}";
+    }
     // Leave a group
     public async Task LeaveGroup(string groupName)
     {
@@ -133,6 +233,7 @@ public class ChatHub : Hub
             await Clients.Caller.SendAsync("ReceiveMessage", "System", "Unauthorized action. Please log in.");
             return;
         }
+
 
 
         string senderFullName = $"{user.Name} {user.LastName}".Trim();

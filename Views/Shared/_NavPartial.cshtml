@@ -1,126 +1,163 @@
 ﻿@{
-	Layout = null;
+    Layout = null;
+    var controller = ViewBag.User as string;
 }
 
 
 
 <style>
-	.header-nav {
-		display: flex;
-		gap: 1.5rem;
-	}
+    .header-nav {
+    display: flex;
+    gap: 1.5rem;
+    }
 
-	.nav-link {
-		color: var(--gray-600);
-		text-decoration: none;
-		transition: var(--transition);
-	}
+    .nav-link {
+    color: var(--gray-600);
+    text-decoration: none;
+    transition: var(--transition);
+    }
 
-		.nav-link:hover {
-			color: var(--primary-color);
-		}
+    .nav-link:hover {
+    color: var(--primary-color);
+    }
 
-	/* ---- Chat Layout Styles ---- */
-	.chat-layout {
-		height: 100% !important;
-		display: flex;
-		height: calc(100% - 57px); /* subtract header height */
-		overflow: hidden;
-	}
+    /* ---- Chat Layout Styles ---- */
+    .chat-layout {
+    height: 100% !important;
+    display: flex;
+    height: calc(100% - 57px); /* subtract header height */
+    overflow: hidden;
+    }
 
-	/* Navigation Sidebar */
-	.nav-sidebar {
-        height:100%;
-		width: 76px;
-		flex-shrink: 0;
-        background-color: #9370db !important;
-		border-right: 1px solid var(--dark-light);
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		padding: 1rem 0;
-		color: var(--white);
-	}
+    /* Navigation Sidebar */
+    .nav-sidebar {
+    height: 100%;
+    width: 76px;
+    flex-shrink: 0;
+    background-color: #9370db !important;
+    border-right: 1px solid var(--dark-light);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem 0;
+    color: var(--white);
+    }
 
-	.logo-container {
-		padding: 0.5rem 0 1.5rem;
-	}
+    .logo-container {
+    padding: 0.5rem 0 1.5rem;
+    }
 
     img.sidebar-img {
-        height: 45px;
-        width: 45px;
-        border-radius:10px;
+    height: 45px;
+    width: 45px;
+    border-radius: 10px;
     }
-	.chat-logo-icon {
-		width: 32px;
-		height: 32px;
-		color: var(--white);
-		opacity: 0.7;
-		transition: var(--transition);
-		cursor: pointer;
-	}
 
-		.chat-logo-icon:hover {
-			opacity: 1;
-		}
+    .chat-logo-icon {
+    width: 32px;
+    height: 32px;
+    color: var(--white);
+    opacity: 0.7;
+    transition: var(--transition);
+    cursor: pointer;
+    }
+
+    .chat-logo-icon:hover {
+    opacity: 1;
+    }
 
     .sidebar-nav {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        justify-content: center; /* Vertically center icons */
-        width: 100%; /* Ensure full width */
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Vertically center icons */
+    width: 100%; /* Ensure full width */
     }
 
     .nav-list {
-        list-style: none;
-        display: flex;
-        flex-direction: column;
-        align-items: center; /* Horizontally center each icon */
-        gap: 1.5rem;
-        padding: 0;
-        margin: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Horizontally center each icon */
+    gap: 1.5rem;
+    padding: 0;
+    margin: 0;
     }
 
 
-	.nav-item {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		position: relative;
-		cursor: pointer;
-	}
+    .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    cursor: pointer;
+    }
 
-	.nav-icon {
-		width: 24px;
-		height: 24px;
-        color: #ced4da;
-		transition: var(--transition);
-	}
+    .nav-icon {
+    width: 24px;
+    height: 24px;
+    color: #ced4da;
+    transition: var(--transition);
+    }
 
-	.nav-text {
-		font-size: 0.75rem;
-		margin-top: 0.25rem;
-		color: var(--gray-400);
-	}
+    .nav-text {
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+    color: var(--gray-400);
+    }
 
-	.nav-item:hover .nav-icon,
-	.nav-item:hover .nav-text {
-        color: #ffffff;
-	}
+    .nav-item:hover .nav-icon,
+    .nav-item:hover .nav-text {
+    color: #ffffff;
+    }
 
 
-	.nav-item.active .nav-icon,
-	.nav-item.active .nav-text {
-		color: white;
-	}
+    .nav-item.active .nav-icon,
+    .nav-item.active .nav-text {
+    color: white;
+    }
 
 
     .user-profile {
-        margin-top: auto;
-        position: relative;
+    margin-top: auto;
+    position: relative;
     }
 
+    .badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: red;
+    color: white;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 0.7em;
+    min-width: 18px;
+    text-align: center;
+    }
+
+    .d-none {
+    display: none !important;
+    }
+
+    /* Toast styles */
+    .toast {
+    margin-bottom: 10px;
+    max-width: 350px;
+    }
+
+    .toast-header.bg-low {
+    background-color: #0d6efd !important;
+    }
+
+    .toast-header.bg-medium {
+    background-color: #ffc107 !important;
+    color: #000 !important;
+    }
+
+    .toast-header.bg-high {
+    background-color: #dc3545 !important;
+    }
 </style>
 
 
@@ -128,75 +165,242 @@
 <aside class="nav-sidebar">
     <div class="logo-container">
         <div class="sidebar-logo">
-            <img src="~/images/logo.png" alt="Logo" class="sidebar-img" />
+            <img src="~/images/logo.png" alt="Logo" class="sidebar-img" style="    height: 45px;
+    width: 45px;
+    border-radius: 10px;" />
         </div>
     </div>
 
     <nav class="sidebar-nav">
-        <ul class="nav-list">
-            <li class="nav-item active">
-                <a href="#" class="nav-link">
-                    <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                    </svg>
-                </a>
-            </li>
-
-            <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="9" cy="7" r="4"></circle>
-                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                    </svg>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <svg id="nav-item-4" class="nav-icon" width="1em" height="1.1em" viewBox="0 0 576 512" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                        <path d="M576 240c0-23.63-12.95-44.04-32-55.12V32.01C544 23.26 537.02 0 512 0c-7.12 0-14.19 2.38-19.98 7.02l-85.03 68.03C364.28 109.19 310.66 128 256 128H64c-35.35 0-64 28.65-64 64v96c0 35.35 28.65 64 64 64h33.7c-1.39 10.48-2.18 21.14-2.18 32 0 39.77 9.26 77.35 25.56 110.94 5.19 10.69 16.52 17.06 28.4 17.06h74.28c26.05 0 41.69-29.84 25.9-50.56-16.4-21.52-26.15-48.36-26.15-77.44 0-11.11 1.62-21.79 4.41-32H256c54.66 0 108.28 18.81 150.98 52.95l85.03 68.03a32.023 32.023 0 0 0 19.98 7.02c24.92 0 32-22.78 32-32V295.13C563.05 284.04 576 263.63 576 240zm-96 141.42l-33.05-26.44C392.95 311.78 325.12 288 256 288v-96c69.12 0 136.95-23.78 190.95-66.98L480 98.58v282.84z" fill="currentColor" />
-                    </svg>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
-                    </svg>
-                </a>
-            </li>
-
-
-
-
-            <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                        <polyline points="16 17 21 12 16 7"></polyline>
-                        <line x1="21" y1="12" x2="9" y2="12"></line>
-                    </svg>
-                </a>
-            </li>
-        </ul>
-    </nav>
-
-    <div class="user-profile">
-        <div class="avatar">
-<ul>
-                <li class="nav-item" id="chatbot-icon">
-                    <a asp-controller="UserProfile" asp-action="UserProfileManagement" class="nav-items" id="chatbot-icon">
-                        <img src="@ViewBag.ProfilePic" class="nav-profile-pic" alt="Profile Picture" />
-                    </a>
-                </li>
-
-</ul>
+        <div hidden id="debug-info">
+            Connection: @ViewBag.ConnectionId
+            UserId: @ViewBag.UserId
+            Unread: @ViewBag.UnreadAnnouncements
         </div>
-    </div>
+		<ul class="nav-list">
+			<li class="nav-item active">
+                <a asp-controller=@controller asp-action="Dashboard" class="nav-link">
+					<svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+					</svg>
+				</a>
+			</li>
+
+			<li class="nav-item">
+				<a href="#" class="nav-link">
+					<svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+						<circle cx="9" cy="7" r="4"></circle>
+						<path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+						<path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+					</svg>
+				</a>
+			</li>
+
+            <!-- Update the announcement icon section -->
+            <li class="nav-item">
+                <a href="#" class="nav-link position-relative" id="announcement-icon">
+                    <svg id="nav-item-4" class="nav-icon" width="1em" height="1.1em" viewBox="0 0 576 512"
+                         xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path d="M576 240c0-23.63-12.95-44.04-32-55.12V32.01C544 23.26 537.02 0 512 0c-7.12 0-14.19 2.38-19.98 7.02l-85.03 68.03C364.28 109.19 310.66 128 256 128H64c-35.35 0-64 28.65-64 64v96c0 35.35 28.65 64 64 64h33.7c-1.39 10.48-2.18 21.14-2.18 32 0 39.77 9.26 77.35 25.56 110.94 5.19 10.69 16.52 17.06 28.4 17.06h74.28c26.05 0 41.69-29.84 25.9-50.56-16.4-21.52-26.15-48.36-26.15-77.44 0-11.11 1.62-21.79 4.41-32H256c54.66 0 108.28 18.81 150.98 52.95l85.03 68.03a32.023 32.023 0 0 0 19.98 7.02c24.92 0 32-22.78 32-32V295.13C563.05 284.04 576 263.63 576 240zm-96 141.42l-33.05-26.44C392.95 311.78 325.12 288 256 288v-96c69.12 0 136.95-23.78 190.95-66.98L480 98.58v282.84z"
+                              fill="currentColor" />
+                    </svg>
+					<span id="announcement-badge"
+						  class="badge @(ViewBag.UnreadAnnouncements > 0 ? "" : "d-none")">
+						@ViewBag.UnreadAnnouncements
+					</span>
+                </a>
+            </li>
+
+
+			<li class="nav-item">
+				<a href="#" class="nav-link">
+                    <img src="/images/chatbotIcon(4).jpeg" id="chatbotIcon" style="    height: 50px;
+    width: 45px;
+    border-radius: 10px;" />
+@* 					<svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+					</svg> *@
+				</a>
+			</li>
+
+
+
+
+			<li class="nav-item">
+				<a asp-controller="Home" asp-action="Login" class="nav-link">
+					<svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+						<polyline points="16 17 21 12 16 7"></polyline>
+						<line x1="21" y1="12" x2="9" y2="12"></line>
+					</svg>
+				</a>
+			</li>
+		</ul>
+	</nav>
+
+	<div class="user-profile">
+		<div class="avatar">
+			<ul>
+				<li class="nav-item" id="chatbot-icon">
+					<a asp-controller="UserProfile" asp-action="UserProfileManagement" class="nav-items" id="chatbot-icon">
+                        <img src="@ViewBag.ProfilePic" class="nav-profile-pic" alt="Profile Picture" style="    height: 45px;
+    width: 45px;
+    border-radius: 10px;" />
+					</a>
+				</li>
+
+			</ul>
+		</div>
+	</div>
 </aside>
 
+@* <script src="~/js/signalr/dist/browser/signalr.js?v=1.0.3"></script>
+ *@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
 
+ <script>
+    // Initialize with server-side count
+    let announcementCount = @ViewBag.UnreadAnnouncements;
+    updateAnnouncementBadge();
+
+    // Enhanced connection handling
+    let connection = new signalR.HubConnectionBuilder()
+        .withUrl("/Services/ChatHub", {
+            withCredentials: true,
+            skipNegotiation: true,
+            transport: signalR.HttpTransportType.WebSockets
+        })
+        .withAutomaticReconnect()
+        .build();
+
+    connection.on("receiveannouncement", (title, content, priority) => {
+        console.log("New announcement:", title);
+
+        // Update badge
+        announcementCount++;
+        updateAnnouncementBadge();
+
+        // Show modal notification
+        window.showAnnouncementModal(title, content, priority);
+    });
+
+    // Start connection
+    connection.start()
+        .then(() => console.log("SignalR connected"))
+        .catch(err => console.error("Connection failed:", err));
+
+    // Update badge display
+    function updateAnnouncementBadge() {
+        const badge = document.getElementById("announcement-badge");
+        if (announcementCount > 0) {
+            badge.innerText = announcementCount;
+            badge.classList.remove("d-none");
+        } else {
+            badge.classList.add("d-none");
+        }
+    }
+
+    // Fetch and display all announcements
+    window.loadAnnouncements = async function() {
+        try {
+            const container = document.getElementById("announcementsContainer");
+            container.innerHTML = '<div class="loading-spinner">              </div>';
+
+            const response = await fetch('/Home/GetUnreadAnnouncements');
+            const announcements = await response.json();
+
+            renderAnnouncements(announcements);
+        } catch (error) {
+            console.error('Error loading announcements:', error);
+            container.innerHTML = '<div class="error-message">Error loading announcements</div>';
+        }
+    };
+
+    // Render announcements in modal
+    function renderAnnouncements(announcements) {
+        const container = document.getElementById("announcementsContainer");
+        container.innerHTML = '';
+
+        if (!announcements || announcements.length === 0) {
+            container.innerHTML = '<div class="empty-message">No unread announcements</div>';
+            return;
+        }
+
+        announcements.forEach(ann => {
+            const announcementEl = document.createElement("div");
+            announcementEl.className = "announcement-card";
+            announcementEl.innerHTML = `
+                <div class="announcement-header">
+                    <h4>${ann.title}</h4>
+                    <span class="priority-badge" data-priority="${ann.priority}">${ann.priority}</span>
+                </div>
+                <div class="announcement-content">
+                    <p>${ann.content}</p>
+                    <div class="announcement-meta">
+                        <small>${new Date(ann.createdAt).toLocaleString()}</small>
+                    </div>
+                </div>
+            `;
+            container.appendChild(announcementEl);
+        });
+    }
+
+    // Mark announcements as read
+    window.markAnnouncementsRead = async function() {
+        try {
+            await fetch('/Home/MarkAsRead', { method: 'POST' });
+
+            // Reset badge count
+            announcementCount = 0;
+            updateAnnouncementBadge();
+
+            console.log("Announcements marked as read");
+        } catch (err) {
+            console.error('Mark as read failed:', err);
+        }
+    };
+
+    // Handle announcement icon click
+    document.querySelector('#announcement-icon').addEventListener('click', function(e) {
+        e.preventDefault();
+        window.showAllAnnouncementsModal();
+        window.markAnnouncementsRead();
+    });
+</script>
+
+
+@* <script src="~/js/signalr/dist/browser/signalr.js?v=1.0.3"></script>
+
+<script>
+    console.log("hello")
+    // Create connection to your ChatHub
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl("/Services/ChatHub") // must match the endpoint in Startup.cs
+        .build();
+
+        console.log("Connection: ",connection);
+    // Announcement badge element
+    const badge = document.getElementById("announcement-badge");
+    let unreadCount = 0;
+
+    // Listen for incoming announcements
+    connection.on("ReceiveAnnouncement", function (title, content, priority) {
+        unreadCount++;
+        badge.textContent = unreadCount;
+        badge.style.display = "inline"; // show badge
+    });
+
+    // Start connection
+    connection.start()
+        .catch(err => console.error(err.toString()));
+
+    // Optional: reset count when user clicks the icon
+    document.getElementById("nav-item-4").addEventListener("click", function () {
+        unreadCount = 0;
+        badge.style.display = "none";
+    });
+</script> *@
 
 
 

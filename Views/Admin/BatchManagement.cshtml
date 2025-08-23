@@ -1,0 +1,78 @@
+﻿@model List<GCTConnect.ViewModel.Admin.BatchViewModel>
+@{
+	ViewBag.Title = "Batch Management";
+	Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>GCT Connect - Batch Management</title>
+	<link rel="stylesheet" href="/css/adminDashboard.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+	<partial name="_AdminNavBarPartial" />
+
+	<main class="main-content">
+		<header class="header">
+			<div class="header-left">
+				<button class="sidebar-toggle" onclick="toggleSidebar()">
+					<i class="fas fa-bars"></i>
+				</button>
+				<h1 class="page-title">Batch Management</h1>
+			</div>
+			<div class="header-right">
+				<div class="admin-profile">
+					<img src="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?w=40&h=40" alt="Admin" class="profile-img">
+					<span class="admin-name">Admin User</span>
+					<i class="fas fa-chevron-down"></i>
+				</div>
+			</div>
+		</header>
+		<div class="page-content">
+
+			<div id="batches" class="page">
+				<div class="page-header">
+					<h2>Batch Management</h2>
+					<button class="btn btn-primary" onclick="showModal('addBatchModal')">
+						<i class="fas fa-plus"></i> Add Batch
+					</button>
+				</div>
+
+				<div class="batch-grid">
+					@foreach (var batch in Model)
+					{
+						<div class="batch-card">
+							<div class="batch-header">
+								<h3>Batch @batch.BatchYear</h3>
+								<span class="batch-status @(batch.IsActive ? "active" : "inactive")">
+									@(batch.IsActive ? "Active" : "Inactive")
+								</span>
+							</div>
+							<div class="batch-stats">
+								<div class="stat-item">
+									<span class="stat-label">Total Students</span>
+									<span class="stat-value">@batch.StudentsCount</span>
+								</div>
+								<div class="stat-item">
+									<span class="stat-label">Departments</span>
+									<span class="stat-value">@batch.DepartmentCount</span>
+								</div>
+							</div>
+							<div class="batch-actions">
+								<a href="@Url.Action("Details", "Admin", new { year = batch.BatchYear })" class="btn btn-outline">View Details</a>
+								<a href="@Url.Action("DeleteBatchYear", "Admin", new { year = batch.BatchYear })" class="btn btn-danger">Delete</a>
+							</div>
+						</div>
+					}
+				</div>
+			</div>
+		</div>
+	</main>
+	<script src="/js/adminDashboard.js"></script>
+
+</body>
+</html>

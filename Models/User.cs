@@ -35,6 +35,8 @@ public partial class User
 
     public string? ProfilePic { get; set; }
 
+    public virtual ICollection<AnnouncementRecipient> AnnouncementRecipients { get; set; } = new List<AnnouncementRecipient>();
+
     public virtual ICollection<ChatbotQuery> ChatbotQueries { get; set; } = new List<ChatbotQuery>();
 
     public virtual ICollection<Department> Departments { get; set; } = new List<Department>();

@@ -1,0 +1,468 @@
+﻿@* @{
+	ViewBag.Title = "Admin Dashboard";
+	Layout = null;
+	var activities = ViewBag.Activities as List<GCTConnect.ViewModel.Admin.ActivityViewModel>;
+}
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>GCT Connect - Admin Panel</title>
+	<link rel="stylesheet" href="/css/adminDashboard.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+
+	<partial name="_AdminNavBarPartial" />
+	<!-- Main Content -->
+	<main class="main-content">
+		<!-- Header -->
+		<header class="header">
+			<div class="header-left">
+				<button class="sidebar-toggle" onclick="toggleSidebar()">
+					<i class="fas fa-bars"></i>
+				</button>
+				<h1 class="page-title">Admin Dashboard</h1>
+			</div>
+			<div class="header-right">
+				<div class="admin-profile">
+					<img src="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=40&h=40&dpr=1" alt="Admin" class="profile-img">
+					<span class="admin-name">Admin User</span>
+					<i class="fas fa-chevron-down"></i>
+				</div>
+			</div>
+		</header>
+
+
+		<div class="page-content">
+			<div id="announcements" class="page">
+				<div class="page-header">
+					<h2>Announcement Management</h2>
+					<button class="btn btn-primary" onclick="showModal('addAnnouncementModal')">
+						<i class="fas fa-plus"></i> Create Announcement
+					</button>
+				</div>
+
+				<div class="announcements-list">
+					<div class="announcement-card">
+						<div class="announcement-header">
+							<h3>Semester Exam Schedule</h3>
+							<span class="announcement-date">2024-01-20</span>
+						</div>
+						<div class="announcement-content">
+							<p>The semester examination schedule has been released. Please check your respective department pages for detailed information.</p>
+						</div>
+						<div class="announcement-footer">
+							<div class="announcement-meta">
+								<span class="priority high">High Priority</span>
+								<span class="visibility all">All Students</span>
+							</div>
+							<div class="announcement-actions">
+								<button class="btn-action edit"><i class="fas fa-edit"></i></button>
+								<button class="btn-action delete"><i class="fas fa-trash"></i></button>
+							</div>
+						</div>
+					</div>
+
+					<div class="announcement-card">
+						<div class="announcement-header">
+							<h3>Library Hours Update</h3>
+							<span class="announcement-date">2024-01-18</span>
+						</div>
+						<div class="announcement-content">
+							<p>The library will be open from 8:00 AM to 10:00 PM on weekdays and 9:00 AM to 6:00 PM on weekends.</p>
+						</div>
+						<div class="announcement-footer">
+							<div class="announcement-meta">
+								<span class="priority medium">Medium Priority</span>
+								<span class="visibility all">All Users</span>
+							</div>
+							<div class="announcement-actions">
+								<button class="btn-action edit"><i class="fas fa-edit"></i></button>
+								<button class="btn-action delete"><i class="fas fa-trash"></i></button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</main>
+	<script src="/js/adminDashboard.js"></script>
+
+</body>
+</html>
+
+ *@
+
+
+
+
+@{
+	ViewBag.Title = "Admin Dashboard";
+	Layout = null;
+	var announcements = ViewBag.Announcements as List<GCTConnect.Models.ViewModels.AnnouncementViewModel>;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>GCT Connect - Admin Panel</title>
+	<link rel="stylesheet" href="/css/adminDashboard.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+	<partial name="_AdminNavBarPartial" />
+
+	<main class="main-content">
+		<header class="header">
+			<div class="header-left">
+				<button class="sidebar-toggle" onclick="toggleSidebar()">
+					<i class="fas fa-bars"></i>
+				</button>
+				<h1 class="page-title">Admin Dashboard</h1>
+			</div>
+			<div class="header-right">
+				<div class="admin-profile">
+					<img src="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=40&h=40&dpr=1" alt="Admin" class="profile-img">
+					<span class="admin-name">Admin User</span>
+					<i class="fas fa-chevron-down"></i>
+				</div>
+			</div>
+		</header>
+
+		<div class="page-content">
+			<div id="announcements" class="page">
+				<div class="page-header">
+					<h2>Announcement Management</h2>
+					<button class="btn btn-primary" onclick="showModal('addAnnouncementModal')">
+						<i class="fas fa-plus"></i> Create Announcement
+					</button>
+				</div>
+
+				<div class="announcements-list">
+					@if (announcements != null && announcements.Any())
+					{
+						foreach (var ann in announcements)
+						{
+							<div class="announcement-card" data-id="@ann.AnnouncementId">
+								<div class="announcement-header">
+									<h3>@ann.Title</h3>
+									<span class="announcement-date">@ann.CreatedAt.ToString("yyyy-MM-dd")</span>
+								</div>
+								<div class="announcement-content">
+									<p>@ann.Content</p>
+								</div>
+								<div class="announcement-footer">
+									<div class="announcement-meta">
+										<span class="priority @ann.Priority.ToLower()">@ann.Priority</span>
+										<span class="visibility">@ann.Audience</span>
+									</div>
+									<div class="announcement-actions">
+										<button class="btn-action edit"><i class="fas fa-edit"></i></button>
+										<button class="btn-action delete"><i class="fas fa-trash"></i></button>
+									</div>
+								</div>
+							</div>
+						}
+					}
+					else
+					{
+						<p>No announcements available.</p>
+					}
+				</div>
+			</div>
+		</div>
+		<div id="addAnnouncementModal" class="modal">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3>Create Announcement</h3>
+					<button class="modal-close" onclick="hideModal('addAnnouncementModal')">
+						<i class="fas fa-times"></i>
+					</button>
+				</div>
+
+				<div class="modal-body">
+					<form id="announcementForm" class="announcement-form">
+						<!-- Title -->
+						<div class="form-group">
+							<label for="titleInput">Title</label>
+							<input id="titleInput" name="title" type="text" class="form-input" required />
+						</div>
+
+						<!-- Content -->
+						<div class="form-group">
+							<label for="contentInput">Content</label>
+							<textarea id="contentInput" name="content" class="form-textarea" rows="4" required></textarea>
+						</div>
+
+						<!-- Priority -->
+						<div class="form-group">
+							<label for="prioritySelect">Priority (Importance)</label>
+							<select id="prioritySelect" name="priority" class="form-select" required>
+								<option value="">Select Priority</option>
+								<option value="Low">Low</option>
+								<option value="Medium">Medium</option>
+								<option value="High">High</option>
+							</select>
+						</div>
+
+						<!-- Audience -->
+						<div class="form-group">
+							<label for="audienceSelect">Audience</label>
+							<select id="audienceSelect" name="audience" class="form-select" required>
+								<option value="">Select Audience</option>
+								<option value="all">All Members</option>
+								<option value="hods">Only HODs (all departments)</option>
+								<option value="teachers_all">All Teachers (all departments)</option>
+								<option value="teachers_department">Teachers of a specific department</option>
+								<option value="students_all">All Students</option>
+								<option value="students_department">Students of a specific department</option>
+								<option value="students_batch">Students of a specific batch</option>
+								<option value="students_department_batch">Students of a specific department & batch</option>
+							</select>
+							<small id="audienceHelp" class="help-text"></small>
+						</div>
+
+						<!-- Department -->
+						<div id="departmentGroup" class="form-group" style="display:none;">
+							<label for="departmentSelect">Department</label>
+							<select id="departmentSelect" name="departmentId" class="form-select">
+								<option value="">Select Department</option>
+							</select>
+						</div>
+
+						<!-- Batch -->
+						<div id="batchGroup" class="form-group" style="display:none;">
+							<label for="batchSelect">Batch</label>
+							<select id="batchSelect" name="batchId" class="form-select" disabled>
+								<option value="">Select Batch</option>
+							</select>
+							<small class="help-text">Batches are department-specific.</small>
+						</div>
+					</form>
+				</div>
+
+				<div class="modal-footer">
+					<button class="btn btn-outline" onclick="hideModal('addAnnouncementModal')">Cancel</button>
+					<button id="createAnnouncementBtn" type="button" class="btn btn-primary">Create Announcement</button>
+				</div>
+
+			</div>
+		</div>
+
+		<script>
+			// -------------------- Helpers --------------------
+			const $ = (q) => document.querySelector(q);
+			const byId = (id) => document.getElementById(id);
+
+			// Audience helper text (unchanged, optional)
+			const audienceHelpText = {
+			  "all": "Send to every registered member (Admins, Principal, HODs, Teachers, Students).",
+			  "hods": "Send only to HODs of all departments.",
+			  "teachers_all": "Send to all teachers in all departments.",
+			  "teachers_department": "Send to teachers in the selected department.",
+			  "students_all": "Send to all students across all departments and batches.",
+			  "students_department": "Send to students in the selected department.",
+			  "students_batch": "Send to students in a specific batch (across departments).",
+			  "students_department_batch": "Send to students in the selected department & batch."
+			};
+
+			// ✅ FIX: students_batch does NOT require department
+			const audienceRequires = {
+			  "all":        { dept:false, batch:false },
+			  "hods":       { dept:false, batch:false },
+			  "teachers_all": { dept:false, batch:false },
+			  "teachers_department": { dept:true,  batch:false },
+			  "students_all": { dept:false, batch:false },
+			  "students_department": { dept:true,  batch:false },
+			  "students_batch": { dept:false, batch:true },             // <-- changed
+			  "students_department_batch": { dept:true,  batch:true }
+			};
+
+			// -------------------- Populate Departments/Batches --------------------
+			async function loadDepartments() {
+			  const sel = byId('departmentSelect');
+			  sel.innerHTML = `<option value="">Select Department</option>`;
+			  try {
+						   const res = await fetch('/api/generalapi/departments') // adjust if needed
+				const data = await res.json(); // [{departmentId,name},...]
+				data.forEach(d => {
+				  const opt = document.createElement('option');
+				  opt.value = d.departmentId ?? d.id ?? d.DepartmentId;
+				  opt.textContent = d.name ?? d.Name;
+				  sel.appendChild(opt);
+				});
+			  } catch (e) {
+				console.error('Failed to load departments', e);
+			  }
+			}
+
+			// ✅ Updated: if departmentId is null/empty, load ALL batches
+			async function loadBatches(departmentId) {
+			  const sel = byId('batchSelect');
+			  sel.disabled = true;
+			  sel.innerHTML = `<option value="">Select Batch</option>`;
+			  try {
+
+				const url = departmentId
+				  ? `/api/generalapi/batches?departmentId=${encodeURIComponent(departmentId)}`
+				  : `/api/generalapi/batches`; // endpoint should return all batches when departmentId not provided
+				const res = await fetch(url);
+				const data = await res.json(); // [{batchId,batchYear},...]
+				data.forEach(b => {
+				  const opt = document.createElement('option');
+				  opt.value = b.batchId ?? b.id ?? b.BatchId;
+				  const year = b.batchYear ?? b.year ?? b.BatchYear;
+				  opt.textContent = year ? `Batch ${year}` : `Batch #${opt.value}`;
+				  sel.appendChild(opt);
+				});
+				sel.disabled = false;
+			  } catch (e) {
+				console.error('Failed to load batches', e);
+			  }
+			}
+
+			// -------------------- Audience toggling (✅ robust reset) --------------------
+			function clearAndDisableBatch() {
+			  const batchSel = byId('batchSelect');
+			  batchSel.innerHTML = `<option value="">Select Batch</option>`;
+			  batchSel.value = '';
+			  batchSel.disabled = true;
+			}
+
+			function updateAudienceUI() {
+			  const audience = byId('audienceSelect').value;
+			  byId('audienceHelp').textContent = audienceHelpText[audience] || '';
+
+			  const needDept  = audienceRequires[audience]?.dept  ?? false;
+			  const needBatch = audienceRequires[audience]?.batch ?? false;
+
+			  // Department visibility + reset
+			  if (needDept) {
+				byId('departmentGroup').style.display = 'block';
+				// Optionally load departments on demand (cheap to keep preloaded too)
+				if (!byId('departmentSelect').options.length || byId('departmentSelect').options.length === 1) {
+				  loadDepartments();
+				}
+			  } else {
+				byId('departmentGroup').style.display = 'none';
+				byId('departmentSelect').value = '';
+			  }
+
+			  // Batch visibility + data source
+			  if (needBatch) {
+				byId('batchGroup').style.display = 'block';
+				byId('batchSelect').disabled = false;
+
+				// If batch is needed but department is NOT needed -> load ALL batches
+				if (!needDept) {
+				  loadBatches(null); // ✅ all batches
+				} else {
+				  // Batch depends on department: only load after dept selected
+				  const depVal = byId('departmentSelect').value;
+				  if (depVal) {
+					loadBatches(depVal);
+				  } else {
+					clearAndDisableBatch();
+				  }
+				}
+			  } else {
+				byId('batchGroup').style.display = 'none';
+				clearAndDisableBatch();
+			  }
+			}
+
+			// -------------------- Wire up events --------------------
+			(function initAnnouncementModal() {
+			  const modal = byId('addAnnouncementModal');
+
+			  // Load depts once when modal opens (optional)
+			  const observer = new MutationObserver(() => {
+				const visible = getComputedStyle(modal).display !== 'none';
+				if (visible) {
+				  // Preload departments for snappy UX
+				  loadDepartments();
+				  // Reset UI state each time modal is opened
+				  updateAudienceUI();
+				}
+			  });
+			  observer.observe(modal, { attributes: true, attributeFilter: ['style', 'class'] });
+
+			  // When audience changes, toggle fields accordingly (✅ hides unrelated fields)
+			  byId('audienceSelect').addEventListener('change', updateAudienceUI);
+
+			  // When department changes, (re)load batches only if both dept & batch are required
+			  byId('departmentSelect').addEventListener('change', (e) => {
+				const audience = byId('audienceSelect').value;
+				const needsBatchAndDept = (audienceRequires[audience]?.batch && audienceRequires[audience]?.dept);
+				if (needsBatchAndDept) {
+				  const depId = e.target.value || null;
+				  if (depId) {
+					loadBatches(depId);
+				  } else {
+					clearAndDisableBatch();
+				  }
+				}
+			  });
+			})();
+						document.getElementById('createAnnouncementBtn').addEventListener('click', async function () {
+				const title = document.getElementById('titleInput').value.trim();
+				const content = document.getElementById('contentInput').value.trim();
+				const priority = document.getElementById('prioritySelect').value;
+				const audience = document.getElementById('audienceSelect').value;
+				const departmentId = document.getElementById('departmentSelect').value || null;
+				const batchId = document.getElementById('batchSelect').value || null;
+
+				if (!title || !content || !priority || !audience) {
+					alert("Please fill in all required fields.");
+					return;
+				}
+
+				const requestData = {
+					title,
+					content,
+					priority,
+					audience,
+					departmentId: departmentId ? parseInt(departmentId) : null,
+					batchId: batchId ? parseInt(batchId) : null
+				};
+
+				try {
+					const response = await fetch('/admin/create-announcement', {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json'
+						},
+						body: JSON.stringify(requestData)
+					});
+
+					if (response.ok) {
+						const result = await response.json();
+						alert(result.message || "Announcement created!");
+						hideModal('addAnnouncementModal');
+						location.reload(); // refresh announcements list
+					} else {
+						const error = await response.json();
+						alert(error.message || "Error creating announcement");
+					}
+				} catch (err) {
+					console.error("Request failed", err);
+					alert("An unexpected error occurred.");
+				}
+			});
+
+		</script>
+	</main>
+
+	<script src="/js/adminDashboard.js"></script>
+</body>
+</html>
