@@ -11,10 +11,12 @@
 using System;
 using System.Reflection;
 
+[assembly: Microsoft.Extensions.Configuration.UserSecrets.UserSecretsIdAttribute("git add .gitignore\r\ngit commit -m \"Add .gitignore to exclude .vs, bin, and obj fo" +
+    "lders\"\r\ngit push")]
 [assembly: System.Reflection.AssemblyCompanyAttribute("GCTConnect")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bfa58a143394420eb592cc00dc6d0cbb0561f96e")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f56d3ccbf1b5dd2609f39ba88475478109b051a9")]
 [assembly: System.Reflection.AssemblyProductAttribute("GCTConnect")]
 [assembly: System.Reflection.AssemblyTitleAttribute("GCTConnect")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
