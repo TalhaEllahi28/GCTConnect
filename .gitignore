@@ -1,0 +1,9 @@
+﻿# Visual Studio local files
+.vs/
+*.user
+*.suo
+*.vscode/
+
+# Build output
+bin/
+obj/
