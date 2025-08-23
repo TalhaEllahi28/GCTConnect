@@ -4,6 +4,10 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>git add .gitignore
+git commit -m "Add .gitignore to exclude .vs, bin, and obj folders"
+git push
+</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
