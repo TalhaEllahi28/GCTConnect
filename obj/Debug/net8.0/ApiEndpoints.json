@@ -297,22 +297,6 @@
   },
   {
     "ContainingType": "GCTConnect.Controllers.AdminController",
-    "Method": "DeleteUser",
-    "RelativePath": "admin",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "id",
-        "Type": "System.Int32",
-        "IsRequired": false
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "GCTConnect.Controllers.AdminController",
     "Method": "AddBatch",
     "RelativePath": "admin",
     "HttpMethod": "POST",
@@ -339,6 +323,22 @@
         "Name": "batch",
         "Type": "System.Int32",
         "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GCTConnect.Controllers.AdminController",
+    "Method": "DeleteUser",
+    "RelativePath": "admin/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
       }
     ],
     "ReturnTypes": []
@@ -391,6 +391,22 @@
   },
   {
     "ContainingType": "GCTConnect.Controllers.AdminController",
+    "Method": "DeleteUser",
+    "RelativePath": "admin/delete-user/{id}",
+    "HttpMethod": "",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GCTConnect.Controllers.AdminController",
     "Method": "DepartmentManagement",
     "RelativePath": "admin/department-management",
     "HttpMethod": "GET",
@@ -416,7 +432,33 @@
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
-    "Parameters": [],
+    "Parameters": [
+      {
+        "Name": "role",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "departmentId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "search",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "page",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageSize",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
     "ReturnTypes": []
   },
   {

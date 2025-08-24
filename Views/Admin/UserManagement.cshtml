@@ -1,324 +1,402 @@
 ﻿@model List<GCTConnect.Models.User>
 @{
-	ViewData["Title"] = "User Management";
-	Layout = null;
-	var departments = ViewBag.DepartmentNames as List<GCTConnect.Models.Department>;
-	// var message = "ok";
-	var message = TempData["Success"];
+    ViewData["Title"] = "User Management";
+    Layout = null;
+    var departments = ViewBag.DepartmentNames as List<GCTConnect.Models.Department>;
+    // var message = "ok";
+    var message = TempData["Success"];
 }
 
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>GCT Connect - User Management</title>
-	<link rel="stylesheet" href="/css/adminDashboard.css">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GCT Connect - User Management</title>
+    <link rel="stylesheet" href="/css/adminDashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <style>
-	/* Stylish select dropdowns */
-	.filter-select, .form-select {
-		appearance: none;
-		-webkit-appearance: none;
-		-moz-appearance: none;
-		background-color: #fff;
-		border: 1px solid #ccc;
-		border-radius: 8px;
-		padding: 8px 12px;
-		font-size: 14px;
-		color: #333;
-		outline: none;
-		transition: all 0.2s ease-in-out;
-		min-width: 180px;
-		background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3e%3cpath fill='%23666' d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
-		background-repeat: no-repeat;
-		background-position: right 12px center;
-		background-size: 12px;
-	}
+    /* Stylish select dropdowns */
+    .filter-select, .form-select {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        padding: 8px 12px;
+        font-size: 14px;
+        color: #333;
+        outline: none;
+        transition: all 0.2s ease-in-out;
+        min-width: 180px;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3e%3cpath fill='%23666' d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        background-size: 12px;
+    }
 
-		.filter-select:hover, .form-select:hover {
-			border-color: #888;
-		}
+        .filter-select:hover, .form-select:hover {
+            border-color: #888;
+        }
 
-		.filter-select:focus, .form-select:focus {
-			border-color: #4a90e2;
-			box-shadow: 0 0 5px rgba(74, 144, 226, 0.4);
-		}
+        .filter-select:focus, .form-select:focus {
+            border-color: #4a90e2;
+            box-shadow: 0 0 5px rgba(74, 144, 226, 0.4);
+        }
 
-	.alert-success {
-		background-color: #d4edda;
-		color: #155724;
-		padding: 12px 20px;
-		border-radius: 8px;
-		text-align: center;
-		width: 50%;
-		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-		transition: opacity 0.5s ease;
-	}
+    .alert-success {
+        background-color: #d4edda;
+        color: #155724;
+        padding: 12px 20px;
+        border-radius: 8px;
+        text-align: center;
+        width: 50%;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        transition: opacity 0.5s ease;
+    }
 
 </style>
 <body>
 
 
-	<partial name="_AdminNavBarPartial" />
+    <partial name="_AdminNavBarPartial" />
 
 
-	<main class="main-content">
-		<header class="header">
-			<div class="header-left">
-				<button class="sidebar-toggle" onclick="toggleSidebar()">
-					<i class="fas fa-bars"></i>
-				</button>
+    <main class="main-content">
+        <header class="header">
+            <div class="header-left">
+                <button class="sidebar-toggle" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
 
 
-				<h1 class="page-title">User Management</h1>
-			</div>
-			@if (message?.ToString() == "ok")
-			{
-				<div id="successMessage" class="alert-success">
-					User add successfully!
-				</div>
+                <h1 class="page-title">User Management</h1>
+            </div>
+            @if (message?.ToString() == "ok")
+            {
+                <div id="successMessage" class="alert-success">
+                    User add successfully!
+                </div>
 
-				<script>
-					setTimeout(() => {
-						document.getElementById("successMessage").style.opacity = "0";
-						setTimeout(() => document.getElementById("successMessage").remove(), 500);
-					}, 3000);
-				</script>
-			}
-			<div class="header-right">
-				<div class="admin-profile">
-					<img src="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=40&h=40&dpr=1" alt="Admin" class="profile-img">
-					<span class="admin-name">Admin User</span>
-					<i class="fas fa-chevron-down"></i>
-				</div>
-			</div>
-		</header>
-		<div class="page-content">
-			<div id="users" class="page">
-				<div class="page-header">
-					<button class="btn btn-primary" onclick="showModal('addUserModal')">
-						<i class="fas fa-plus"></i> Add User
-					</button>
-				</div>
+                <script>
+                    setTimeout(() => {
+                        document.getElementById("successMessage").style.opacity = "0";
+                        setTimeout(() => document.getElementById("successMessage").remove(), 500);
+                    }, 3000);
+                </script>
+            }
+            <div class="header-right">
+                <div class="admin-profile">
+                    <img src="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=40&h=40&dpr=1" alt="Admin" class="profile-img">
+                    <span class="admin-name">Admin User</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+        </header>
+        <div class="page-content">
+            <div id="users" class="page">
+                <div class="page-header">
+                    <button class="btn btn-primary" onclick="showModal('addUserModal')">
+                        <i class="fas fa-plus"></i> Add User
+                    </button>
+                </div>
 
-				<div class="card">
-					<div class="card-header">
-						<div class="filters">
-							<select class="filter-select">
-								<option value="">All Roles</option>
-								<option value="student">Student</option>
-								<option value="teacher">Teacher</option>
-								<option value="hod">HoD</option>
-								<option value="principal">Principal</option>
-							</select>
-							<select class="filter-select">
-								<option value="">All Departments</option>
-								@foreach (var dept in departments)
-								{
-									<option value="@dept.DepartmentId">@dept.Name</option>
-								}
-							</select>
-							<input type="text" class="search-input" placeholder="Search users...">
-						</div>
-					</div>
-					<div class="card-body">
-						<div class="table-responsive">
-							<table class="data-table">
-								<thead>
-									<tr>
-										<th>Name</th>
-										<th>Email</th>
-										<th>Role</th>
-										<th>Department</th>
-										<th>Status</th>
-										<th>Actions</th>
-									</tr>
-								</thead>
-								<tbody>
-									@foreach (var user in Model)
-									{
-										<tr>
-											<td>
-												<div class="user-info">
-													<img src="@(string.IsNullOrEmpty(user.ProfilePic) ? "https://via.placeholder.com/40" : user.ProfilePic)" class="user-avatar" />
-													<span>@user.Name @user.LastName</span>
-												</div>
-											</td>
-											<td>@user.Email</td>
-											<td><span class="role-badge @user.Role.ToLower()">@user.Role</span></td>
-											<td>@(user.Departments.FirstOrDefault()?.Name ?? "N/A")</td>
-											<td><span class="status-badge active">Active</span></td>
-											<td>
-												<div class="action-buttons">
-													<button class="btn-action edit" title="Edit" onclick="openEditModal(@user.UserId)"><i class="fas fa-edit"></i></button>
-													<form asp-action="DeleteUser" method="post" style="display:inline;">
-														<input type="hidden" name="id" value="@user.UserId" />
-														<button class="btn-action delete" title="Delete">
-															<i class="fas fa-trash"></i>
-														</button>
-													</form>
-												</div>
-											</td>
-										</tr>
-									}
-								</tbody>
-							</table>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</main>
+                <div class="card">
+                    <div class="card-header">
+                        <!-- Hidden form for filtering -->
+                        <form id="filterForm" method="get" style="display: none;">
+                            <input type="hidden" name="role" value="@ViewBag.CurrentRole" />
+                            <input type="hidden" name="departmentId" value="@ViewBag.CurrentDepartmentId" />
+                            <input type="hidden" name="search" value="@ViewBag.CurrentSearch" />
+                            <input type="hidden" name="page" value="1" />
+                        </form>
+
+                        <div class="filters">
+                            <select class="filter-select" id="roleFilter" onchange="applyFilters()">
+                                <option value="">All Roles</option>
+                                <option value="Students" selected="@(ViewBag.CurrentRole == "Students")">Students</option>
+                                <option value="Teachers" selected="@(ViewBag.CurrentRole == "Teachers")">Teachers</option>
+                                <option value="Hod" selected="@(ViewBag.CurrentRole == "Hod")">HoD</option>
+                                <option value="Principal" selected="@(ViewBag.CurrentRole == "Principal")">Principal</option>
+                                <option value="Admin" selected="@(ViewBag.CurrentRole == "Admin")">Admin</option>
+                            </select>
+                            <select class="filter-select" id="departmentFilter" onchange="applyFilters()">
+                                <option value="">All Departments</option>
+                                @foreach (var dept in departments)
+                                {
+                                    <option value="@dept.DepartmentId" selected="@(ViewBag.CurrentDepartmentId==dept.DepartmentId)">@dept.Name</option>
+                                }
+                            </select>
+                            <input type="text" class="search-input" id="searchInput" placeholder="Search users..."
+                                   value="@ViewBag.CurrentSearch" oninput="debounceSearch(this.value)">
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Role</th>
+                                        <th>Department</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var user in Model)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="user-info">
+                                                    <img src="@(string.IsNullOrEmpty(user.ProfilePic) ? "https://via.placeholder.com/40" : user.ProfilePic)" class="user-avatar" />
+                                                    <span>@user.Name @user.LastName</span>
+                                                </div>
+                                            </td>
+                                            <td>@user.Email</td>
+                                            <td><span class="role-badge @user.Role.ToLower()">@user.Role</span></td>
+                                            <td>@(user.Departments.FirstOrDefault()?.Name ?? "N/A")</td>
+                                            <td><span class="status-badge active">Active</span></td>
+                                            <td>
+                                                <div class="action-buttons">
+                                                    <button class="btn-action edit" title="Edit" onclick="openEditModal(@user.UserId)"><i class="fas fa-edit"></i></button>
+                                                    <form class="delete-user-form" data-user-id="@user.UserId" style="display:inline;">
+                                                        <button type="submit" class="btn-action delete" title="Delete">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </form>
+
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
 
 
-	<partial name="_AddSomeone" model="new GCTConnect.Models.User()" />
-	<partial name="_EditSomeone" model=" new GCTConnect.Models.User()" />
-	<script src="/js/adminDashboard.js"></script>
-	<script>
-		// Access the value from ViewData
-		var currentUserRole = "@ViewData["CurrentUserRole"]";
-		console.log("CurrentUserLog");
-		// Handle role-specific dropdown visibility
-		if (currentUserRole === "Admin") {
-			let roleOptionsForAdmin = document.getElementById("roleOptionsForAdmin");
-			roleOptionsForAdmin.style.display = "block";
+    <partial name="_AddSomeone" model="new GCTConnect.Models.User()" />
+    <partial name="_EditSomeone" model=" new GCTConnect.Models.User()" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
 
-			// Admin role dropdown event listener
-			var roleOptionsForAdminSelect = document.getElementById("roleOptionsForAdminSelect");
-			roleOptionsForAdminSelect.addEventListener('change', function () {
-				handleRoleSelection(roleOptionsForAdminSelect.value);
-			});
-		} else if (currentUserRole === "Hod") {
-			let roleOptionsForHod = document.getElementById("roleOptionsForHod");
-			roleOptionsForHod.style.display = "block";
+    <script src="/js/adminDashboard.js"></script>
+    <script>
+        // Access the value from ViewData
+        var currentUserRole = "@ViewData["CurrentUserRole"]";
+        console.log("CurrentUserLog");
+        // Handle role-specific dropdown visibility
+        if (currentUserRole === "Admin") {
+            let roleOptionsForAdmin = document.getElementById("roleOptionsForAdmin");
+            roleOptionsForAdmin.style.display = "block";
 
-			// Hod role dropdown event listener
-			var roleOptionsForHodSelect = document.getElementById("roleOptionsForHodSelect");
-			roleOptionsForHodSelect.addEventListener('change', function () {
-				handleRoleSelection(roleOptionsForHodSelect.value);
-			});
-		}
+            // Admin role dropdown event listener
+            var roleOptionsForAdminSelect = document.getElementById("roleOptionsForAdminSelect");
+            roleOptionsForAdminSelect.addEventListener('change', function () {
+                handleRoleSelection(roleOptionsForAdminSelect.value);
+            });
+        } else if (currentUserRole === "Hod") {
+            let roleOptionsForHod = document.getElementById("roleOptionsForHod");
+            roleOptionsForHod.style.display = "block";
 
-		// Function to handle role-based dynamic field visibility
-		function handleRoleSelection(selectedRole) {
-			// Hide all role-dependent fields first
-			document.getElementById("department").style.display = "none";
-			document.getElementById("rollno").style.display = "none";
-			document.getElementById("batch").style.display = "none";
-			document.getElementById("subject").style.display = "none";
+            // Hod role dropdown event listener
+            var roleOptionsForHodSelect = document.getElementById("roleOptionsForHodSelect");
+            roleOptionsForHodSelect.addEventListener('change', function () {
+                handleRoleSelection(roleOptionsForHodSelect.value);
+            });
+        }
 
-			// Display specific fields based on the selected role
-			if (selectedRole === "Students") {
-				document.getElementById("rollno").style.display = "block";
-				document.getElementById("batch").style.display = "block";
-				document.getElementById("department").style.display = "block";
-			} else if (selectedRole === "Hod" || selectedRole === "Teachers") {
-				document.getElementById("department").style.display = "block";
-				document.getElementById("subject").style.display = "block";
-			}
-		}
+        // Function to handle role-based dynamic field visibility
+        function handleRoleSelection(selectedRole) {
+            // Hide all role-dependent fields first
+            document.getElementById("department").style.display = "none";
+            document.getElementById("rollno").style.display = "none";
+            document.getElementById("batch").style.display = "none";
+            document.getElementById("subject").style.display = "none";
 
-		document.getElementById('subject-input').addEventListener('input', function () {
-			const input = this.value.toLowerCase();
-			const datalist = document.getElementById('subjects-datalist');
+            // Display specific fields based on the selected role
+            if (selectedRole === "Students") {
+                document.getElementById("rollno").style.display = "block";
+                document.getElementById("batch").style.display = "block";
+                document.getElementById("department").style.display = "block";
+            } else if (selectedRole === "Hod" || selectedRole === "Teachers") {
+                document.getElementById("department").style.display = "block";
+                document.getElementById("subject").style.display = "block";
+            }
+        }
 
-			// Show only matching subjects
-			Array.from(datalist.options).forEach(option => {
-				option.style.display = option.value.toLowerCase().includes(input) ? '' : 'none';
-			});
-		});
+        document.getElementById('subject-input').addEventListener('input', function () {
+            const input = this.value.toLowerCase();
+            const datalist = document.getElementById('subjects-datalist');
 
-	</script>
-	<script>
+            // Show only matching subjects
+            Array.from(datalist.options).forEach(option => {
+                option.style.display = option.value.toLowerCase().includes(input) ? '' : 'none';
+            });
+        });
 
-		// Function to open edit modal and populate with user data
-		function openEditModal(userId) {
-			// Make AJAX call to get user data
-			fetch(`/Home/GetUserForEdit/${userId}`)
-				.then(response => response.json())
-				.then(user => {
-					// Populate the edit form with user data
-					document.querySelector('#editUserModal input[name="UserId"]').value = user.userId;
-					document.querySelector('#editUserModal input[name="Name"]').value = user.name || '';
-					document.querySelector('#editUserModal input[name="LastName"]').value = user.lastName || '';
-					document.querySelector('#editUserModal input[name="Email"]').value = user.email || '';
-					document.querySelector('#editUserModal input[name="PhoneNumber"]').value = user.phoneNumber || '';
-					document.querySelector('#editUserModal select[name="Gender"]').value = user.gender || '';
-					document.querySelector('#editUserModal input[name="RollNumber"]').value = user.rollNumber || '';
-					document.querySelector('#editUserModal input[name="Subject"]').value = user.subject || '';
+    </script>
+    <script>
 
-					// Set department and batch
-					if (user.departmentId) {
-						document.querySelector('#editUserModal select[name="DepartmentId"]').value = user.departmentId;
-					}
-					if (user.batchId) {
-						document.querySelector('#editUserModal select[name="BatchId"]').value = user.batchId;
-					}
+        // Function to open edit modal and populate with user data
+        function openEditModal(userId) {
+            // Make AJAX call to get user data
+            fetch(`/Home/GetUserForEdit/${userId}`)
+                .then(response => response.json())
+                .then(user => {
+                    // Populate the edit form with user data
+                    document.querySelector('#editUserModal input[name="UserId"]').value = user.userId;
+                    document.querySelector('#editUserModal input[name="Name"]').value = user.name || '';
+                    document.querySelector('#editUserModal input[name="LastName"]').value = user.lastName || '';
+                    document.querySelector('#editUserModal input[name="Email"]').value = user.email || '';
+                    document.querySelector('#editUserModal input[name="PhoneNumber"]').value = user.phoneNumber || '';
+                    document.querySelector('#editUserModal select[name="Gender"]').value = user.gender || '';
+                    document.querySelector('#editUserModal input[name="RollNumber"]').value = user.rollNumber || '';
+                    document.querySelector('#editUserModal input[name="Subject"]').value = user.subject || '';
 
-					// Handle role selection and show appropriate dropdowns
-					var currentUserRole = "@ViewData["CurrentUserRole"]";
-					if (currentUserRole === "Admin") {
-						document.getElementById("editRoleOptionsForAdmin").style.display = "block";
-						document.getElementById("editRoleOptionsForAdminSelect").value = user.role || '';
-						handleEditRoleSelection(user.role);
+                    // Set department and batch
+                    if (user.departmentId) {
+                        document.querySelector('#editUserModal select[name="DepartmentId"]').value = user.departmentId;
+                    }
+                    if (user.batchId) {
+                        document.querySelector('#editUserModal select[name="BatchId"]').value = user.batchId;
+                    }
 
-						// Add event listener for role changes
-						document.getElementById("editRoleOptionsForAdminSelect").addEventListener('change', function () {
-							handleEditRoleSelection(this.value);
-						});
-					} else if (currentUserRole === "Hod") {
-						document.getElementById("editRoleOptionsForHod").style.display = "block";
-						document.getElementById("editRoleOptionsForHodSelect").value = user.role || '';
-						handleEditRoleSelection(user.role);
+                    // Handle role selection and show appropriate dropdowns
+                    var currentUserRole = "@ViewData["CurrentUserRole"]";
+                    if (currentUserRole === "Admin") {
+                        document.getElementById("editRoleOptionsForAdmin").style.display = "block";
+                        document.getElementById("editRoleOptionsForAdminSelect").value = user.role || '';
+                        handleEditRoleSelection(user.role);
 
-						// Add event listener for role changes
-						document.getElementById("editRoleOptionsForHodSelect").addEventListener('change', function () {
-							handleEditRoleSelection(this.value);
-						});
-					}
+                        // Add event listener for role changes
+                        document.getElementById("editRoleOptionsForAdminSelect").addEventListener('change', function () {
+                            handleEditRoleSelection(this.value);
+                        });
+                    } else if (currentUserRole === "Hod") {
+                        document.getElementById("editRoleOptionsForHod").style.display = "block";
+                        document.getElementById("editRoleOptionsForHodSelect").value = user.role || '';
+                        handleEditRoleSelection(user.role);
 
-					// Show the modal
-					showModal('editUserModal');
-				})
-				.catch(error => {
-					console.error('Error fetching user data:', error);
-					alert('Error loading user data. Please try again.');
-				});
-		}
+                        // Add event listener for role changes
+                        document.getElementById("editRoleOptionsForHodSelect").addEventListener('change', function () {
+                            handleEditRoleSelection(this.value);
+                        });
+                    }
 
-		// Function to handle role-based dynamic field visibility for edit modal
-		function handleEditRoleSelection(selectedRole) {
-			// Hide all role-dependent fields first
-			document.getElementById("editDepartment").style.display = "none";
-			document.getElementById("editRollno").style.display = "none";
-			document.getElementById("editBatch").style.display = "none";
-			document.getElementById("editSubject").style.display = "none";
+                    // Show the modal
+                    showModal('editUserModal');
+                })
+                .catch(error => {
+                    console.error('Error fetching user data:', error);
+                    alert('Error loading user data. Please try again.');
+                });
+        }
 
-			// Display specific fields based on the selected role
-			if (selectedRole === "Students") {
-				document.getElementById("editRollno").style.display = "block";
-				document.getElementById("editBatch").style.display = "block";
-				document.getElementById("editDepartment").style.display = "block";
-			} else if (selectedRole === "Hod" || selectedRole === "Teachers") {
-				document.getElementById("editDepartment").style.display = "block";
-				document.getElementById("editSubject").style.display = "block";
-			}
-		}
+        // Function to handle role-based dynamic field visibility for edit modal
+        function handleEditRoleSelection(selectedRole) {
+            // Hide all role-dependent fields first
+            document.getElementById("editDepartment").style.display = "none";
+            document.getElementById("editRollno").style.display = "none";
+            document.getElementById("editBatch").style.display = "none";
+            document.getElementById("editSubject").style.display = "none";
 
-		// Subject input functionality for edit modal
-		document.getElementById('edit-subject-input').addEventListener('input', function () {
-			const input = this.value.toLowerCase();
-			const datalist = document.getElementById('edit-subject-options');
+            // Display specific fields based on the selected role
+            if (selectedRole === "Students") {
+                document.getElementById("editRollno").style.display = "block";
+                document.getElementById("editBatch").style.display = "block";
+                document.getElementById("editDepartment").style.display = "block";
+            } else if (selectedRole === "Hod" || selectedRole === "Teachers") {
+                document.getElementById("editDepartment").style.display = "block";
+                document.getElementById("editSubject").style.display = "block";
+            }
+        }
 
-			// Show only matching subjects
-			Array.from(datalist.options).forEach(option => {
-				option.style.display = option.value.toLowerCase().includes(input) ? '' : 'none';
-			});
-		});
+        // Subject input functionality for edit modal
+        document.getElementById('edit-subject-input').addEventListener('input', function () {
+            const input = this.value.toLowerCase();
+            const datalist = document.getElementById('edit-subject-options');
 
-	</script>
+            // Show only matching subjects
+            Array.from(datalist.options).forEach(option => {
+                option.style.display = option.value.toLowerCase().includes(input) ? '' : 'none';
+            });
+        });
+
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll(".delete-user-form").forEach(form => {
+                form.addEventListener("submit", async function (e) {
+                    e.preventDefault();
+
+                    const userId = this.getAttribute("data-user-id");
+
+                    if (!confirm("Are you sure you want to delete this user?")) return;
+
+                    try {
+                        const response = await fetch(`/admin/delete-user/${userId}`, {
+                            method: "DELETE"
+                        });
+
+                        if (response.ok) {
+                            toastr.success("User deleted successfully");
+
+                            // Optionally remove row from table
+                            this.closest("tr").remove();
+                        } else {
+                            const error = await response.json();
+                            toastr.error(error.message || "Error deleting user");
+                        }
+                    } catch (err) {
+                        toastr.error("An unexpected error occurred: " + err.message);
+                    }
+                });
+            });
+        });
+    </script>
+    <script>
+        // Filtering and Search Functions
+        function applyFilters() {
+            const form = document.getElementById('filterForm');
+
+            // Update hidden fields from the visible filters
+            form.querySelector('input[name="role"]').value = document.getElementById('roleFilter').value;
+            form.querySelector('input[name="departmentId"]').value = document.getElementById('departmentFilter').value;
+            form.querySelector('input[name="page"]').value = 1; // reset page when filters change
+
+            form.submit();
+        }
+
+
+        let searchTimeout;
+        function debounceSearch(searchValue) {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                const form = document.getElementById('filterForm');
+                const searchInput = form.querySelector('input[name="search"]');
+                searchInput.value = searchValue;
+                form.querySelector('input[name="page"]').value = 1; // Reset to first page
+                form.submit();
+            }, 500); // Wait 500ms after user stops typing
+        }
+
+        function goToPage(page) {
+            const form = document.getElementById('filterForm');
+            form.querySelector('input[name="page"]').value = page;
+            form.submit();
+        }
+
+    </script>
 </body>
 </html>

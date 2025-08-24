@@ -119,8 +119,45 @@ public class AdminController : Controller
         return View();
     }
 
+    //[HttpGet("user-management")]
+    //public IActionResult UserManagement()
+    //{
+    //    var currentUser = _userService.GetCurrentUser();
+    //    if (currentUser == null)
+    //    {
+    //        return NotFound();
+    //    }
+    //    string currentUserRole = currentUser.Role;
+    //    ViewData["CurrentUserRole"] = currentUserRole;
+    //    ViewBag.Batches = _context.Batches
+    //        .GroupBy(b => b.BatchYear) // Group batches by year
+    //        .Select(g => new
+    //        {
+    //            Id = g.First().BatchId,  // Use the first BatchId in the group
+    //            Year = g.Key              // The key is the BatchYear
+    //        })
+    //        .ToList(); // Materialize the results in memory
+    //    ViewBag.Departments = _context.Departments.Select(d => new { Id = d.DepartmentId, Name = d.Name }).ToList();
+
+    //    ViewBag.Subjects = _context.Users
+    //          .Where(u => u.Subject != null) // Exclude NULL entries
+    //          .Select(u => u.Subject)
+    //          .Distinct()
+    //          .ToList();
+
+
+
+    //    ViewBag.ActivePage = "UserManagement";
+
+    //    var users = _context.Users.Include(u => u.Departments).ToList();
+    //    ViewBag.DepartmentNames = _context.Departments.ToList();
+    //    return View(users);
+    //}
+
+
+
     [HttpGet("user-management")]
-    public IActionResult UserManagement()
+    public IActionResult UserManagement(string role = "", int departmentId = 0, string search = "", int page = 1, int pageSize = 10)
     {
         var currentUser = _userService.GetCurrentUser();
         if (currentUser == null)
@@ -145,15 +182,58 @@ public class AdminController : Controller
               .Distinct()
               .ToList();
 
-
-
         ViewBag.ActivePage = "UserManagement";
 
-        var users = _context.Users.Include(u => u.Departments).ToList();
+        // Start with all users
+        var usersQuery = _context.Users.Include(u => u.Departments).AsQueryable();
+
+        // Apply role filter
+        if (!string.IsNullOrEmpty(role))
+        {
+            usersQuery = usersQuery.Where(u => u.Role.ToLower() == role.ToLower());
+        }
+
+        // Apply department filter
+        if (departmentId > 0)
+        {
+            usersQuery = usersQuery.Where(u => u.DepartmentId == departmentId);
+        }
+
+        // Apply search filter
+        if (!string.IsNullOrEmpty(search))
+        {
+            search = search.ToLower();
+            usersQuery = usersQuery.Where(u =>
+                u.Name.ToLower().Contains(search) ||
+                u.LastName.ToLower().Contains(search) ||
+                u.Email.ToLower().Contains(search) ||
+                (u.RollNumber != null && u.RollNumber.ToLower().Contains(search))
+            );
+        }
+
+        // Get total count for pagination
+        var totalUsers = usersQuery.Count();
+        var totalPages = (int)Math.Ceiling((double)totalUsers / pageSize);
+
+        // Apply pagination
+        var users = usersQuery
+            .OrderBy(u => u.Name)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
+
+        // Pass pagination and filter data to view
+        ViewBag.CurrentPage = page;
+        ViewBag.TotalPages = totalPages;
+        ViewBag.PageSize = pageSize;
+        ViewBag.TotalUsers = totalUsers;
+        ViewBag.CurrentRole = role;
+        ViewBag.CurrentDepartmentId = departmentId;
+        ViewBag.CurrentSearch = search;
+
         ViewBag.DepartmentNames = _context.Departments.ToList();
         return View(users);
     }
-
     [HttpPost]
     public IActionResult AddUser(User user)
     {
@@ -171,18 +251,70 @@ public class AdminController : Controller
         return View("UserManagement", users);
     }
 
-    [HttpPost]
-    public IActionResult DeleteUser(int id)
-    {
-        var user = _context.Users.Find(id);
-        if (user != null)
-        {
-            _context.Users.Remove(user);
-            _context.SaveChanges();
-        }
 
-        return RedirectToAction("UserManagement");
+
+    [HttpDelete("{id}")]
+    [Route("delete-user/{id}")]
+    public async Task<IActionResult> DeleteUser(int id)
+    {
+        var user = await _context.Users.Where(u=>u.UserId == id)
+            .FirstOrDefaultAsync();
+
+        if (user == null)
+            return NotFound(new { message = "User not found." });
+
+        using var transaction = await _context.Database.BeginTransactionAsync();
+
+        try
+        {
+            _context.AnnouncementRecipients.RemoveRange(
+                _context.AnnouncementRecipients.Where(ar => ar.UserId == id));
+
+            _context.ChatbotQueries.RemoveRange(
+                _context.ChatbotQueries.Where(q => q.UserId == id));
+
+            _context.Files.RemoveRange(
+                _context.Files.Where(f => f.UploaderId == id));
+
+            _context.Friends.RemoveRange(
+                _context.Friends.Where(f => f.SenderId == id || f.ReceiverId == id));
+
+            _context.GroupMembers.RemoveRange(
+                _context.GroupMembers.Where(gm => gm.UserId == id));
+
+            _context.Groups.RemoveRange(
+                _context.Groups.Where(g => g.CreatedBy == id));
+
+            _context.Messages.RemoveRange(
+                _context.Messages.Where(m => m.SenderId == id));
+
+
+            _context.UserProfiles.RemoveRange(
+                _context.UserProfiles.Where(up => up.UserId == id));
+
+            // 2. Nullify Department HOD if user is a HOD
+            var departments = _context.Departments.Where(d => d.HodId == id);
+            foreach (var dept in departments)
+            {
+                dept.HodId = null;
+            }
+
+            // 3. Finally delete the user
+            _context.Users.Remove(user);
+
+            // Commit changes
+            await _context.SaveChangesAsync();
+            await transaction.CommitAsync();
+
+            return Ok(new { message = "User deleted successfully." });
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync();
+            return StatusCode(500, new { error = ex.Message });
+        }
     }
+
 
 
     [HttpGet("batch-management")]
