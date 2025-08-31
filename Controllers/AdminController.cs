@@ -12,6 +12,7 @@ using Org.BouncyCastle.Crypto.Generators;
 using Microsoft.AspNetCore.SignalR;
 using GCTConnect.Models.ViewModels;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 
 
@@ -317,6 +318,14 @@ public class AdminController : Controller
 
 
 
+
+
+
+
+
+
+
+    #region BatchManagement
     [HttpGet("batch-management")]
     public async Task<IActionResult> BatchManagement()
     {
@@ -336,6 +345,522 @@ public class AdminController : Controller
 
         return View(batchSummary);
     }
+
+    [HttpGet("get-departments")]
+    public JsonResult GetDepartments()
+    {
+        try
+        {
+            var departments = _context.Departments
+                .Select(d => new { d.DepartmentId, d.Name })
+                .OrderBy(d => d.Name)
+                .ToList();
+
+            return Json(new { success = true, departments });
+        }
+        catch (Exception ex)
+        {
+            return Json(new { success = false, message = "Failed to load departments" });
+        }
+    }
+
+    [HttpGet("get-batch-departments")]
+    public JsonResult GetBatchDepartments(int batchYear)
+    {
+        try
+        {
+            var existingDepartments = _context.Batches
+                .Where(b => b.BatchYear == batchYear)
+                .Select(b => new {
+                    b.DepartmentId,
+                    b.Department.Name,
+                    b.StudentsCount
+                })
+                .ToList();
+
+            return Json(new { success = true, departments = existingDepartments });
+        }
+        catch (Exception ex)
+        {
+            return Json(new { success = false, message = "Failed to load batch departments" });
+        }
+    }
+
+    [HttpPost("add-batch")]
+    public JsonResult AddBatch(int batchYear, int[] selectedDepartments)
+    {
+        if (_userService.GetCurrentUser() == null)
+        {
+            return Json(new { success = false, message = "User is not authenticated." });
+        }
+
+        try
+        {
+            // Validate batch year format
+            string pattern = "^20\\d{2}$";
+            if (!Regex.IsMatch(batchYear.ToString(), pattern))
+            {
+                return Json(new { success = false, message = $"Invalid batch year format: {batchYear}" });
+            }
+
+            // Validate selected departments
+            if (selectedDepartments == null || selectedDepartments.Length == 0)
+            {
+                return Json(new { success = false, message = "Please select at least one department" });
+            }
+
+            // Check if batch already exists for any selected department
+            var existingBatches = _context.Batches
+                .Where(b => b.BatchYear == batchYear && selectedDepartments.Contains(b.DepartmentId))
+                .Select(b => b.Department.Name)
+                .ToList();
+
+            if (existingBatches.Any())
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = $"Batch {batchYear} already exists for: {string.Join(", ", existingBatches)}"
+                });
+            }
+
+            var currentUser = _userService.GetCurrentUser();
+            var departments = _context.Departments
+                .Where(d => selectedDepartments.Contains(d.DepartmentId))
+                .ToList();
+
+            // Create batches for selected departments
+            foreach (var department in departments)
+            {
+                var batch = new Batch
+                {
+                    BatchYear = batchYear,
+                    DepartmentId = department.DepartmentId,
+                    StudentsCount = 0
+                };
+                _context.Batches.Add(batch);
+
+                // Create two groups for each batch-department combination
+                var studentsOnlyGroup = new Models.Group
+                {
+                    GroupName = $"{batchYear}_{department.Name}_StudentsOnly",
+                    Description = $"A group only for students batch: {batchYear} & department: {department.Name}",
+                    CreatedBy = currentUser.UserId,
+                    DepartmentId = department.DepartmentId,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                var studentsTeachersHodGroup = new Models.Group
+                {
+                    GroupName = $"{batchYear}_{department.Name}_StudentsTeachersHod",
+                    Description = $"A group for students, teachers, and HOD of batch: {batchYear} & department: {department.Name}",
+                    CreatedBy = currentUser.UserId,
+                    DepartmentId = department.DepartmentId,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                _context.Groups.AddRange(studentsOnlyGroup, studentsTeachersHodGroup);
+            }
+
+            _context.SaveChanges();
+
+            return Json(new
+            {
+                success = true,
+                message = $"Batch {batchYear} created successfully for {departments.Count} department(s)"
+            });
+        }
+        catch (Exception ex)
+        {
+            return Json(new { success = false, message = "An error occurred while creating the batch" });
+        }
+    }
+
+    [HttpPost("edit-batch")]
+    public JsonResult EditBatch(int batchYear, int[] selectedDepartments)
+    {
+        if (_userService.GetCurrentUser() == null)
+        {
+            return Json(new { success = false, message = "User is not authenticated." });
+        }
+
+        try
+        {
+            // Validate selected departments
+            if (selectedDepartments == null || selectedDepartments.Length == 0)
+            {
+                return Json(new { success = false, message = "Please select at least one department to add" });
+            }
+
+            // Get existing departments for this batch
+            var existingDepartmentIds = _context.Batches
+                .Where(b => b.BatchYear == batchYear)
+                .Select(b => b.DepartmentId)
+                .ToList();
+
+            // Filter out departments that already exist for this batch
+            var newDepartmentIds = selectedDepartments.Except(existingDepartmentIds).ToList();
+
+            if (!newDepartmentIds.Any())
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "All selected departments already exist for this batch"
+                });
+            }
+
+            var currentUser = _userService.GetCurrentUser();
+            var newDepartments = _context.Departments
+                .Where(d => newDepartmentIds.Contains(d.DepartmentId))
+                .ToList();
+
+            // Create batches only for new departments
+            foreach (var department in newDepartments)
+            {
+                var batch = new Batch
+                {
+                    BatchYear = batchYear,
+                    DepartmentId = department.DepartmentId,
+                    StudentsCount = 0  // New departments start with 0 students
+                };
+                _context.Batches.Add(batch);
+
+                // Create groups for new departments only
+                var studentsOnlyGroup = new Models.Group
+                {
+                    GroupName = $"{batchYear}_{department.Name}_StudentsOnly",
+                    Description = $"A group only for students batch: {batchYear} & department: {department.Name}",
+                    CreatedBy = currentUser.UserId,
+                    DepartmentId = department.DepartmentId,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                var studentsTeachersHodGroup = new Models.Group
+                {
+                    GroupName = $"{batchYear}_{department.Name}_StudentsTeachersHod",
+                    Description = $"A group for students, teachers, and HOD of batch: {batchYear} & department: {department.Name}",
+                    CreatedBy = currentUser.UserId,
+                    DepartmentId = department.DepartmentId,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                _context.Groups.AddRange(studentsOnlyGroup, studentsTeachersHodGroup);
+            }
+
+            _context.SaveChanges();
+
+            return Json(new
+            {
+                success = true,
+                message = $"Added {newDepartments.Count} new department(s) to batch {batchYear}"
+            });
+        }
+        catch (Exception ex)
+        {
+            return Json(new { success = false, message = "An error occurred while editing the batch" });
+        }
+    }
+
+    [HttpPost("check-batch-exists")]
+    public JsonResult CheckBatchExists(int batchYear)
+    {
+        try
+        {
+            var batchExists = _context.Batches.Any(b => b.BatchYear == batchYear);
+            return Json(new { success = true, exists = batchExists });
+        }
+        catch (Exception ex)
+        {
+            return Json(new { success = false, message = "Error checking batch existence" });
+        }
+    }
+
+
+
+    [HttpGet("get-batch-detail")]
+    public JsonResult GetBatchDetails(int batchYear)
+    {
+        if (_userService.GetCurrentUser() == null)
+        {
+            return Json(new { success = false, message = "User is not authenticated." });
+        }
+
+        var batchDepartments = _context.Batches
+            .Where(b => b.BatchYear == batchYear)
+            .Select(b => b.DepartmentId)
+            .ToList();
+
+        var allDepartments = _context.Departments
+            .Select(d => new { d.DepartmentId, d.Name })
+            .ToList();
+
+        return Json(new
+        {
+            success = true,
+            selectedDepartments = batchDepartments,
+            allDepartments = allDepartments
+        });
+    }
+
+    //[HttpPost("add-or-edit")]
+    //public JsonResult AddOrEditBatch(int batchYear, List<int> selectedDepartments)
+    //{
+    //    if (_userService.GetCurrentUser() == null)
+    //    {
+    //        return Json(new
+    //        {
+    //            success = false,
+    //            message = "User is not authenticated."
+    //        });
+    //    }
+
+    //    string pattern = "^20\\d{2}$";
+    //    if (!Regex.IsMatch(batchYear.ToString(), pattern))
+    //    {
+    //        TempData["ErrorMessage"] = $"Invalid batch year format: {batchYear}. Year should be in 20XX format.";
+    //        return Json(new { success = false });
+    //    }
+
+    //    if (selectedDepartments == null || !selectedDepartments.Any())
+    //    {
+    //        TempData["ErrorMessage"] = "Please select at least one department for the batch.";
+    //        return Json(new { success = false });
+    //    }
+
+    //    try
+    //    {
+    //        User currentUser = _userService.GetCurrentUser();
+
+    //        // Get existing batch-department combinations for this batch year
+    //        var existingBatchDepartments = _context.Batches
+    //            .Where(b => b.BatchYear == batchYear)
+    //            .Select(b => b.DepartmentId)
+    //            .ToList();
+
+    //        // Find departments that need to be added (new departments for this batch)
+    //        var departmentsToAdd = selectedDepartments.Except(existingBatchDepartments).ToList();
+
+    //        if (!departmentsToAdd.Any() && existingBatchDepartments.Any())
+    //        {
+    //            TempData["ErrorMessage"] = "All selected departments already exist for this batch.";
+    //            return Json(new { success = false });
+    //        }
+
+    //        // Get department details for the new departments
+    //        var departments = _context.Departments
+    //            .Where(d => departmentsToAdd.Contains(d.DepartmentId))
+    //            .ToList();
+
+    //        // Create batch records for new departments
+    //        foreach (var department in departments)
+    //        {
+    //            // Create batch record
+    //            Batch batch = new Batch
+    //            {
+    //                BatchYear = batchYear,
+    //                DepartmentId = department.DepartmentId,
+    //                StudentsCount = 0
+    //            };
+    //            _context.Batches.Add(batch);
+
+    //            // Create StudentsOnly group
+    //            Models.Group studentsOnlyGroup = new Models.Group
+    //            {
+    //                GroupName = $"{batchYear}{department.Name}StudentsOnly",
+    //                Description = $"A group only for students batch: {batchYear} & department: {department.Name}",
+    //                CreatedBy = currentUser.UserId,
+    //                DepartmentId = department.DepartmentId,
+    //                CreatedAt = DateTime.UtcNow
+    //            };
+
+    //            // Create StudentsTeachersHod group
+    //            Models.Group studentsTeachersHodGroup = new Models.Group
+    //            {
+    //                GroupName = $"{batchYear}{department.Name}_StudentsTeachersHod",
+    //                Description = $"A group only for students, teachers, and Hod of batch: {batchYear} & department: {department.Name}",
+    //                CreatedBy = currentUser.UserId,
+    //                DepartmentId = department.DepartmentId,
+    //                CreatedAt = DateTime.UtcNow
+    //            };
+
+    //            _context.Groups.AddRange(studentsOnlyGroup, studentsTeachersHodGroup);
+    //        }
+
+    //        _context.SaveChanges();
+
+    //        string action = existingBatchDepartments.Any() ? "updated" : "created";
+    //        TempData["Message"] = $"Batch {batchYear} has been {action} successfully!";
+
+    //        return Json(new { success = true });
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        TempData["ErrorMessage"] = $"An error occurred while processing the batch: {ex.Message}";
+    //        return Json(new { success = false });
+    //    }
+    //}
+
+    [HttpGet("get-batch-department-details")]
+    public JsonResult GetBatchDepartmentDetails(int batchYear)
+    {
+        if (_userService.GetCurrentUser() == null)
+        {
+            return Json(new { success = false, message = "User is not authenticated." });
+        }
+
+        var batchDepartments = _context.Batches
+            .Where(b => b.BatchYear == batchYear)
+            .Include(b => b.Department)
+            .Select(b => new {
+                b.BatchId,
+                b.DepartmentId,
+                DepartmentName = b.Department.Name,
+                b.StudentsCount
+            })
+            .ToList();
+
+        return Json(new
+        {
+            success = true,
+            batchYear = batchYear,
+            departments = batchDepartments
+        });
+    }
+
+    [HttpPost("delete-batch-department")]
+    public JsonResult DeleteBatchDepartment(int batchYear, int departmentId)
+    {
+        if (_userService.GetCurrentUser() == null)
+        {
+            return Json(new { success = false, message = "User is not authenticated." });
+        }
+
+        try
+        {
+            // Find the specific batch-department combination
+            var batchToDelete = _context.Batches
+                .FirstOrDefault(b => b.BatchYear == batchYear && b.DepartmentId == departmentId);
+
+            if (batchToDelete == null)
+            {
+                TempData["ErrorMessage"] = "Batch department combination not found.";
+                return Json(new { success = false });
+            }
+
+            // Get department name for group deletion
+            var department = _context.Departments.FirstOrDefault(d => d.DepartmentId == departmentId);
+            if (department == null)
+            {
+                TempData["ErrorMessage"] = "Department not found.";
+                return Json(new { success = false });
+            }
+
+            // Delete associated groups for this specific batch-department
+            //var groupsToDelete = _context.Groups
+            //    .Where(g => g.DepartmentId == departmentId &&
+            //               (g.GroupName.Contains($"{batchYear}_{department.Name}_StudentsOnly") ||
+            //                g.GroupName.Contains($"{batchYear}_{department.Name}_StudentsTeachersHod")))
+            //    .ToList();
+
+            List<GCTConnect.Models.Group> groupsToDelete = _context.Groups.Where((GCTConnect.Models.Group g) => g.GroupName.Contains($"{batchYear}_{department.Name}_")).ToList();
+
+            foreach (var group in groupsToDelete)
+            {
+                // Delete group members first
+                var groupMembers = _context.GroupMembers
+                    .Where(gm => gm.GroupId == group.GroupId)
+                    .ToList();
+
+                _context.GroupMembers.RemoveRange(groupMembers);
+                _context.Groups.Remove(group);
+            }
+
+            // Delete users associated with this specific batch-department
+            var usersToDelete = _context.Users
+                .Where(u => u.BatchId == batchToDelete.BatchId && u.DepartmentId == departmentId)
+                .ToList();
+
+            _context.Users.RemoveRange(usersToDelete);
+
+            // Finally delete the batch record
+            _context.Batches.Remove(batchToDelete);
+
+            _context.SaveChanges();
+
+            TempData["Message"] = $"{department.Name} has been removed from Batch {batchYear} successfully!";
+            return Json(new { success = true });
+        }
+        catch (Exception ex)
+        {
+            TempData["ErrorMessage"] = $"An error occurred while deleting the department: {ex.Message}";
+            return Json(new { success = false });
+        }
+    }
+
+    [HttpPost("delete-batch")]
+    public JsonResult DeleteBatch(int batch)
+    {
+        List<Batch> deleteBatches = _context.Batches.Where((Batch u) => u.BatchYear == batch).ToList();
+        if (deleteBatches == null)
+        {
+            base.TempData["ErrorMessage"] = "An error occurred while saving the batch " + batch;
+            return Json(new
+            {
+                success = false,
+                message = "An error occurred while saving the batch"+ batch
+            });
+        }
+        List<GCTConnect.Models.Group> groups = _context.Groups.Where((GCTConnect.Models.Group g) => g.GroupName.Contains(Convert.ToString(batch))).ToList();
+        foreach (GCTConnect.Models.Group group in groups)
+        {
+            List<GroupMember> deletedGroupMembers = _context.GroupMembers.Where((GroupMember u) => u.GroupId == (int?)group.GroupId).ToList();
+            foreach (GroupMember deletedGrpupMember in deletedGroupMembers)
+            {
+                _context.GroupMembers.Remove(deletedGrpupMember);
+            }
+            _context.Groups.Remove(group);
+            _context.SaveChanges();
+        }
+        foreach (Batch deleteBatch in deleteBatches)
+        {
+            List<User> users = _context.Users.Where((User u) => u.BatchId == (int?)deleteBatch.BatchId && u.DepartmentId == (int?)deleteBatch.DepartmentId).ToList();
+            foreach (User user in users)
+            {
+                _context.Users.Remove(user);
+                _context.SaveChanges();
+            }
+            _context.Batches.Remove(deleteBatch);
+            _context.SaveChanges();
+        }
+        List<Batch> batchDetails = _context.Batches.Include((Batch u) => u.Department).ToList();
+        base.ViewBag.BatchDetails = batchDetails;
+        base.TempData["Message"] = batch + " Batch has been deleted successfully!";
+        return Json(new
+        {
+            success = true,
+            message = $"Batch {batch} successfully deleted!"
+        });
+    }
+
+
+    #endregion BatchManagement
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     [HttpGet("group-management")]
     public async Task<IActionResult> GroupManagement()
@@ -413,15 +938,216 @@ public class AdminController : Controller
         return View(departmentVMs);
     }
 
+    [HttpPost("add-department")]
+    public async Task<JsonResult> AddDepartment(string department)
+    {
+
+        if (department == null)
+        {
+            return Json(new
+            {
+                success = false,
+                message = "Invalid Department!"
+            });
+        }
+        var newDepartment = new Department
+        {
+            Name = department
+        };
+        await _context.Departments.AddAsync(newDepartment);
+        await _context.SaveChangesAsync();
+        return Json(new
+        {
+            success = true,
+            Department = department,
+            message = "Department fetched successfully"
+        });
+    }
+
+
+    [HttpGet("edit-department")]
+    public async Task<JsonResult> EditDepartment(int depId)
+    {
+        var department = await _context.Departments
+            .FirstOrDefaultAsync(d => d.DepartmentId == depId);
+
+        if (department == null)
+        {
+            return Json(new
+            {
+                success = false,
+                message = "Invalid Department!"
+            });
+        }
+
+        return Json(new
+        {
+            success = true,
+            Department = department,
+            message = "Department fetched successfully"
+        });
+    }
+
+    [HttpPost("edit-department")]
+    public async Task<JsonResult> EditDepartment(int depId, string name)
+    {
+        var department = await _context.Departments
+            .FirstOrDefaultAsync(d => d.DepartmentId == depId);
+
+        if (department == null)
+        {
+            return Json(new
+            {
+                success = false,
+                message = "Invalid Department!"
+            });
+        }
+
+        var oldName = department.Name;
+        department.Name = name;
+        _context.Departments.Update(department);
+        var groups = await _context.Groups
+            .Where(g => g.GroupName.Contains($"_{oldName}_"))
+            .ToListAsync();
+
+        foreach (var group in groups)
+        {
+            group.GroupName = group.GroupName.Replace($"_{oldName}_", $"_{name}_");
+            _context.Groups.Update(group);
+        }
+
+        await _context.SaveChangesAsync();
+
+        return Json(new
+        {
+            success = true,
+            Department = new
+            {
+                department.DepartmentId,
+                department.Name
+            },
+            message = "Department and related groups updated successfully"
+        });
+    }
+
+    [HttpDelete("delete-department")]
+    public async Task<JsonResult> DeleteDepartment(int depId)
+    {
+        var department = await _context.Departments
+            .FirstOrDefaultAsync(d => d.DepartmentId == depId);
+
+        if (department == null)
+        {
+            return Json(new
+            {
+                success = false,
+                message = "Invalid Department!"
+            });
+        }
+
+        // Find all groups for this department
+        var groups = await _context.Groups
+            .Where(g => g.GroupName.Contains($"_{department.Name}_"))
+            .ToListAsync();
+
+        var groupIds = groups.Select(g => g.GroupId).ToList();
+
+        // Delete messages in those groups
+        if (groupIds.Any())
+        {
+            var messages = await _context.Messages
+                .Where(m => m.GroupId.HasValue && groupIds.Contains(m.GroupId.Value))
+                .ToListAsync();
+
+            _context.Messages.RemoveRange(messages);
+
+            // Delete group members
+            var usersInGroups = await _context.GroupMembers
+                .Where(gm => groupIds.Contains((int)gm.GroupId))
+                .ToListAsync();
+
+            _context.GroupMembers.RemoveRange(usersInGroups);
+
+            // Delete groups
+            _context.Groups.RemoveRange(groups);
+        }
+
+        // Delete users in department
+        var users = await _context.Users
+            .Where(u => u.DepartmentId == depId)
+            .ToListAsync();
+        _context.Users.RemoveRange(users);
+
+        // Delete batches for department
+        var batches = await _context.Batches
+            .Where(b => b.DepartmentId == department.DepartmentId)
+            .ToListAsync();
+        _context.Batches.RemoveRange(batches);
+
+        // Finally delete department
+        _context.Departments.Remove(department);
+
+        await _context.SaveChangesAsync();
+
+        return Json(new
+        {
+            success = true,
+            Department = new
+            {
+                department.DepartmentId,
+                department.Name
+            },
+            message = "Department and all related data deleted successfully"
+        });
+    }
+
+
+    //[HttpGet("announcement")]
+    //public IActionResult Announcement()
+    //{
+    //    ViewBag.ActivePage = "Announcement";
+
+    //    var announcements = _context.Announcements
+    //        .OrderByDescending(a => a.CreatedAt)
+    //        .Select(a => new AnnouncementViewModel
+    //        {
+    //            AnnouncementId = a.AnnouncementId,
+    //            Title = a.Title,
+    //            Content = a.Content,
+    //            CreatedAt = (DateTime)a.CreatedAt,
+    //            Priority = a.Priority == 1 ? "Low Priority" :
+    //                       a.Priority == 2 ? "Medium Priority" :
+    //                       a.Priority == 3 ? "High Priority" : "Unknown",
+    //            Audience = a.Audience == "all" ? "All" :
+    //       a.Audience == "hods" ? "HODs" :
+    //       a.Audience == "teachers_all" ? "All Teachers" :
+    //       a.Audience == "teachers_department" ? "Teachers (Selected Department)" :
+    //       a.Audience == "students_all" ? "All Students" :
+    //       a.Audience == "students_department" ? "Students (Selected Department)" :
+    //       a.Audience == "students_batch" ? "Students (Specific Batch)" :
+    //       a.Audience == "students_department_batch" ? "Students (Department & Batch)" :
+    //       "Unknown",
+    //        })
+    //        .ToList();
+
+    //    ViewBag.Announcements = announcements;
+    //    return View();
+    //}
 
 
     [HttpGet("announcement")]
-    public IActionResult Announcement()
+    public IActionResult Announcement(int page = 1, int pageSize = 5)
     {
         ViewBag.ActivePage = "Announcement";
 
-        var announcements = _context.Announcements
-            .OrderByDescending(a => a.CreatedAt)
+        var query = _context.Announcements.OrderByDescending(a => a.CreatedAt);
+
+        var totalAnnouncements = query.Count();
+        var totalPages = (int)Math.Ceiling(totalAnnouncements / (double)pageSize);
+
+        var announcements = query
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .Select(a => new AnnouncementViewModel
             {
                 AnnouncementId = a.AnnouncementId,
@@ -432,20 +1158,24 @@ public class AdminController : Controller
                            a.Priority == 2 ? "Medium Priority" :
                            a.Priority == 3 ? "High Priority" : "Unknown",
                 Audience = a.Audience == "all" ? "All" :
-           a.Audience == "hods" ? "HODs" :
-           a.Audience == "teachers_all" ? "All Teachers" :
-           a.Audience == "teachers_department" ? "Teachers (Selected Department)" :
-           a.Audience == "students_all" ? "All Students" :
-           a.Audience == "students_department" ? "Students (Selected Department)" :
-           a.Audience == "students_batch" ? "Students (Specific Batch)" :
-           a.Audience == "students_department_batch" ? "Students (Department & Batch)" :
-           "Unknown",
+                           a.Audience == "hods" ? "HODs" :
+                           a.Audience == "teachers_all" ? "All Teachers" :
+                           a.Audience == "teachers_department" ? "Teachers (Selected Department)" :
+                           a.Audience == "students_all" ? "All Students" :
+                           a.Audience == "students_department" ? "Students (Selected Department)" :
+                           a.Audience == "students_batch" ? "Students (Specific Batch)" :
+                           a.Audience == "students_department_batch" ? "Students (Department & Batch)" :
+                           "Unknown",
             })
             .ToList();
 
         ViewBag.Announcements = announcements;
+        ViewBag.CurrentPage = page;
+        ViewBag.TotalPages = totalPages;
+
         return View();
     }
+
 
 
 
@@ -515,122 +1245,80 @@ public class AdminController : Controller
     }
 
 
-    [HttpGet("add-batch")]
-    public IActionResult AddBatch()
-    {
+    //[HttpGet("add-batch")]
+    //public IActionResult AddBatch()
+    //{
 
-        List<Batch> batchDetails = _context.Batches.Include((Batch u) => u.Department).ToList();
-        base.ViewBag.BatchDetails = batchDetails;
-        return View();
-    }
+    //    List<Batch> batchDetails = _context.Batches.Include((Batch u) => u.Department).ToList();
+    //    base.ViewBag.BatchDetails = batchDetails;
+    //    return View();
+    //}
 
-    [HttpPost]
-    public JsonResult AddBatch(int newBatch)
-    {
-        if (_userService.GetCurrentUser() == null)
-        {
-            return Json(new
-            {
-                success = false,
-                message = "User is not authenticated."
-            });
-        }
-        string pattern = "^20\\d{2}$";
-        if (_context.Batches.Any((Batch u) => u.BatchYear == newBatch))
-        {
-            base.TempData["ErrorMessage"] = "This batch is already exists!";
-            return Json(new
-            {
-                success = false
-            });
-        }
-        if (!Regex.IsMatch(newBatch.ToString(), pattern))
-        {
-            base.TempData["ErrorMessage"] = "An error occurred while saving the batch " + newBatch;
-            return Json(new
-            {
-                success = false
-            });
-        }
-        List<Department> departments = _context.Departments.ToList();
-        User currentUser = _userService.GetCurrentUser();
-        foreach (Department department in departments)
-        {
-            Batch batch = new Batch
-            {
-                BatchYear = newBatch,
-                DepartmentId = department.DepartmentId,
-                StudentsCount = 0
-            };
-            _context.Batches.Add(batch);
-            GCTConnect.Models.Group studentsOnlyGroup = new GCTConnect.Models.Group
-            {
-                GroupName = $"{newBatch}_{department.Name}_StudentsOnly",
-                Description = $"A group only for students batch: {newBatch} & department: {department.Name}",
-                CreatedBy = currentUser.UserId,
-                DepartmentId = department.DepartmentId,
-                CreatedAt = DateTime.UtcNow
-            };
-            GCTConnect.Models.Group studentsTeachersHodGroup = new GCTConnect.Models.Group
-            {
-                GroupName = $"{newBatch}_{department.Name}_StudentsTeachersHod",
-                Description = $"A group only for students, teachers, and Hod of batch: {newBatch} & department: {department.Name}",
-                CreatedBy = currentUser.UserId,
-                DepartmentId = department.DepartmentId,
-                CreatedAt = DateTime.UtcNow
-            };
-            _context.Groups.AddRange(studentsOnlyGroup, studentsTeachersHodGroup);
-        }
-        _context.SaveChanges();
-        base.TempData["Message"] = newBatch + " Batch has been saved successfully!";
-        return Json(new
-        {
-            success = true
-        });
-    }
+    //[HttpPost]
+    //public JsonResult AddBatch(int newBatch)
+    //{
+    //    if (_userService.GetCurrentUser() == null)
+    //    {
+    //        return Json(new
+    //        {
+    //            success = false,
+    //            message = "User is not authenticated."
+    //        });
+    //    }
+    //    string pattern = "^20\\d{2}$";
+    //    if (_context.Batches.Any((Batch u) => u.BatchYear == newBatch))
+    //    {
+    //        base.TempData["ErrorMessage"] = "This batch is already exists!";
+    //        return Json(new
+    //        {
+    //            success = false
+    //        });
+    //    }
+    //    if (!Regex.IsMatch(newBatch.ToString(), pattern))
+    //    {
+    //        base.TempData["ErrorMessage"] = "An error occurred while saving the batch " + newBatch;
+    //        return Json(new
+    //        {
+    //            success = false
+    //        });
+    //    }
+    //    List<Department> departments = _context.Departments.ToList();
+    //    User currentUser = _userService.GetCurrentUser();
+    //    foreach (Department department in departments)
+    //    {
+    //        Batch batch = new Batch
+    //        {
+    //            BatchYear = newBatch,
+    //            DepartmentId = department.DepartmentId,
+    //            StudentsCount = 0
+    //        };
+    //        _context.Batches.Add(batch);
+    //        GCTConnect.Models.Group studentsOnlyGroup = new GCTConnect.Models.Group
+    //        {
+    //            GroupName = $"{newBatch}_{department.Name}_StudentsOnly",
+    //            Description = $"A group only for students batch: {newBatch} & department: {department.Name}",
+    //            CreatedBy = currentUser.UserId,
+    //            DepartmentId = department.DepartmentId,
+    //            CreatedAt = DateTime.UtcNow
+    //        };
+    //        GCTConnect.Models.Group studentsTeachersHodGroup = new GCTConnect.Models.Group
+    //        {
+    //            GroupName = $"{newBatch}_{department.Name}_StudentsTeachersHod",
+    //            Description = $"A group only for students, teachers, and Hod of batch: {newBatch} & department: {department.Name}",
+    //            CreatedBy = currentUser.UserId,
+    //            DepartmentId = department.DepartmentId,
+    //            CreatedAt = DateTime.UtcNow
+    //        };
+    //        _context.Groups.AddRange(studentsOnlyGroup, studentsTeachersHodGroup);
+    //    }
+    //    _context.SaveChanges();
+    //    base.TempData["Message"] = newBatch + " Batch has been saved successfully!";
+    //    return Json(new
+    //    {
+    //        success = true
+    //    });
+    //}
 
-    [HttpPost]
-    public JsonResult DeleteBatch(int batch)
-    {
-        List<Batch> deleteBatches = _context.Batches.Where((Batch u) => u.BatchYear == batch).ToList();
-        if (deleteBatches == null)
-        {
-            base.TempData["ErrorMessage"] = "An error occurred while saving the batch " + batch;
-            return Json(new
-            {
-                success = false
-            });
-        }
-        List<GCTConnect.Models.Group> groups = _context.Groups.Where((GCTConnect.Models.Group g) => g.GroupName.Contains(Convert.ToString(batch))).ToList();
-        foreach (GCTConnect.Models.Group group in groups)
-        {
-            List<GroupMember> deletedGroupMembers = _context.GroupMembers.Where((GroupMember u) => u.GroupId == (int?)group.GroupId).ToList();
-            foreach (GroupMember deletedGrpupMember in deletedGroupMembers)
-            {
-                _context.GroupMembers.Remove(deletedGrpupMember);
-            }
-            _context.Groups.Remove(group);
-            _context.SaveChanges();
-        }
-        foreach (Batch deleteBatch in deleteBatches)
-        {
-            List<User> users = _context.Users.Where((User u) => u.BatchId == (int?)deleteBatch.BatchId && u.DepartmentId == (int?)deleteBatch.DepartmentId).ToList();
-            foreach (User user in users)
-            {
-                _context.Users.Remove(user);
-                _context.SaveChanges();
-            }
-            _context.Batches.Remove(deleteBatch);
-            _context.SaveChanges();
-        }
-        List<Batch> batchDetails = _context.Batches.Include((Batch u) => u.Department).ToList();
-        base.ViewBag.BatchDetails = batchDetails;
-        base.TempData["Message"] = batch + " Batch has been deleted successfully!";
-        return Json(new
-        {
-            success = true
-        });
-    }
 
     //public async Task<IActionResult> Dashboard()
     //{

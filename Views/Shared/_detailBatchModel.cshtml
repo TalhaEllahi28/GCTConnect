@@ -1,0 +1,652 @@
+﻿<!-- Batch Details Modal -->
+<div id="batchDetailsModal" class="batch-modal">
+    <div class="batch-modal-overlay" onclick="closeBatchModal()"></div>
+    <div class="batch-modal-content batch-modal-large">
+        <div class="batch-modal-header">
+            <h3 id="batchDetailsTitle">Batch Details</h3>
+            <div class="batch-modal-header-actions">
+                <button class="btn btn-primary btn-sm" id="editBatchBtn" onclick="openEditBatchFromDetails()">
+                    <i class="fas fa-edit"></i> Edit Batch
+                </button>
+                <button class="batch-modal-close" onclick="closeBatchModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        <div class="batch-modal-body">
+            <div id="batchDetailsLoading" class="batch-loading-spinner" style="display: none;">
+                <i class="fas fa-spinner fa-spin"></i> Loading batch details...
+            </div>
+
+            <div id="batchDetailsContent" style="display: none;">
+                <div class="batch-summary">
+                    <div class="batch-summary-stats">
+                        <div class="batch-stat-card">
+                            <span class="batch-stat-label">Total Departments</span>
+                            <span class="batch-stat-value" id="totalDepartments">0</span>
+                        </div>
+                        <div class="batch-stat-card">
+                            <span class="batch-stat-label">Total Students</span>
+                            <span class="batch-stat-value" id="totalStudents">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="batch-table-responsive">
+                    <table class="batch-data-table">
+                        <thead>
+                            <tr>
+                                <th>Department Name</th>
+                                <th>Students Count</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="batchDepartmentsTable">
+                            <!-- Department rows will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="noDepartments" style="display: none;" class="batch-empty-state">
+                    <i class="fas fa-inbox fa-3x"></i>
+                    <h4>No Departments Found</h4>
+                    <p>This batch doesn't have any departments assigned yet.</p>
+                    <button class="btn btn-primary" onclick="openEditBatchFromDetails()">
+                        <i class="fas fa-plus"></i> Add Departments
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="batch-modal-footer">
+            <button class="btn btn-outline" onclick="closeBatchModal()">Close</button>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    let currentBatchYear = null;
+    let batchDepartments = [];
+
+    function showBatchDetails(batchYear) {
+        const modal = document.getElementById("batchDetailsModal");
+        if (modal) {
+            // Reset modal state first
+            resetModalState();
+
+            // Show modal
+            modal.style.display = 'flex';
+            // Use setTimeout to ensure display change is processed before adding active class
+            setTimeout(() => {
+                modal.classList.add('batch-modal-active');
+                // document.body.classList.add('batch-modal-open');
+            }, 10);
+        }
+
+        currentBatchYear = batchYear;
+        document.getElementById('batchDetailsTitle').textContent = `Batch ${batchYear} Details`;
+
+        // Show loading state
+        document.getElementById('batchDetailsLoading').style.display = 'block';
+        document.getElementById('batchDetailsContent').style.display = 'none';
+
+        loadBatchDepartmentDetails(batchYear);
+    }
+
+    function closeBatchModal() {
+        const modal = document.getElementById("batchDetailsModal");
+        if (modal) {
+            modal.classList.remove('batch-modal-active');
+            // document.body.classList.remove('batch-modal-open');
+
+            // Hide modal after animation completes
+            setTimeout(() => {
+                modal.style.display = 'none';
+                // resetModalState();
+            }, 300);
+        }
+    }
+
+    function resetModalState() {
+        // Reset content visibility
+        document.getElementById('batchDetailsLoading').style.display = 'none';
+        document.getElementById('batchDetailsContent').style.display = 'none';
+        document.getElementById('noDepartments').style.display = 'none';
+
+        // Clear table content
+        document.getElementById('batchDepartmentsTable').innerHTML = '';
+
+        // Reset counters
+        document.getElementById('totalDepartments').textContent = '0';
+        document.getElementById('totalStudents').textContent = '0';
+
+        // Reset variables
+        currentBatchYear = null;
+        batchDepartments = [];
+    }
+
+    function loadBatchDepartmentDetails(batchYear) {
+        fetch(`/admin/get-batch-department-details?batchYear=${batchYear}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('batchDetailsLoading').style.display = 'none';
+                if (data.success) {
+                    batchDepartments = data.departments;
+                    renderBatchDetails(data.departments);
+                    document.getElementById('batchDetailsContent').style.display = 'block';
+                } else {
+                    alert('Failed to load batch details');
+                    closeBatchModal();
+                }
+            })
+            .catch(error => {
+                console.error('Error loading batch details:', error);
+                document.getElementById('batchDetailsLoading').style.display = 'none';
+                alert('Error loading batch details');
+                closeBatchModal();
+            });
+    }
+
+    function renderBatchDetails(departments) {
+        const tableBody = document.getElementById('batchDepartmentsTable');
+        const noDepartments = document.getElementById('noDepartments');
+        const totalDepartments = document.getElementById('totalDepartments');
+        const totalStudents = document.getElementById('totalStudents');
+
+        if (!departments || departments.length === 0) {
+            tableBody.innerHTML = '';
+            noDepartments.style.display = 'block';
+            totalDepartments.textContent = '0';
+            totalStudents.textContent = '0';
+            return;
+        }
+
+        noDepartments.style.display = 'none';
+
+        // Calculate totals
+        const departmentCount = departments.length;
+        const studentCount = departments.reduce((sum, dept) => sum + (dept.studentsCount || 0), 0);
+        totalDepartments.textContent = departmentCount;
+        totalStudents.textContent = studentCount;
+
+        // Render table rows
+        tableBody.innerHTML = departments.map(dept => `
+            <tr>
+                <td>
+                    <div class="batch-department-info">
+                        <i class="fas fa-graduation-cap batch-department-icon"></i>
+                        <span class="batch-department-name">${dept.departmentName}</span>
+                    </div>
+                </td>
+                <td>
+                    <span class="batch-student-count">${dept.studentsCount || 0}</span>
+                </td>
+                <td>
+                    <span class="batch-status-badge batch-status-active">Active</span>
+                </td>
+                <td>
+                    <div class="batch-action-buttons">
+                        <button class="batch-btn-action batch-btn-delete" title="Remove Department" onclick="confirmDeleteDepartment(${dept.departmentId}, '${dept.departmentName}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function confirmDeleteDepartment(departmentId, departmentName) {
+        if (confirm(`Are you sure you want to remove "${departmentName}" from Batch ${currentBatchYear}?\n\nThis will permanently delete:\n- All students in this department for this batch\n- All associated groups\n- All related data\n\nThis action cannot be undone.`)) {
+            deleteBatchDepartment(departmentId, departmentName);
+        }
+    }
+
+    function deleteBatchDepartment(departmentId, departmentName) {
+        const formData = new FormData();
+        formData.append('batchYear', currentBatchYear);
+        formData.append('departmentId', departmentId);
+
+        fetch('/admin/delete-batch-department', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Remove department from local array
+                batchDepartments = batchDepartments.filter(d => d.departmentId !== departmentId);
+
+                // Re-render the table
+                renderBatchDetails(batchDepartments);
+
+            // ✅ Update batch card in the grid
+                const cards = document.querySelectorAll('.batch-card');
+                cards.forEach(card => {
+                    const title = card.querySelector('h3');
+                    if (title && title.textContent.includes(`Batch ${currentBatchYear}`)) {
+                        // Update departments count
+                        const deptCountEl = card.querySelector('.stat-item:nth-child(2) .stat-value');
+                        if (deptCountEl) {
+                            deptCountEl.textContent = batchDepartments.length;
+                        }
+                
+                        // Update students count
+                        const studentCountEl = card.querySelector('.stat-item:nth-child(1) .stat-value');
+                        if (studentCountEl) {
+                            const studentCount = batchDepartments.reduce((sum, d) => sum + (d.studentsCount || 0), 0);
+                            studentCountEl.textContent = studentCount;
+                        }
+                    }
+                });
+                // Show success message
+                showBatchNotification(`${departmentName} has been removed from Batch ${currentBatchYear} successfully!`, 'success');
+            } else {
+                alert('Failed to remove department. Please try again.');
+            }
+        })
+        .catch(error => {
+            console.error('Error deleting department:', error);
+            alert('Error removing department. Please try again.');
+        });
+    }
+
+    function openEditBatchFromDetails() {
+        closeBatchModal();
+        // Add slight delay to ensure modal is closed before opening edit modal
+        setTimeout(() => {
+            showEditBatchModal(currentBatchYear, "batchModal");
+        }, 350);
+    }
+
+    // Utility function to show notifications
+    function showBatchNotification(message, type = 'info') {
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = `batch-notification batch-notification-${type}`;
+        notification.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 'info-circle'}"></i>
+            <span>${message}</span>
+            <button onclick="this.parentElement.remove()">
+                <i class="fas fa-times"></i>
+            </button>
+        `;
+
+        // Add to page
+        document.body.appendChild(notification);
+
+        // Auto remove after 5 seconds
+        setTimeout(() => {
+            if (notification.parentElement) {
+                notification.remove();
+            }
+        }, 5000);
+    }
+
+    // Close modal when clicking outside
+    document.addEventListener('click', function(event) {
+        const modal = document.getElementById('batchDetailsModal');
+        if (event.target === modal) {
+            closeBatchModal();
+        }
+    });
+
+    // Close modal on Escape key
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            const modal = document.getElementById('batchDetailsModal');
+            if (modal && modal.classList.contains('batch-modal-active')) {
+                closeBatchModal();
+            }
+        }
+    });
+
+</script>
+
+<style>
+    /* Modal Base Styles - Prefixed to avoid conflicts */
+    .batch-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 10000;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+        .batch-modal.batch-modal-active {
+            opacity: 1;
+        }
+
+    .batch-modal-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: transparent;
+    }
+
+    .batch-modal-content {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        position: relative;
+        max-height: 90vh;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        transform: scale(0.9);
+        transition: transform 0.3s ease;
+    }
+
+    .batch-modal.batch-modal-active .batch-modal-content {
+        transform: scale(1);
+    }
+
+    .batch-modal-large {
+        max-width: 900px;
+        width: 90%;
+    }
+
+    .batch-modal-header {
+        padding: 20px 24px;
+        border-bottom: 1px solid #e9ecef;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-shrink: 0;
+    }
+
+        .batch-modal-header h3 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+    .batch-modal-header-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .batch-modal-close {
+        background: none;
+        border: none;
+        font-size: 1.25rem;
+        color: #6c757d;
+        cursor: pointer;
+        padding: 8px;
+        border-radius: 4px;
+        transition: background-color 0.2s, color 0.2s;
+    }
+
+        .batch-modal-close:hover {
+            background-color: #f8f9fa;
+            color: #495057;
+        }
+
+    .batch-modal-body {
+        padding: 24px;
+        flex: 1;
+        overflow-y: auto;
+    }
+
+    .batch-modal-footer {
+        padding: 16px 24px;
+        border-top: 1px solid #e9ecef;
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        flex-shrink: 0;
+    }
+
+
+
+    /* Batch Summary Styles */
+    .batch-summary {
+        margin-bottom: 20px;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 8px;
+    }
+
+    .batch-summary-stats {
+        display: flex;
+        gap: 20px;
+    }
+
+    .batch-stat-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 15px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        min-width: 120px;
+    }
+
+        .batch-stat-card .batch-stat-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+
+        .batch-stat-card .batch-stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
+    /* Table Styles */
+    .batch-table-responsive {
+        overflow-x: auto;
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+    }
+
+    .batch-data-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+    }
+
+        .batch-data-table th {
+            background: #f8f9fa;
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: #495057;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .batch-data-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #dee2e6;
+            vertical-align: middle;
+        }
+
+        .batch-data-table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+    .batch-department-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .batch-department-icon {
+        color: #007bff;
+        font-size: 16px;
+    }
+
+    .batch-department-name {
+        font-weight: 500;
+    }
+
+    .batch-student-count {
+        font-weight: 600;
+        color: #28a745;
+    }
+
+    .batch-status-badge {
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+
+    .batch-status-active {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .batch-action-buttons {
+        display: flex;
+        gap: 8px;
+    }
+
+    .batch-btn-action {
+        padding: 6px 8px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .batch-btn-delete {
+        background: #dc3545;
+        color: white;
+    }
+
+        .batch-btn-delete:hover {
+            background: #c82333;
+        }
+
+    /* Loading and Empty States */
+    .batch-loading-spinner {
+        text-align: center;
+        padding: 40px;
+        color: #666;
+    }
+
+        .batch-loading-spinner i {
+            font-size: 24px;
+            margin-right: 10px;
+        }
+
+    .batch-empty-state {
+        text-align: center;
+        padding: 40px;
+        color: #666;
+    }
+
+        .batch-empty-state i {
+            color: #ddd;
+            margin-bottom: 20px;
+        }
+
+        .batch-empty-state h4 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .batch-empty-state p {
+            margin-bottom: 20px;
+        }
+
+    /* Notification Styles */
+    .batch-notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 10001;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        max-width: 400px;
+        animation: batchSlideIn 0.3s ease-out;
+    }
+
+    .batch-notification-success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+
+    .batch-notification-info {
+        background: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+    }
+
+    .batch-notification button {
+        background: none;
+        border: none;
+        color: inherit;
+        cursor: pointer;
+        padding: 0;
+        margin-left: auto;
+    }
+
+    @@keyframes batchSlideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    /* Responsive Design */
+    @@media (max-width: 768px) {
+        .batch-modal-large {
+            width: 95%;
+            margin: 10px;
+        }
+
+        .batch-modal-content {
+            max-height: 95vh;
+        }
+
+        .batch-summary-stats {
+            flex-direction: column;
+        }
+
+        .batch-stat-card {
+            min-width: auto;
+        }
+
+        .batch-modal-header {
+            padding: 16px 20px;
+        }
+
+        .batch-modal-body {
+            padding: 20px;
+        }
+
+        .batch-data-table {
+            font-size: 14px;
+        }
+
+            .batch-data-table th,
+            .batch-data-table td {
+                padding: 8px 12px;
+            }
+    }</style>

@@ -65,6 +65,7 @@ namespace GCTConnect.Controllers.Api
 
             return View(viewModel);
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UserProfileManagement(UserProfileViewModel model)

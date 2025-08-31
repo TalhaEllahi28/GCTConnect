@@ -45,6 +45,19 @@ builder.Services.AddDbContext<GctConnectContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("gctconnectdbcs")));
 builder.Services.AddTransient<EmailService>();
 
+// Configure request size limits BEFORE building the app
+builder.Services.Configure<IISServerOptions>(options =>
+{
+    options.MaxRequestBodySize = 100_000_000; // 100MB
+});
+
+// For Kestrel - configure through builder.WebHost
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.Limits.MaxRequestBodySize = 100_000_000; // 100MB
+});
+
+// NOW build the application
 var app = builder.Build();
 
 // Error handling
@@ -88,7 +101,5 @@ app.MapControllerRoute(
 
 // SignalR hub
 app.MapHub<ChatHub>("/Services/ChatHub");
-
-// React SPA fallback route
 
 app.Run();

@@ -297,38 +297,6 @@
   },
   {
     "ContainingType": "GCTConnect.Controllers.AdminController",
-    "Method": "AddBatch",
-    "RelativePath": "admin",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "newBatch",
-        "Type": "System.Int32",
-        "IsRequired": false
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "GCTConnect.Controllers.AdminController",
-    "Method": "DeleteBatch",
-    "RelativePath": "admin",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "batch",
-        "Type": "System.Int32",
-        "IsRequired": false
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "GCTConnect.Controllers.AdminController",
     "Method": "DeleteUser",
     "RelativePath": "admin/{id}",
     "HttpMethod": "DELETE",
@@ -347,10 +315,37 @@
     "ContainingType": "GCTConnect.Controllers.AdminController",
     "Method": "AddBatch",
     "RelativePath": "admin/add-batch",
-    "HttpMethod": "GET",
+    "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
-    "Parameters": [],
+    "Parameters": [
+      {
+        "Name": "batchYear",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "selectedDepartments",
+        "Type": "System.Int32[]",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GCTConnect.Controllers.AdminController",
+    "Method": "AddDepartment",
+    "RelativePath": "admin/add-department",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "department",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
     "ReturnTypes": []
   },
   {
@@ -360,7 +355,18 @@
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
-    "Parameters": [],
+    "Parameters": [
+      {
+        "Name": "page",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageSize",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
     "ReturnTypes": []
   },
   {
@@ -375,6 +381,22 @@
   },
   {
     "ContainingType": "GCTConnect.Controllers.AdminController",
+    "Method": "CheckBatchExists",
+    "RelativePath": "admin/check-batch-exists",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "batchYear",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GCTConnect.Controllers.AdminController",
     "Method": "CreateAnnouncement",
     "RelativePath": "admin/create-announcement",
     "HttpMethod": "POST",
@@ -385,6 +407,59 @@
         "Name": "request",
         "Type": "GCTConnect.Models.ViewModels.AnnouncementRequest",
         "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GCTConnect.Controllers.AdminController",
+    "Method": "DeleteBatch",
+    "RelativePath": "admin/delete-batch",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "batch",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GCTConnect.Controllers.AdminController",
+    "Method": "DeleteBatchDepartment",
+    "RelativePath": "admin/delete-batch-department",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "batchYear",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "departmentId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GCTConnect.Controllers.AdminController",
+    "Method": "DeleteDepartment",
+    "RelativePath": "admin/delete-department",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "depId",
+        "Type": "System.Int32",
+        "IsRequired": false
       }
     ],
     "ReturnTypes": []
@@ -409,6 +484,122 @@
     "ContainingType": "GCTConnect.Controllers.AdminController",
     "Method": "DepartmentManagement",
     "RelativePath": "admin/department-management",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GCTConnect.Controllers.AdminController",
+    "Method": "EditBatch",
+    "RelativePath": "admin/edit-batch",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "batchYear",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "selectedDepartments",
+        "Type": "System.Int32[]",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GCTConnect.Controllers.AdminController",
+    "Method": "EditDepartment",
+    "RelativePath": "admin/edit-department",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "depId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GCTConnect.Controllers.AdminController",
+    "Method": "EditDepartment",
+    "RelativePath": "admin/edit-department",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "depId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "name",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GCTConnect.Controllers.AdminController",
+    "Method": "GetBatchDepartmentDetails",
+    "RelativePath": "admin/get-batch-department-details",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "batchYear",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GCTConnect.Controllers.AdminController",
+    "Method": "GetBatchDepartments",
+    "RelativePath": "admin/get-batch-departments",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "batchYear",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GCTConnect.Controllers.AdminController",
+    "Method": "GetBatchDetails",
+    "RelativePath": "admin/get-batch-detail",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "batchYear",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GCTConnect.Controllers.AdminController",
+    "Method": "GetDepartments",
+    "RelativePath": "admin/get-departments",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,

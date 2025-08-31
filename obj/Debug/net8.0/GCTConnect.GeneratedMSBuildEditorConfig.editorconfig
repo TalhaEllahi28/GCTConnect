@@ -110,6 +110,14 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXFVzZXJQcm9maWxlTWFuYWdlbWVudC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
+[E:/sites/GCTConnect (1)/GCTConnect (1)/GCTConnect/Views/Shared/_AddBatchModel.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9BZGRCYXRjaE1vZGVsLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/sites/GCTConnect (1)/GCTConnect (1)/GCTConnect/Views/Shared/_addDepartmentModal.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9hZGREZXBhcnRtZW50TW9kYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [E:/sites/GCTConnect (1)/GCTConnect (1)/GCTConnect/Views/Shared/_AddSomeone.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9BZGRTb21lb25lLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
@@ -124,6 +132,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [E:/sites/GCTConnect (1)/GCTConnect (1)/GCTConnect/Views/Shared/_CreateGroup.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9DcmVhdGVHcm91cC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/sites/GCTConnect (1)/GCTConnect (1)/GCTConnect/Views/Shared/_detailBatchModel.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9kZXRhaWxCYXRjaE1vZGVsLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [E:/sites/GCTConnect (1)/GCTConnect (1)/GCTConnect/Views/Shared/_EditSomeone.cshtml]

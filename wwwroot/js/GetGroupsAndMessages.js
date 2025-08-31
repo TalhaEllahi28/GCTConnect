@@ -1,5 +1,4 @@
-﻿
-// ========== ON DOM LOAD: Load Groups and Friends ==========
+﻿// ========== ON DOM LOAD: Load Groups and Friends ==========
 document.addEventListener("DOMContentLoaded", function () {
     loadUserGroups();
     loadFriends();
@@ -101,10 +100,14 @@ function loadMessages(groupId, groupName) {
         .then(response => response.text())
         .then(partialViewHtml => {
             document.querySelector('#chat-container').innerHTML = partialViewHtml;
+
+            // FIXED: Process loaded messages to fix video display
+            processLoadedMessages();
+
             setupUploadModalHandlers();
             setupSignalR(groupId, false);
             attachSendButtonListener(groupId, "group");
-            setupDocumentButton(groupId); // Add document button functionality
+            setupDocumentButton(groupId);
         })
         .catch(error => console.error('Error loading group messages:', error));
 }
@@ -122,23 +125,257 @@ function openChatWithFriend(friendId, friendName) {
                 }
             }, 50);
 
+            // FIXED: Process loaded messages to fix video display
+            processLoadedMessages();
+
             setupUploadModalHandlers();
             setupSignalR(friendId, true);
             attachSendButtonListener(friendId, "friends");
-            // Friends don't have document functionality as they don't have courseId
         })
         .catch(error => console.error('Error loading friend chat:', error));
 }
 
-/*let connection;*/
+// FIXED: New function to process loaded messages and fix video/media display
+function processLoadedMessages() {
+    setTimeout(() => {
+        const messagesContainer = document.getElementById('messages-container');
+        if (!messagesContainer) return;
+
+        // Find all message containers with file attachments
+        const messageContainers = messagesContainer.querySelectorAll('.message-container');
+
+        messageContainers.forEach(messageContainer => {
+            // Look for file links or document previews that should be videos
+            const fileLinks = messageContainer.querySelectorAll('a[href*="/uploads/"]');
+            const documentPreviews = messageContainer.querySelectorAll('.document-preview, .generic-file-container, .file-preview');
+
+            fileLinks.forEach(link => {
+                const fileUrl = link.href;
+                const fileName = link.textContent || link.download || 'file';
+
+                // Try to determine file type from URL or filename
+                const fileInfo = getFileTypeInfo(null, fileName);
+
+                if (fileInfo.type === 'video') {
+                    // Replace document link with video player
+                    const videoContainer = createVideoPreview(fileUrl, fileName, fileInfo);
+                    link.parentNode.replaceChild(videoContainer, link);
+                } else if (fileInfo.type === 'image') {
+                    // Replace document link with image preview
+                    const imageContainer = createImagePreview(fileUrl, fileName, fileInfo);
+                    link.parentNode.replaceChild(imageContainer, link);
+                } else if (fileInfo.type === 'audio') {
+                    // Replace document link with audio player
+                    const audioContainer = createAudioPreview(fileUrl, fileName, fileInfo);
+                    link.parentNode.replaceChild(audioContainer, link);
+                }
+            });
+
+            // Also check existing document previews to see if they should be videos/images/audio
+            documentPreviews.forEach(preview => {
+                const fileNameElement = preview.querySelector('.file-name, .document-name');
+                const downloadLink = preview.querySelector('a[download], a[href*="/uploads/"]');
+
+                if (fileNameElement && downloadLink) {
+                    const fileName = fileNameElement.textContent;
+                    const fileUrl = downloadLink.href;
+                    const fileInfo = getFileTypeInfo(null, fileName);
+
+                    if (fileInfo.type === 'video') {
+                        // Replace document preview with video player
+                        const videoContainer = createVideoPreview(fileUrl, fileName, fileInfo);
+                        preview.parentNode.replaceChild(videoContainer, preview);
+                    } else if (fileInfo.type === 'image') {
+                        // Replace document preview with image preview
+                        const imageContainer = createImagePreview(fileUrl, fileName, fileInfo);
+                        preview.parentNode.replaceChild(imageContainer, preview);
+                    } else if (fileInfo.type === 'audio') {
+                        // Replace document preview with audio player
+                        const audioContainer = createAudioPreview(fileUrl, fileName, fileInfo);
+                        preview.parentNode.replaceChild(audioContainer, preview);
+                    }
+                }
+            });
+        });
+    }, 100); // Small delay to ensure DOM is fully loaded
+}
+
+// FIXED: Helper function to create video preview container
+function createVideoPreview(fileUrl, fileName, fileInfo) {
+    const container = document.createElement('div');
+    container.className = 'file-preview video-preview-container';
+    container.innerHTML = `
+        <video src="${fileUrl}" controls class="video-preview" preload="metadata">
+            <source src="${fileUrl}" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        <div class="file-info">
+            <span class="file-name">${fileName}</span>
+            <span class="file-category">${fileInfo.category}</span>
+            <a href="${fileUrl}" download="${fileName}" class="file-download">Download Video</a>
+        </div>
+    `;
+    return container;
+}
+
+// FIXED: Helper function to create image preview container
+function createImagePreview(fileUrl, fileName, fileInfo) {
+    const container = document.createElement('div');
+    container.className = 'file-preview image-preview-container';
+    container.innerHTML = `
+        <img src="${fileUrl}" alt="${fileName}" class="image-preview" onclick="openImageModal('${fileUrl}', '${fileName}')" loading="lazy" />
+        <div class="file-info">
+            <span class="file-name">${fileName}</span>
+            <a href="${fileUrl}" download="${fileName}" class="file-download">Download</a>
+        </div>
+    `;
+    return container;
+}
+
+// FIXED: Helper function to create audio preview container
+function createAudioPreview(fileUrl, fileName, fileInfo) {
+    const container = document.createElement('div');
+    container.className = 'file-preview audio-preview-container';
+    container.innerHTML = `
+        <audio src="${fileUrl}" controls class="audio-preview" preload="metadata">
+            <source src="${fileUrl}" type="audio/mpeg">
+            Your browser does not support the audio tag.
+        </audio>
+        <div class="file-info">
+            <span class="file-name">${fileName}</span>
+            <span class="file-category">${fileInfo.category}</span>
+            <a href="${fileUrl}" download="${fileName}" class="file-download">Download Audio</a>
+        </div>
+    `;
+    return container;
+}
+
 let mediaRecorder;
 let audioChunks = [];
 let isRecording = false;
 let currentChatId = null;
-let currentChatType = null/*;*/
+let currentChatType = null;
 let selectedFileType = null;
-let selectedFile = null; // Store the selected file object
-let activeTab = 'documents'; // Track active tab
+let selectedFile = null;
+let uploadedFileData = null; // Separate variable to track uploaded file data
+let activeTab = 'documents';
+let allDocuments = [];
+let allPastPapers = [];
+let uploadXHR = null; // For tracking upload progress and enabling cancellation
+
+// Enhanced file type detection and handling
+function getFileTypeInfo(fileType, fileName) {
+    const extension = fileName ? fileName.split('.').pop().toLowerCase() : '';
+
+    // Video formats
+    const videoFormats = ['mp4', 'webm', 'ogg', 'avi', 'mov', 'wmv', 'flv', 'mkv', '3gp', 'm4v'];
+    // Image formats
+    const imageFormats = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg', 'ico', 'tiff'];
+    // Audio formats
+    const audioFormats = ['mp3', 'wav', 'ogg', 'aac', 'flac', 'm4a', 'wma'];
+    // Document formats
+    const documentFormats = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'rtf', 'odt', 'ods', 'odp'];
+    // Archive formats
+    const archiveFormats = ['zip', 'rar', '7z', 'tar', 'gz', 'bz2'];
+    // Code formats
+    const codeFormats = ['js', 'html', 'css', 'php', 'py', 'java', 'cpp', 'c', 'cs', 'xml', 'json'];
+
+    if (fileType) {
+        if (fileType.startsWith('video/')) return { type: 'video', category: 'Video' };
+        if (fileType.startsWith('image/')) return { type: 'image', category: 'Image' };
+        if (fileType.startsWith('audio/')) return { type: 'audio', category: 'Audio' };
+        if (fileType.includes('pdf')) return { type: 'pdf', category: 'PDF Document' };
+        if (fileType.includes('document') || fileType.includes('word')) return { type: 'document', category: 'Document' };
+        if (fileType.includes('spreadsheet') || fileType.includes('excel')) return { type: 'spreadsheet', category: 'Spreadsheet' };
+        if (fileType.includes('presentation') || fileType.includes('powerpoint')) return { type: 'presentation', category: 'Presentation' };
+        if (fileType.includes('zip') || fileType.includes('archive')) return { type: 'archive', category: 'Archive' };
+    }
+
+    // Fallback to extension-based detection
+    if (videoFormats.includes(extension)) return { type: 'video', category: 'Video' };
+    if (imageFormats.includes(extension)) return { type: 'image', category: 'Image' };
+    if (audioFormats.includes(extension)) return { type: 'audio', category: 'Audio' };
+    if (documentFormats.includes(extension)) return { type: 'document', category: 'Document' };
+    if (archiveFormats.includes(extension)) return { type: 'archive', category: 'Archive' };
+    if (codeFormats.includes(extension)) return { type: 'code', category: 'Code File' };
+
+    return { type: 'generic', category: 'File' };
+}
+
+function getFileIcon(fileInfo, fileName) {
+    const extension = fileName ? fileName.split('.').pop().toLowerCase() : '';
+
+    switch (fileInfo.type) {
+        case 'video':
+            return `<svg class="file-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="23 7 16 12 23 17 23 7"></polygon>
+                <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+            </svg>`;
+        case 'image':
+            return `<svg class="file-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                <polyline points="21,15 16,10 5,21"></polyline>
+            </svg>`;
+        case 'audio':
+            return `<svg class="file-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 18V5l12-2v13"></path>
+                <circle cx="6" cy="18" r="3"></circle>
+                <circle cx="18" cy="16" r="3"></circle>
+            </svg>`;
+        case 'pdf':
+            return `<svg class="file-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <text x="8" y="16" font-size="6" fill="currentColor">PDF</text>
+            </svg>`;
+        case 'document':
+            if (['doc', 'docx'].includes(extension)) {
+                return `<svg class="file-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <text x="7" y="16" font-size="5" fill="currentColor">DOC</text>
+                </svg>`;
+            }
+            return `<svg class="file-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>`;
+        case 'spreadsheet':
+            return `<svg class="file-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <path d="M8 13h8M8 17h8M8 10h2M8 6h2"></path>
+            </svg>`;
+        case 'presentation':
+            return `<svg class="file-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                <line x1="8" y1="21" x2="16" y2="21"></line>
+                <line x1="12" y1="17" x2="12" y2="21"></line>
+            </svg>`;
+        case 'archive':
+            return `<svg class="file-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="21 8 21 21 3 21 3 8"></polyline>
+                <rect x="1" y="3" width="22" height="5"></rect>
+                <line x1="10" y1="12" x2="14" y2="12"></line>
+            </svg>`;
+        case 'code':
+            return `<svg class="file-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="16 18 22 12 16 6"></polyline>
+                <polyline points="8 6 2 12 8 18"></polyline>
+            </svg>`;
+        default:
+            return `<svg class="file-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <line x1="10" y1="9" x2="8" y2="9"></line>
+            </svg>`;
+    }
+}
 
 function setupSignalR(identifier, isPrivate) {
     if (connection) {
@@ -165,48 +402,96 @@ function setupSignalR(identifier, isPrivate) {
             messageContent += `<p>${message}</p>`;
         }
 
-        if (fileUrl) {
-            if (fileType && fileType.startsWith('image/')) {
+        if (fileUrl && fileName) {
+            const fileInfo = getFileTypeInfo(fileType, fileName);
+            const fileSize = selectedFile ? formatFileSize(selectedFile.size) : '';
+
+            // FIXED: Properly handle video files to show video player instead of document
+            if (fileInfo.type === 'video') {
                 messageContent += `
-                    <div class="file-preview">
-                        <img src="${fileUrl}" alt="${fileName || 'Image'}" class="image-preview" />
-                        <a href="${fileUrl}" download="${fileName}" class="file-download">${fileName || 'Download image'}</a>
+                    <div class="file-preview video-preview-container">
+                        <video src="${fileUrl}" controls class="video-preview" preload="metadata">
+                            <source src="${fileUrl}" type="${fileType || 'video/mp4'}">
+                            Your browser does not support the video tag.
+                        </video>
+                        <div class="file-info">
+                            <span class="file-name">${fileName}</span>
+                            <span class="file-category">${fileInfo.category}</span>
+                            <a href="${fileUrl}" download="${fileName}" class="file-download">Download Video</a>
+                        </div>
                     </div>`;
-            } else if (fileType && fileType.startsWith('video/')) {
+            } else if (fileInfo.type === 'image') {
                 messageContent += `
-                    <div class="file-preview">
-                        <video src="${fileUrl}" controls class="video-preview"></video>
-                        <a href="${fileUrl}" download="${fileName}" class="file-download">${fileName || 'Download video'}</a>
+                    <div class="file-preview image-preview-container">
+                        <img src="${fileUrl}" alt="${fileName}" class="image-preview" onclick="openImageModal('${fileUrl}', '${fileName}')" loading="lazy" />
+                        <div class="file-info">
+                            <span class="file-name">${fileName}</span>
+                            <a href="${fileUrl}" download="${fileName}" class="file-download">Download</a>
+                        </div>
                     </div>`;
-            } else if (fileType && fileType.startsWith('audio/')) {
+            } else if (fileInfo.type === 'audio') {
                 messageContent += `
-                    <div class="file-preview">
-                        <audio src="${fileUrl}" controls class="audio-preview"></audio>
-                        <a href="${fileUrl}" download="${fileName}" class="file-download">${fileName || 'Download audio'}</a>
+                    <div class="file-preview audio-preview-container">
+                        <audio src="${fileUrl}" controls class="audio-preview" preload="metadata">
+                            <source src="${fileUrl}" type="${fileType || 'audio/mpeg'}">
+                            Your browser does not support the audio tag.
+                        </audio>
+                        <div class="file-info">
+                            <span class="file-name">${fileName}</span>
+                            <span class="file-category">${fileInfo.category}</span>
+                            <a href="${fileUrl}" download="${fileName}" class="file-download">Download Audio</a>
+                        </div>
+                    </div>`;
+            } else if (fileInfo.type === 'pdf') {
+                const fileIcon = getFileIcon(fileInfo, fileName);
+                messageContent += `
+                    <div class="file-preview document-preview-container">
+                        <div class="document-preview">
+                            <iframe src="${fileUrl}" class="pdf-preview" title="${fileName}"></iframe>
+                            <div class="pdf-fallback">
+                                <div class="generic-file">
+                                    ${fileIcon}
+                                    <div class="file-details">
+                                        <span class="file-name">${fileName}</span>
+                                        <span class="file-category">${fileInfo.category}</span>
+                                        ${fileSize ? `<span class="file-size">${fileSize}</span>` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="file-actions">
+                            <button onclick="window.open('${fileUrl}', '_blank')" class="file-view">View PDF</button>
+                            <a href="${fileUrl}" download="${fileName}" class="file-download">Download</a>
+                        </div>
                     </div>`;
             } else {
+                const fileIcon = getFileIcon(fileInfo, fileName);
                 messageContent += `
-                    <div class="file-preview">
+                    <div class="file-preview generic-file-container">
                         <div class="generic-file">
-                            <svg class="file-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                <polyline points="14 2 14 8 20 8"></polyline>
-                                <line x1="16" y1="13" x2="8" y2="13"></line>
-                                <line x1="16" y1="17" x2="8" y2="17"></line>
-                                <line x1="10" y1="9" x2="8" y2="9"></line>
-                            </svg>
-                            <span class="file-name">${fileName || 'File'}</span>
+                            ${fileIcon}
+                            <div class="file-details">
+                                <span class="file-name">${fileName}</span>
+                                <span class="file-category">${fileInfo.category}</span>
+                                ${fileSize ? `<span class="file-size">${fileSize}</span>` : ''}
+                            </div>
                         </div>
-                        <a href="${fileUrl}" download="${fileName}" class="file-download">Download file</a>
+                        <div class="file-actions">
+                            <button onclick="window.open('${fileUrl}', '_blank')" class="file-view">Open</button>
+                            <a href="${fileUrl}" download="${fileName}" class="file-download">Download</a>
+                        </div>
                     </div>`;
             }
         }
 
         if (audioUrl) {
             messageContent += `
-                <div class="file-preview">
+                <div class="file-preview voice-message-container">
                     <audio src="${audioUrl}" controls class="audio-preview"></audio>
-                    <a href="${audioUrl}" download="voice-message.wav" class="file-download">Download voice message</a>
+                    <div class="file-info">
+                        <span class="file-name">Voice Message</span>
+                        <a href="${audioUrl}" download="voice-message.wav" class="file-download">Download</a>
+                    </div>
                 </div>`;
         }
 
@@ -231,14 +516,15 @@ function setupSignalR(identifier, isPrivate) {
 
     connection.on("receiveannouncement", (title, content, priority) => {
         console.log("New announcement:", title);
-
-        // Update badge
-        announcementCount++;
-        updateAnnouncementBadge();
-
-        // Show modal notification
-        window.showAnnouncementModal(title, content, priority);
+        if (typeof announcementCount !== 'undefined') {
+            announcementCount++;
+            updateAnnouncementBadge();
+        }
+        if (typeof window.showAnnouncementModal === 'function') {
+            window.showAnnouncementModal(title, content, priority);
+        }
     });
+
     connection.start()
         .then(function () {
             console.log("SignalR Connected.");
@@ -252,6 +538,136 @@ function setupSignalR(identifier, isPrivate) {
         });
 }
 
+// Image modal for full-screen viewing
+function openImageModal(imageUrl, imageName) {
+    const modal = document.createElement('div');
+    modal.className = 'image-modal';
+    modal.innerHTML = `
+        <div class="image-modal-content">
+            <span class="image-modal-close">&times;</span>
+            <img src="${imageUrl}" alt="${imageName}" class="image-modal-img">
+            <div class="image-modal-caption">${imageName}</div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+    modal.style.display = 'block';
+
+    modal.querySelector('.image-modal-close').onclick = () => {
+        document.body.removeChild(modal);
+    };
+
+    modal.onclick = (e) => {
+        if (e.target === modal) {
+            document.body.removeChild(modal);
+        }
+    };
+}
+
+// Enhanced upload progress functions for large files
+function showUploadProgress(fileName, fileSize = null) {
+    const filePreview = document.getElementById('file-preview');
+    if (filePreview) {
+        const fileSizeText = fileSize ? ` (${formatFileSize(fileSize)})` : '';
+        const isLargeFile = fileSize && fileSize > 50 * 1024 * 1024; // 50MB threshold
+
+        filePreview.innerHTML = `
+            <div class="upload-progress-indicator ${isLargeFile ? 'large-file' : ''}">
+                <div class="upload-spinner"></div>
+                <div class="upload-text">
+                    <span>Uploading ${fileName}${fileSizeText}...</span>
+                    <small>${isLargeFile ? 'Large file detected - this may take several minutes' : 'Please wait while your file is being uploaded'}</small>
+                    <div class="upload-progress-bar" id="upload-progress-bar" style="display: none;">
+                        <div class="progress-fill" id="progress-fill"></div>
+                        <span class="progress-text" id="progress-text">0%</span>
+                    </div>
+                    ${isLargeFile ? '<button onclick="cancelUpload()" class="cancel-upload-btn">Cancel Upload</button>' : ''}
+                </div>
+            </div>
+        `;
+        filePreview.style.display = 'block';
+    }
+}
+
+function updateUploadProgress(percentage) {
+    const progressBar = document.getElementById('upload-progress-bar');
+    const progressFill = document.getElementById('progress-fill');
+    const progressText = document.getElementById('progress-text');
+
+    if (progressBar && progressFill && progressText) {
+        progressBar.style.display = 'block';
+        progressFill.style.width = `${percentage}%`;
+        progressText.textContent = `${Math.round(percentage)}%`;
+    }
+}
+
+function hideUploadProgress() {
+    const filePreview = document.getElementById('file-preview');
+    if (filePreview) {
+        filePreview.innerHTML = '';
+        filePreview.style.display = 'none';
+    }
+}
+
+function cancelUpload() {
+    if (uploadXHR) {
+        uploadXHR.abort();
+        uploadXHR = null;
+    }
+    hideUploadProgress();
+    disableSendButton(false);
+
+    // Clear selected file and uploaded data
+    selectedFile = null;
+    selectedFileType = null;
+    uploadedFileData = null;
+    const fileInput = document.getElementById('file-input');
+    if (fileInput) fileInput.value = '';
+
+    console.log('Upload cancelled by user');
+}
+
+function disableSendButton(disable) {
+    const sendButton = document.getElementById('send-button');
+    const messageInput = document.getElementById('message-input');
+    const recordButton = document.getElementById('record-button');
+    const fileButtons = document.querySelectorAll('.message-action-btn, #document-button');
+
+    if (sendButton) {
+        sendButton.disabled = disable;
+        if (disable) {
+            sendButton.style.opacity = '0.5';
+            sendButton.style.cursor = 'not-allowed';
+        } else {
+            sendButton.style.opacity = '1';
+            sendButton.style.cursor = 'pointer';
+        }
+    }
+
+    if (messageInput) {
+        messageInput.disabled = disable;
+        if (disable) {
+            messageInput.style.opacity = '0.5';
+            messageInput.placeholder = 'File uploading, please wait...';
+        } else {
+            messageInput.style.opacity = '1';
+            messageInput.placeholder = 'Type a message...';
+        }
+    }
+
+    // Disable other action buttons during upload
+    if (recordButton) {
+        recordButton.disabled = disable;
+        recordButton.style.opacity = disable ? '0.5' : '1';
+    }
+
+    fileButtons.forEach(btn => {
+        btn.disabled = disable;
+        btn.style.opacity = disable ? '0.5' : '1';
+        btn.style.pointerEvents = disable ? 'none' : 'auto';
+    });
+}
+
 async function sendMessage(groupId, chatType) {
     const input = document.getElementById('message-input');
     const message = input?.value.trim() || '';
@@ -261,34 +677,55 @@ async function sendMessage(groupId, chatType) {
     let fileName = null;
     let audioUrl = null;
 
-    // Upload file if one is selected with a file type
-    if (selectedFile && selectedFileType) {
+    // FIXED: Check if file is already uploaded (for large files) using separate uploadedFileData
+    if (uploadedFileData && uploadedFileData.fileUrl) {
+        fileUrl = uploadedFileData.fileUrl;
+        fileType = uploadedFileData.fileType;
+        fileName = uploadedFileData.fileName;
+        console.log('Using pre-uploaded file:', fileName);
+    }
+    // Upload file if one is selected with a file type but not yet uploaded
+    else if (selectedFile && selectedFileType && !uploadedFileData) {
+        console.log('Starting file upload for:', selectedFile.name);
+
+        // Show upload progress and disable send button
+        showUploadProgress(selectedFile.name, selectedFile.size);
+        disableSendButton(true);
+
         const formData = new FormData();
         formData.append("file", selectedFile);
 
         try {
-            const response = await fetch('/GetGroupsAndMessages/UploadFile', {
-                method: 'POST',
-                body: formData
-            });
+            // Use XMLHttpRequest for progress tracking on large files
+            const result = await uploadFileWithProgress(formData, selectedFile.size);
 
-            const result = await response.json();
             if (result.success) {
                 fileUrl = result.fileUrl;
-                fileType = selectedFileType; // Use the user-selected file type
+                fileType = selectedFileType;
                 fileName = result.fileName;
+                hideUploadProgress();
+                console.log('File uploaded successfully during send:', fileName);
             } else {
                 console.error("File upload failed:", result.message);
                 alert("File upload failed: " + result.message);
+                hideUploadProgress();
+                disableSendButton(false);
                 return;
             }
         } catch (error) {
+            if (error.name === 'AbortError' || (error.message && error.message.includes('cancelled'))) {
+                console.log('Upload was cancelled');
+                return; // Don't show error for user cancellation
+            }
             console.error("Error uploading file:", error);
-            alert("Error uploading file");
+            alert("Error uploading file: " + error.message);
+            hideUploadProgress();
+            disableSendButton(false);
             return;
         }
     }
 
+    // Handle audio upload
     const audioDataInput = document.getElementById('recorded-audio-data');
     if (audioDataInput && audioDataInput.value) {
         try {
@@ -317,48 +754,143 @@ async function sendMessage(groupId, chatType) {
         }
     }
 
-    if (!message && !fileUrl && !audioUrl) {
-        if (!message) {
-            alert('Please provide a message, file, or audio recording.');
-        }
+    // FIXED: Better validation that properly handles all cases
+    const hasMessage = message && message.trim() !== '';
+    const hasFile = fileUrl && fileUrl.trim() !== '';
+    const hasAudio = audioUrl && audioUrl.trim() !== '';
+
+    console.log('Send validation:', { hasMessage, hasFile, hasAudio, message, fileUrl, audioUrl });
+
+    if (!hasMessage && !hasFile && !hasAudio) {
+        alert('Please provide a message, attach a file, or record audio before sending.');
+        disableSendButton(false);
         return;
     }
 
     if (!connection) {
         console.error("SignalR connection not established");
+        disableSendButton(false);
         return;
     }
 
-    connection.invoke('SendMessage', chatType, groupId, message, fileUrl, fileType, fileName, audioUrl)
-        .then(() => {
-            console.log("Message sent successfully");
-            if (input) input.value = '';
+    try {
+        await connection.invoke('SendMessage', chatType, groupId, message, fileUrl, fileType, fileName, audioUrl);
 
-            // Clear file selection
-            selectedFile = null;
-            selectedFileType = null;
-            const fileInput = document.getElementById('file-input');
-            if (fileInput) fileInput.value = '';
+        console.log("Message sent successfully");
 
-            if (audioDataInput) audioDataInput.value = '';
+        // Clear all inputs and states after successful send
+        if (input) input.value = '';
 
-            const audioPlayer = document.getElementById('audio-player-container');
-            if (audioPlayer) audioPlayer.style.display = 'none';
+        // Clear file-related data
+        selectedFile = null;
+        selectedFileType = null;
+        uploadedFileData = null;
+        const fileInput = document.getElementById('file-input');
+        if (fileInput) fileInput.value = '';
 
-            const filePreview = document.getElementById('file-preview');
-            if (filePreview) {
-                filePreview.innerHTML = '';
-                filePreview.style.display = 'none';
+        // Clear audio data
+        if (audioDataInput) audioDataInput.value = '';
+
+        const audioPlayer = document.getElementById('audio-player-container');
+        if (audioPlayer) audioPlayer.style.display = 'none';
+
+        // Clear file preview
+        const filePreview = document.getElementById('file-preview');
+        if (filePreview) {
+            filePreview.innerHTML = '';
+            filePreview.style.display = 'none';
+        }
+
+        // Reset recording state
+        isRecording = false;
+        audioChunks = [];
+        updateRecordingUI();
+
+        // Re-enable send button after successful message
+        disableSendButton(false);
+
+    } catch (err) {
+        console.error('SendMessage error:', err);
+        alert("Failed to send message. Please try again.");
+        // Re-enable send button on error
+        disableSendButton(false);
+    }
+}
+
+// Enhanced file upload with progress tracking for large files
+function uploadFileWithProgress(formData, fileSize) {
+    return new Promise((resolve, reject) => {
+        uploadXHR = new XMLHttpRequest();
+
+        // Enhanced timeout for very large files
+        const isVeryLargeFile = fileSize > 100 * 1024 * 1024; // 100MB
+        const isLargeFile = fileSize > 30 * 1024 * 1024; // 30MB
+
+        if (isVeryLargeFile) {
+            uploadXHR.timeout = 900000; // 15 minutes for very large files
+        } else if (isLargeFile) {
+            uploadXHR.timeout = 600000; // 10 minutes for large files
+        } else {
+            uploadXHR.timeout = 300000; // 5 minutes for normal files
+        }
+
+        uploadXHR.upload.addEventListener('progress', (e) => {
+            if (e.lengthComputable) {
+                const percentage = (e.loaded / e.total) * 100;
+                updateUploadProgress(percentage);
+
+                // Update upload text with speed and ETA for large files
+                if (fileSize > 10 * 1024 * 1024) { // 10MB threshold for speed calculation
+                    const uploadSpeed = e.loaded / ((Date.now() - uploadXHR.startTime) / 1000);
+                    const remainingBytes = e.total - e.loaded;
+                    const eta = remainingBytes / uploadSpeed;
+
+                    const speedText = formatFileSize(uploadSpeed) + '/s';
+                    const etaText = eta > 60 ? `${Math.round(eta / 60)}m` : `${Math.round(eta)}s`;
+
+                    const uploadText = document.querySelector('.upload-progress-indicator .upload-text span');
+                    if (uploadText) {
+                        uploadText.innerHTML = `Uploading... ${speedText} • ETA: ${etaText}`;
+                    }
+                }
             }
-
-            isRecording = false;
-            audioChunks = [];
-            updateRecordingUI();
-        })
-        .catch(err => {
-            console.error('SendMessage error:', err);
-            alert("Failed to send message. Please try again.");
         });
+
+        uploadXHR.addEventListener('load', () => {
+            if (uploadXHR.status === 200) {
+                try {
+                    const result = JSON.parse(uploadXHR.responseText);
+                    resolve(result);
+                } catch (e) {
+                    reject(new Error('Invalid server response'));
+                }
+            } else if (uploadXHR.status === 413) {
+                reject(new Error('File too large. Please try a smaller file.'));
+            } else if (uploadXHR.status === 408) {
+                reject(new Error('Upload timeout. Please try again or use a smaller file.'));
+            } else {
+                reject(new Error(`Upload failed with status: ${uploadXHR.status}`));
+            }
+        });
+
+        uploadXHR.addEventListener('error', () => {
+            reject(new Error('Network error during upload. Please check your connection and try again.'));
+        });
+
+        uploadXHR.addEventListener('timeout', () => {
+            reject(new Error('Upload timeout - please try again with a smaller file or check your connection'));
+        });
+
+        uploadXHR.addEventListener('abort', () => {
+            const abortError = new Error('Upload was cancelled');
+            abortError.name = 'AbortError';
+            reject(abortError);
+        });
+
+        uploadXHR.open('POST', '/GetGroupsAndMessages/UploadFile');
+        uploadXHR.startTime = Date.now();
+        uploadXHR.send(formData);
+    });
 }
 
 function attachSendButtonListener(identifier, chatType) {
@@ -403,11 +935,9 @@ function attachSendButtonListener(identifier, chatType) {
     }
 }
 
-// Document Panel Functions
 function setupDocumentButton(groupId) {
     const documentButton = document.getElementById('document-button');
     if (documentButton) {
-        // Remove existing listeners by cloning
         const newDocumentButton = documentButton.cloneNode(true);
         documentButton.parentNode.replaceChild(newDocumentButton, documentButton);
 
@@ -417,11 +947,9 @@ function setupDocumentButton(groupId) {
     }
 }
 
-
 function loadDocuments(groupId) {
     console.log("Loading documents for group:", groupId);
 
-    // Show the panel and display loading state
     openDocumentPanel();
 
     const contentDiv = document.getElementById('documentPanelContent');
@@ -439,8 +967,8 @@ function loadDocuments(groupId) {
 
             if (data.success) {
                 allDocuments = data.documents || [];
-                allPastPapers = data.pastPapers || []; // Note: Backend has typo "PastPaprs"
-                activeTab = 'documents'; // Reset to default tab
+                allPastPapers = data.pastPapers || [];
+                activeTab = 'documents';
                 displayDocumentsWithTabs(allDocuments, allPastPapers);
                 setupTabFunctionality();
                 setupSearchFunctionality();
@@ -462,7 +990,6 @@ function loadDocuments(groupId) {
         });
 }
 
-
 function setupTabFunctionality() {
     const documentsTab = document.getElementById('documents-tab');
     const pastPapersTab = document.getElementById('past-papers-tab');
@@ -478,7 +1005,6 @@ function setupTabFunctionality() {
 function switchTab(tabName) {
     activeTab = tabName;
 
-    // Update tab appearance
     const documentsTab = document.getElementById('documents-tab');
     const pastPapersTab = document.getElementById('past-papers-tab');
     const documentsContent = document.getElementById('documents-content');
@@ -604,27 +1130,22 @@ function displayDocumentsWithTabs(documents, pastPapers) {
 }
 
 function createDocumentItem(file, type) {
-    const iconSvg = type === 'past-paper'
-        ? `<svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-           </svg>`
-        : `<svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-           </svg>`;
-
     const fileName = file.FileName || file.fileName || 'Unknown file';
+    const fileUrl = file.FileUrl || file.fileUrl || '#';
+    const fileInfo = getFileTypeInfo(file.FileType || file.fileType, fileName);
+    const fileIcon = getFileIcon(fileInfo, fileName);
     const fileSize = file.FileSize ? formatFileSize(file.FileSize) : '';
     const uploadDate = file.UploadDate ? new Date(file.UploadDate).toLocaleDateString() : '';
-    const fileUrl = file.FileUrl || file.fileUrl || '#';
 
     return `
         <div class="document-item" onclick="window.open('${fileUrl}', '_blank')">
             <div class="document-icon">
-                ${iconSvg}
+                ${fileIcon}
             </div>
             <div class="document-info">
                 <div class="document-name">${fileName}</div>
                 <div class="document-meta">
+                    <span class="file-category">${fileInfo.category}</span>
                     ${fileSize ? `<span>${fileSize}</span>` : ''}
                     ${uploadDate ? `<span>${uploadDate}</span>` : ''}
                 </div>
@@ -639,22 +1160,21 @@ function createDocumentItem(file, type) {
 function formatFileSize(bytes) {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
 }
 
 function openDocumentPanel() {
     const panel = document.getElementById('documentPanel');
-    panel.classList.add('show');
+    if (panel) panel.classList.add('show');
 }
 
 function closeDocumentPanel() {
     const panel = document.getElementById('documentPanel');
-    panel.classList.remove('show');
+    if (panel) panel.classList.remove('show');
 }
 
-// ... keep existing code (Recording functions)
 async function toggleRecording() {
     if (!isRecording) {
         await startRecording();
@@ -749,7 +1269,6 @@ function clearRecording() {
     }
 }
 
-// ... keep existing code (Upload Modal functions)
 function setupUploadModalHandlers() {
     const fileBtn = document.querySelector('.message-action-btn');
     if (fileBtn) {
@@ -767,7 +1286,6 @@ function setupUploadModalHandlers() {
         fileInput.addEventListener('change', handleFileSelection);
     }
 
-    // Set up upload option click handlers
     document.querySelectorAll('.upload-option').forEach(option => {
         option.addEventListener('click', () => {
             console.log('Upload option clicked:', option.getAttribute('data-type'));
@@ -790,23 +1308,27 @@ function setupUploadModalHandlers() {
     }
 }
 
-// Modified to only store file and show modal - no upload yet
+// FIXED: Always show upload modal regardless of file size
 function handleFileSelection() {
     const fileInput = document.getElementById('file-input');
     if (!fileInput.files || !fileInput.files.length) {
         return;
     }
 
-    // Store the selected file
     selectedFile = fileInput.files[0];
-    console.log('File selected:', selectedFile.name);
+    console.log('File selected:', selectedFile.name, 'Size:', formatFileSize(selectedFile.size));
 
-    // Show the upload modal for file type selection
+    // Clear any previous uploaded file data
+    uploadedFileData = null;
+
+    // Always show the upload modal for category selection
     openUploadModal();
 }
 
 function openUploadModal() {
     const modal = document.getElementById('uploadModal');
+    if (!modal) return;
+
     modal.style.display = 'block';
     selectedFileType = null;
     const uploadBtn = document.getElementById('uploadBtn');
@@ -818,13 +1340,35 @@ function openUploadModal() {
         el.classList.remove('selected');
     });
 
-    // Re-setup the event listeners every time the modal opens
+    // Enhanced upload modal with more file type options
+    const modalContent = modal.querySelector('.upload-options') || modal.querySelector('.modal-content');
+    if (modalContent && selectedFile) {
+        const detectedInfo = getFileTypeInfo(selectedFile.type, selectedFile.name);
+        const fileSize = formatFileSize(selectedFile.size);
+        const isLargeFile = selectedFile.size > 50 * 1024 * 1024; // 50MB
+
+        // Add file preview to modal
+        const filePreviewHtml = `
+            <div class="selected-file-preview ${isLargeFile ? 'large-file-warning' : ''}">
+                <h4>Selected File:</h4>
+                <div class="file-info">
+                    <span class="file-name">${selectedFile.name}</span>
+                    <span class="file-size">${fileSize}</span>
+                    <span class="detected-type">Detected: ${detectedInfo.category}</span>
+                    ${isLargeFile ? '<span class="large-file-notice">⚠️ Large file - upload may take several minutes</span>' : ''}
+                </div>
+            </div>
+        `;
+
+        // Insert at the beginning of modal content
+        modalContent.insertAdjacentHTML('afterbegin', filePreviewHtml);
+    }
+
     setupUploadOptionHandlers();
 }
 
 function setupUploadOptionHandlers() {
     document.querySelectorAll('.upload-option').forEach(option => {
-        // Remove existing listeners by cloning
         const newOption = option.cloneNode(true);
         option.parentNode.replaceChild(newOption, option);
 
@@ -844,11 +1388,16 @@ function setupUploadOptionHandlers() {
 
 function closeUploadModal() {
     const modal = document.getElementById('uploadModal');
-    modal.style.display = 'none';
-    //selectedFileType = null;
+    if (modal) {
+        modal.style.display = 'none';
 
-    // Don't clear selectedFile here - keep it for sending message
-    // Only clear the file input to allow reselection if needed
+        // Remove file preview
+        const filePreview = modal.querySelector('.selected-file-preview');
+        if (filePreview) {
+            filePreview.remove();
+        }
+    }
+
     const fileInput = document.getElementById('file-input');
     if (fileInput) fileInput.value = '';
 }
@@ -859,18 +1408,39 @@ function handleFileUpload() {
         return;
     }
 
-    // Just close the modal - the file will be uploaded when sendMessage is called
     closeUploadModal();
 
-    // Show some indication that file is ready to send
     console.log('File ready to send:', selectedFile.name, 'Type:', selectedFileType);
 
-    // Optional: Show a visual indicator that a file is ready to be sent
+    // For large files (>30MB), start upload immediately and show progress
+    const isLargeFile = selectedFile.size > 30 * 1024 * 1024; // 30MB threshold
+
+    if (isLargeFile) {
+        // Start uploading immediately for large files
+        startFileUpload();
+    } else {
+        // For smaller files, just show ready indicator
+        showFileReadyIndicator();
+    }
+}
+
+// Show file ready indicator for files that haven't been uploaded yet
+function showFileReadyIndicator() {
     const filePreview = document.getElementById('file-preview');
     if (filePreview) {
+        const fileInfo = getFileTypeInfo(selectedFileType || selectedFile.type, selectedFile.name);
+        const fileIcon = getFileIcon(fileInfo, selectedFile.name);
+        const fileSize = formatFileSize(selectedFile.size);
+
         filePreview.innerHTML = `
             <div class="file-ready-indicator">
-                <span>📎 File ready: ${selectedFile.name} (${selectedFileType})</span>
+                <div class="file-preview-content">
+                    ${fileIcon}
+                    <div class="file-details">
+                        <span class="file-name">${selectedFile.name}</span>
+                        <span class="file-info">${fileInfo.category} • ${fileSize}</span>
+                    </div>
+                </div>
                 <button onclick="clearSelectedFile()" class="clear-file-btn">×</button>
             </div>
         `;
@@ -878,15 +1448,109 @@ function handleFileUpload() {
     }
 }
 
-// Add a function to clear the selected file if user wants to cancel
+// FIXED: New function to start file upload immediately for large files
+async function startFileUpload() {
+    if (!selectedFile || !selectedFileType) {
+        return;
+    }
+
+    console.log('Starting immediate upload for large file:', selectedFile.name);
+
+    // Show upload progress and disable send button
+    showUploadProgress(selectedFile.name, selectedFile.size);
+    disableSendButton(true);
+
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+
+    try {
+        // Use XMLHttpRequest for progress tracking
+        const result = await uploadFileWithProgress(formData, selectedFile.size);
+
+        if (result.success) {
+            // FIXED: Store the uploaded file info in separate variable
+            uploadedFileData = {
+                fileUrl: result.fileUrl,
+                fileType: selectedFileType,
+                fileName: result.fileName,
+                originalFile: selectedFile
+            };
+
+            hideUploadProgress();
+            showUploadedFileIndicator();
+            disableSendButton(false);
+
+            console.log('Large file uploaded successfully:', result.fileName);
+        } else {
+            console.error("File upload failed:", result.message);
+            alert("File upload failed: " + result.message);
+            hideUploadProgress();
+            disableSendButton(false);
+            clearSelectedFile();
+        }
+    } catch (error) {
+        if (error.message && (error.message.includes('cancelled') || error.name === 'AbortError')) {
+            console.log('Upload was cancelled');
+            return;
+        }
+        console.error("Error uploading file:", error);
+        alert("Error uploading file: " + error.message);
+        hideUploadProgress();
+        disableSendButton(false);
+        clearSelectedFile();
+    }
+}
+
+// FIXED: New function to show uploaded file ready indicator
+function showUploadedFileIndicator() {
+    const filePreview = document.getElementById('file-preview');
+    if (filePreview && uploadedFileData) {
+        const fileInfo = getFileTypeInfo(uploadedFileData.fileType, uploadedFileData.fileName);
+        const fileIcon = getFileIcon(fileInfo, uploadedFileData.fileName);
+        const fileSize = uploadedFileData.originalFile ? formatFileSize(uploadedFileData.originalFile.size) : '';
+
+        filePreview.innerHTML = `
+            <div class="file-uploaded-indicator">
+                <div class="file-preview-content">
+                    <div class="upload-success-badge">✓ Uploaded</div>
+                    ${fileIcon}
+                    <div class="file-details">
+                        <span class="file-name">${uploadedFileData.fileName}</span>
+                        <span class="file-info">${fileInfo.category} • ${fileSize}</span>
+                        <span class="upload-status">Ready to send</span>
+                    </div>
+                </div>
+                <button onclick="clearSelectedFile()" class="clear-file-btn">×</button>
+            </div>
+        `;
+        filePreview.style.display = 'block';
+    }
+}
+
 function clearSelectedFile() {
+    // Cancel ongoing upload if any
+    if (uploadXHR) {
+        uploadXHR.abort();
+        uploadXHR = null;
+    }
+
+    // Clear all file-related data
     selectedFile = null;
     selectedFileType = null;
+    uploadedFileData = null;
+
     const filePreview = document.getElementById('file-preview');
     if (filePreview) {
         filePreview.innerHTML = '';
         filePreview.style.display = 'none';
     }
+
     const fileInput = document.getElementById('file-input');
     if (fileInput) fileInput.value = '';
+
+    // Re-enable controls
+    hideUploadProgress();
+    disableSendButton(false);
+
+    console.log('Selected file cleared');
 }

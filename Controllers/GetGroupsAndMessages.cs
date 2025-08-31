@@ -134,7 +134,9 @@ namespace GCTConnect.Controllers
             return PartialView("_ChatWindow", messages);
         }
 
+
         // Add file upload endpoint
+        [RequestSizeLimit(100_000_000)] // 100MB
         [HttpPost]
         public async Task<IActionResult> UploadFile(IFormFile file)
         {

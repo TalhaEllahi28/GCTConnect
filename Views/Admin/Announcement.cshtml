@@ -1,110 +1,4 @@
-﻿@* @{
-	ViewBag.Title = "Admin Dashboard";
-	Layout = null;
-	var activities = ViewBag.Activities as List<GCTConnect.ViewModel.Admin.ActivityViewModel>;
-}
-
-
-
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>GCT Connect - Admin Panel</title>
-	<link rel="stylesheet" href="/css/adminDashboard.css">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-</head>
-<body>
-
-
-	<partial name="_AdminNavBarPartial" />
-	<!-- Main Content -->
-	<main class="main-content">
-		<!-- Header -->
-		<header class="header">
-			<div class="header-left">
-				<button class="sidebar-toggle" onclick="toggleSidebar()">
-					<i class="fas fa-bars"></i>
-				</button>
-				<h1 class="page-title">Admin Dashboard</h1>
-			</div>
-			<div class="header-right">
-				<div class="admin-profile">
-					<img src="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=40&h=40&dpr=1" alt="Admin" class="profile-img">
-					<span class="admin-name">Admin User</span>
-					<i class="fas fa-chevron-down"></i>
-				</div>
-			</div>
-		</header>
-
-
-		<div class="page-content">
-			<div id="announcements" class="page">
-				<div class="page-header">
-					<h2>Announcement Management</h2>
-					<button class="btn btn-primary" onclick="showModal('addAnnouncementModal')">
-						<i class="fas fa-plus"></i> Create Announcement
-					</button>
-				</div>
-
-				<div class="announcements-list">
-					<div class="announcement-card">
-						<div class="announcement-header">
-							<h3>Semester Exam Schedule</h3>
-							<span class="announcement-date">2024-01-20</span>
-						</div>
-						<div class="announcement-content">
-							<p>The semester examination schedule has been released. Please check your respective department pages for detailed information.</p>
-						</div>
-						<div class="announcement-footer">
-							<div class="announcement-meta">
-								<span class="priority high">High Priority</span>
-								<span class="visibility all">All Students</span>
-							</div>
-							<div class="announcement-actions">
-								<button class="btn-action edit"><i class="fas fa-edit"></i></button>
-								<button class="btn-action delete"><i class="fas fa-trash"></i></button>
-							</div>
-						</div>
-					</div>
-
-					<div class="announcement-card">
-						<div class="announcement-header">
-							<h3>Library Hours Update</h3>
-							<span class="announcement-date">2024-01-18</span>
-						</div>
-						<div class="announcement-content">
-							<p>The library will be open from 8:00 AM to 10:00 PM on weekdays and 9:00 AM to 6:00 PM on weekends.</p>
-						</div>
-						<div class="announcement-footer">
-							<div class="announcement-meta">
-								<span class="priority medium">Medium Priority</span>
-								<span class="visibility all">All Users</span>
-							</div>
-							<div class="announcement-actions">
-								<button class="btn-action edit"><i class="fas fa-edit"></i></button>
-								<button class="btn-action delete"><i class="fas fa-trash"></i></button>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-
-		</div>
-	</main>
-	<script src="/js/adminDashboard.js"></script>
-
-</body>
-</html>
-
- *@
-
-
-
-
-@{
+﻿@{
 	ViewBag.Title = "Admin Dashboard";
 	Layout = null;
 	var announcements = ViewBag.Announcements as List<GCTConnect.Models.ViewModels.AnnouncementViewModel>;
@@ -119,6 +13,38 @@
 	<link rel="stylesheet" href="/css/adminDashboard.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
+<style>
+	/* Pagination styling */
+	.pagination {
+		margin-top: 20px;
+		text-align: center;
+	}
+
+	.page-btn {
+		display: inline-block;
+		padding: 8px 14px;
+		margin: 0 4px;
+		border-radius: 6px;
+		text-decoration: none;
+		font-weight: 600;
+		color: #6a0dad; /* Purple text */
+		background: #ffffff; /* White background */
+		border: 2px solid #6a0dad;
+		transition: all 0.3s ease;
+	}
+
+		.page-btn:hover {
+			background: #6a0dad;
+			color: #ffffff; /* White text */
+		}
+
+		.page-btn.active {
+			background: #6a0dad;
+			color: #ffffff;
+			cursor: default;
+		}
+
+</style>
 <body>
 	<partial name="_AdminNavBarPartial" />
 
@@ -179,6 +105,23 @@
 						<p>No announcements available.</p>
 					}
 				</div>
+				<div class="pagination">
+					@if (ViewBag.TotalPages > 1)
+					{
+						for (int i = 1; i <= (int)ViewBag.TotalPages; i++)
+						{
+							if (i == (int)ViewBag.CurrentPage)
+							{
+								<a href="@Url.Action("Announcement", new { page = i })" class="page-btn active">@i</a>
+							}
+							else
+							{
+								<a href="@Url.Action("Announcement", new { page = i })" class="page-btn">@i</a>
+							}
+						}
+					}
+				</div>
+
 			</div>
 		</div>
 		<div id="addAnnouncementModal" class="modal">

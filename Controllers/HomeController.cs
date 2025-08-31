@@ -136,6 +136,8 @@ namespace GCTConnect.Controllers
             return View();
         }
 
+
+
         [Authorize(Roles = "Admin,Hod")]
         [HttpPost]
         public JsonResult CreateGroups([FromBody] CreateGroup newGroup)
@@ -217,6 +219,8 @@ namespace GCTConnect.Controllers
                 success = false
             });
         }
+
+
 
         [Authorize(Roles = "Admin,Hod")]
         public IActionResult AddSomeone()
@@ -360,8 +364,30 @@ namespace GCTConnect.Controllers
                 addUserInGroup(department, User, "TeachersHod");
             }
 
-            else if ((newUser.Role == "Principal" || newUser.Role == "Hod" || newUser.Role == "Admin") &&
-                     currentUser.Role == "Admin")
+            else if (newUser.Role == "Hod" && currentUser.Role == "Admin")
+            {
+                User.Role = newUser.Role;
+                User.Username = newUser.Name;
+                User.BatchId = null;
+                User.DepartmentId = newUser.DepartmentId;
+                // Save user to the database
+                _context.Users.Add(User);
+                _context.SaveChanges();
+                if (newUser.Role == "Hod")
+                {
+                    var department = _context.Departments.FirstOrDefault(d => d.DepartmentId == newUser.DepartmentId);
+                    if (department != null && department.HodId == null)
+                    {
+                        department.HodId = User.UserId;
+                        _context.Departments.Update(department);
+                    }
+                    addUserInGroup(department, User, "StudentsTeachersHod");
+                    addUserInGroup(User, "PrincipalHod");
+                }
+            }
+
+
+            else if ((newUser.Role == "Principal" || newUser.Role == "Admin") && currentUser.Role == "Admin")
             {
                 User.Role = newUser.Role;
                 User.Username = newUser.Name;
@@ -370,19 +396,11 @@ namespace GCTConnect.Controllers
                 // Save user to the database
                 _context.Users.Add(User);
                 _context.SaveChanges();
-                if (newUser.Role == "Hod")
-                {
-                    var department = _context.Departments.FirstOrDefault(d => d.DepartmentId == newUser.DepartmentId);
-                    addUserInGroup(department, User, "StudentsTeachersHod");
-                    addUserInGroup(User, "PrincipalHod");
-                }
-                else if (newUser.Role == "Principle")
+                if (newUser.Role == "Principle")
                 {
                     addUserInGroup(User, "PrincipalOnly");
                 }
             }
-
-
 
             // Send email to the user with credentials
             try
@@ -407,6 +425,7 @@ namespace GCTConnect.Controllers
             // Redirect to appropriate dashboard
             return currentUser.Role == "Admin" ? RedirectToAction("UserManagement", "Admin") : RedirectToAction("Dashboard", "Hod");
         }
+
         [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
         public async Task<IActionResult> Login()
         {
@@ -509,7 +528,7 @@ namespace GCTConnect.Controllers
                            parts[1] == departement;
                 })
                 .ToList();
-            foreach( var group in groups)
+            foreach (var group in groups)
             {
                 GroupMember newMember = new GroupMember
                 {
@@ -706,6 +725,7 @@ namespace GCTConnect.Controllers
 
 
         // GET method for Edit User
+
         [HttpGet]
         [Authorize(Roles = "Admin,Hod")]
         public async Task<IActionResult> EditUser(int id)
@@ -778,7 +798,7 @@ namespace GCTConnect.Controllers
                 subject = user.Subject,
                 departmentId = user.DepartmentId,
                 batchId = user.BatchId,
-               
+
             };
 
             return Json(userData);
@@ -929,6 +949,40 @@ namespace GCTConnect.Controllers
                     existingUser.DepartmentId = null;
                 }
             }
+            if (oldRole == "Hod" && updatedUser.Role != "Hod")
+            {
+                // Clear HOD from department if this user was HOD
+                if (oldDepartmentId.HasValue)
+                {
+                    var oldDept = await _context.Departments.FirstOrDefaultAsync(d => d.DepartmentId == oldDepartmentId.Value);
+                    if (oldDept != null && oldDept.HodId == existingUser.UserId)
+                    {
+                        oldDept.HodId = null;
+                    }
+                }
+            }
+            else if (updatedUser.Role == "Hod")
+            {
+                // Assign HOD if department provided
+                if (updatedUser.DepartmentId.HasValue)
+                {
+                    var dept = await _context.Departments.FirstOrDefaultAsync(d => d.DepartmentId == updatedUser.DepartmentId.Value);
+                    if (dept != null)
+                    {
+                        // If no HOD assigned OR replacing same user, update it
+                        if (dept.HodId == null || dept.HodId == existingUser.UserId)
+                        {
+                            dept.HodId = existingUser.UserId;
+                        }
+                        else if (dept.HodId != existingUser.UserId)
+                        {
+                            // Another HOD already exists ? prevent conflict
+                            ModelState.AddModelError("", $"Department '{dept.Name}' already has a HOD assigned.");
+                            return View(updatedUser);
+                        }
+                    }
+                }
+            }
 
             // Handle batch count adjustments for students
             if (oldRole == "Students" && batchChanged)
@@ -981,3 +1035,4 @@ namespace GCTConnect.Controllers
         }
     }
 }
+

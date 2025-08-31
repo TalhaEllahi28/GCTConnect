@@ -1,0 +1,75 @@
+﻿<div id="addDepartmentModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="departmentModalTitle">Add New Department</h3>
+            <button class="modal-close" onclick="hideModal('addDepartmentModal')">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form class="department-form">
+                <div class="form-group">
+                    <input type="hidden" id="departmentId" /> <!-- hidden field for edit -->
+
+                    <label>Department Name</label>
+                    <input id="departmentName" type="text" class="form-input" required>
+                </div>
+                @*<div class="form-group">
+                    <label>Department Code</label>
+                    <input type="text" class="form-input" required>
+                </div>*@
+                @*<div class="form-group">
+                    <label>Description</label>
+                    <textarea class="form-textarea" rows="3" placeholder="Department description"></textarea>
+                </div>*@
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="hideModal('addDepartmentModal')">Cancel</button>
+            <button id="saveDepartmentBtn" class="btn btn-primary" onclick="saveDepartment()">Create Department</button>
+        </div>
+    </div>
+</div>
+<style>
+    /* Notification Styles */
+    .department-notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 10001;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        max-width: 400px;
+        animation: departmentSlideIn 0.3s ease-out;
+    }
+
+    .department-notification-success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+
+    .department-notification-info {
+        background: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+    }
+
+    .department-notification-error {
+        background: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+    }
+    .department-notification button {
+        background: none;
+        border: none;
+        color: inherit;
+        cursor: pointer;
+        padding: 0;
+        margin-left: auto;
+    }
+</style>

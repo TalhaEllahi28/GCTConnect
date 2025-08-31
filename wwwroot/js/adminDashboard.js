@@ -117,20 +117,7 @@ function deleteBatch(batchId) {
     }
 }
 
-// =============================
-// Department management
-// =============================
-function editDepartment(deptId) {
-    console.log('Edit department:', deptId);
-    showNotification('Edit department functionality would be implemented here', 'info');
-}
 
-function deleteDepartment(deptId) {
-    if (confirm('Are you sure you want to delete this department?')) {
-        console.log('Delete department:', deptId);
-        showNotification('Department deleted successfully', 'success');
-    }
-}
 
 // =============================
 // Group management
