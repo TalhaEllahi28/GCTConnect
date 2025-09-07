@@ -9,6 +9,8 @@ using System.Collections.Concurrent;
 using System.Security.Claims;
 using System.Text.RegularExpressions;
 using Message = GCTConnect.Models.Message;
+using ProfanityFilter; // Add at top of file
+using System.Text;      // For normalization if needed
 
 public class ChatHub : Hub
 {
@@ -208,18 +210,17 @@ public class ChatHub : Hub
     }
 
     // Send a message to a group with optional file or audio attachment
-    public async Task SendMessage(string chatType, int GroupIdOrRecieverId, string message, string? fileUrl = null, string? fileType = null, string? fileName = null, string? audioUrl = null)
+    public async Task SendMessage(string chatType, int GroupIdOrRecieverId, string message,
+        string? fileUrl = null, string? fileType = null, string? fileName = null, string? audioUrl = null)
     {
         var sender = _userService.GetCurrentUser();
         if (sender == null)
-        {
             return;
-        }
+
         string groupName = chatType == "friends"
             ? GeneratePrivateGroupName(Convert.ToString(sender.UserId), Convert.ToString(GroupIdOrRecieverId))
             : $"{GroupIdOrRecieverId}_{(_context.Groups.Find(GroupIdOrRecieverId)?.GroupName ?? "group")}";
 
-        // Allow empty message if there's a file or audio attachment
         if (GroupIdOrRecieverId == 0 || string.IsNullOrEmpty(chatType) ||
             (string.IsNullOrEmpty(message) && string.IsNullOrEmpty(fileUrl) && string.IsNullOrEmpty(audioUrl)))
         {
@@ -234,22 +235,36 @@ public class ChatHub : Hub
             return;
         }
 
+        // -------- PROFANITY FILTER INTEGRATION --------
+        if (!string.IsNullOrWhiteSpace(message))
+        {
+            var filter = new ProfanityFilter.ProfanityFilter();
 
+            //// Option 1: Reject message entirely
+            //if (filter.ContainsProfanity(message))
+            //{
+            //    await Clients.Caller.SendAsync("ReceiveMessage", "System",
+            //        "Your message contains inappropriate language and was not sent.");
+            //    return;
+            //}
+
+            // Option 2: Or automatically censor message
+            message = filter.CensorString(message);
+        }
+        // ----------------------------------------------
 
         string senderFullName = $"{user.Name} {user.LastName}".Trim();
-
 
         if (chatType == "group")
         {
             var group = await _context.Groups.FirstOrDefaultAsync(g => g.GroupId == GroupIdOrRecieverId);
             if (group == null)
             {
-                await Clients.Caller.SendAsync("ReceiveMessage", "System", $"Group Id: '{GroupIdOrRecieverId}' does not exist.");
+                await Clients.Caller.SendAsync("ReceiveMessage", "System",
+                    $"Group Id: '{GroupIdOrRecieverId}' does not exist.");
                 return;
             }
 
-
-            // Save the message to the database with file/audio information
             var newMessage = new Message
             {
                 GroupId = group.GroupId,
@@ -274,33 +289,23 @@ public class ChatHub : Hub
                     UploaderId = sender.UserId,
                     UploadedAt = DateTime.Now
                 };
-
                 _context.Files.Add(newFile);
             }
 
             await _context.SaveChangesAsync();
-
-            try
-            {
-                await Clients.Group(groupName).SendAsync("ReceiveMessage", user.Username, message, user.ProfilePic, fileUrl, fileType, fileName, audioUrl);
-                //await Clients.Group(groupName).SendAsync("ReceiveMessage", user.Username, message, user.ProfilePic, fileUrl, fileType, fileName, audioUrl, senderFullName);
-
-            }
-            catch (Exception ex)
-            {
-                // Log the exception or handle it appropriately
-            }
+            await Clients.Group(groupName)
+                .SendAsync("ReceiveMessage", user.Username, message, user.ProfilePic, fileUrl, fileType, fileName, audioUrl);
         }
         else if (chatType == "friends")
         {
             var reciver = await _context.Users.FirstOrDefaultAsync(g => g.UserId == GroupIdOrRecieverId);
             if (reciver == null)
             {
-                await Clients.Caller.SendAsync("ReceiveMessage", "System", $"Reciver Id: '{GroupIdOrRecieverId}' does not exist.");
+                await Clients.Caller.SendAsync("ReceiveMessage", "System",
+                    $"Reciver Id: '{GroupIdOrRecieverId}' does not exist.");
                 return;
             }
 
-            // Save the message to the database with file/audio information
             var newMessage = new Message
             {
                 ReceiverId = reciver.UserId,
@@ -314,9 +319,8 @@ public class ChatHub : Hub
             };
             _context.Messages.Add(newMessage);
             await _context.SaveChangesAsync();
-            await Clients.Group(groupName).SendAsync("ReceiveMessage", user.Username, message, user.ProfilePic, fileUrl, fileType, fileName, audioUrl);
-            //await Clients.Group(groupName).SendAsync("ReceiveMessage", user.Username, message, user.ProfilePic, fileUrl, fileType, fileName, audioUrl, senderFullName);
-
+            await Clients.Group(groupName)
+                .SendAsync("ReceiveMessage", user.Username, message, user.ProfilePic, fileUrl, fileType, fileName, audioUrl);
         }
     }
 }

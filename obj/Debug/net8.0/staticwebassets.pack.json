@@ -37,6 +37,10 @@
       "PackagePath": "staticwebassets\\css\\site.css"
     },
     {
+      "Id": "E:\\sites\\GCTConnect (1)\\GCTConnect (1)\\GCTConnect\\wwwroot\\css\\socialMedia.css",
+      "PackagePath": "staticwebassets\\css\\socialMedia.css"
+    },
+    {
       "Id": "E:\\sites\\GCTConnect (1)\\GCTConnect (1)\\GCTConnect\\wwwroot\\favicon.ico",
       "PackagePath": "staticwebassets\\favicon.ico"
     },
@@ -1005,6 +1009,10 @@
       "PackagePath": "staticwebassets\\js\\site.js"
     },
     {
+      "Id": "E:\\sites\\GCTConnect (1)\\GCTConnect (1)\\GCTConnect\\wwwroot\\js\\socialMedia.js",
+      "PackagePath": "staticwebassets\\js\\socialMedia.js"
+    },
+    {
       "Id": "E:\\sites\\GCTConnect (1)\\GCTConnect (1)\\GCTConnect\\wwwroot\\lib\\bootstrap\\LICENSE",
       "PackagePath": "staticwebassets\\lib\\bootstrap"
     },
@@ -1685,6 +1693,14 @@
       "PackagePath": "staticwebassets\\uploads\\6338e8a3-0490-43f0-b6de-682b44e323ee_Me.mp4"
     },
     {
+      "Id": "E:\\sites\\GCTConnect (1)\\GCTConnect (1)\\GCTConnect\\wwwroot\\uploads\\63b5b08e-4dbd-4d0b-8edb-cbcf44587241_Me.mp4",
+      "PackagePath": "staticwebassets\\uploads\\63b5b08e-4dbd-4d0b-8edb-cbcf44587241_Me.mp4"
+    },
+    {
+      "Id": "E:\\sites\\GCTConnect (1)\\GCTConnect (1)\\GCTConnect\\wwwroot\\uploads\\678569f9-50b6-4348-98ca-7293b62c8990_scence of yesterday.mp4",
+      "PackagePath": "staticwebassets\\uploads\\678569f9-50b6-4348-98ca-7293b62c8990_scence of yesterday.mp4"
+    },
+    {
       "Id": "E:\\sites\\GCTConnect (1)\\GCTConnect (1)\\GCTConnect\\wwwroot\\uploads\\6bd06b38-432f-4848-be55-49bee2afac11_Operations Engineer.docx",
       "PackagePath": "staticwebassets\\uploads\\6bd06b38-432f-4848-be55-49bee2afac11_Operations Engineer.docx"
     },
@@ -1773,6 +1789,10 @@
       "PackagePath": "staticwebassets\\uploads\\aed2fa31-1703-484a-98fd-df6f25e51e0a_Operations Engineer.docx"
     },
     {
+      "Id": "E:\\sites\\GCTConnect (1)\\GCTConnect (1)\\GCTConnect\\wwwroot\\uploads\\audio\\14e8d852-b50c-47ec-bbc9-995a0a84a706.wav",
+      "PackagePath": "staticwebassets\\uploads\\audio\\14e8d852-b50c-47ec-bbc9-995a0a84a706.wav"
+    },
+    {
       "Id": "E:\\sites\\GCTConnect (1)\\GCTConnect (1)\\GCTConnect\\wwwroot\\uploads\\audio\\1e0dee54-4deb-4cc1-a4e5-2585ccc7ba42.wav",
       "PackagePath": "staticwebassets\\uploads\\audio\\1e0dee54-4deb-4cc1-a4e5-2585ccc7ba42.wav"
     },
@@ -1783,6 +1803,10 @@
     {
       "Id": "E:\\sites\\GCTConnect (1)\\GCTConnect (1)\\GCTConnect\\wwwroot\\uploads\\audio\\2a4d8fed-537f-443a-a5d0-3ca2a30a72b3.wav",
       "PackagePath": "staticwebassets\\uploads\\audio\\2a4d8fed-537f-443a-a5d0-3ca2a30a72b3.wav"
+    },
+    {
+      "Id": "E:\\sites\\GCTConnect (1)\\GCTConnect (1)\\GCTConnect\\wwwroot\\uploads\\audio\\2e7e431b-15a7-4bd3-8234-0f9c1549d1b5.wav",
+      "PackagePath": "staticwebassets\\uploads\\audio\\2e7e431b-15a7-4bd3-8234-0f9c1549d1b5.wav"
     },
     {
       "Id": "E:\\sites\\GCTConnect (1)\\GCTConnect (1)\\GCTConnect\\wwwroot\\uploads\\audio\\2f5152ec-052b-42ab-88fa-a4d3fc944efc.wav",
@@ -1815,6 +1839,10 @@
     {
       "Id": "E:\\sites\\GCTConnect (1)\\GCTConnect (1)\\GCTConnect\\wwwroot\\uploads\\audio\\95e47394-62ce-4a36-bfb3-45e1ba7aebd0.wav",
       "PackagePath": "staticwebassets\\uploads\\audio\\95e47394-62ce-4a36-bfb3-45e1ba7aebd0.wav"
+    },
+    {
+      "Id": "E:\\sites\\GCTConnect (1)\\GCTConnect (1)\\GCTConnect\\wwwroot\\uploads\\audio\\c5c9f737-954c-446d-9ef3-795a608ffbff.wav",
+      "PackagePath": "staticwebassets\\uploads\\audio\\c5c9f737-954c-446d-9ef3-795a608ffbff.wav"
     },
     {
       "Id": "E:\\sites\\GCTConnect (1)\\GCTConnect (1)\\GCTConnect\\wwwroot\\uploads\\b0d114c5-e726-464d-b86a-34b4580cfc32_Operations Engineer.docx",
@@ -1905,8 +1933,16 @@
       "PackagePath": "staticwebassets\\uploads\\e646a53d-4574-4370-a868-c7333322ab46_Me.mp4"
     },
     {
+      "Id": "E:\\sites\\GCTConnect (1)\\GCTConnect (1)\\GCTConnect\\wwwroot\\uploads\\e98fce0f-066b-47b9-b5f3-33b48ff3e864_scence of yesterday.mp4",
+      "PackagePath": "staticwebassets\\uploads\\e98fce0f-066b-47b9-b5f3-33b48ff3e864_scence of yesterday.mp4"
+    },
+    {
       "Id": "E:\\sites\\GCTConnect (1)\\GCTConnect (1)\\GCTConnect\\wwwroot\\uploads\\ea852cb8-6ddf-47d5-b24b-3d33e30ebfcc_Operations Engineer.docx",
       "PackagePath": "staticwebassets\\uploads\\ea852cb8-6ddf-47d5-b24b-3d33e30ebfcc_Operations Engineer.docx"
+    },
+    {
+      "Id": "E:\\sites\\GCTConnect (1)\\GCTConnect (1)\\GCTConnect\\wwwroot\\uploads\\ee10a2f5-4416-4a77-948b-8df297337d6e_scence of yesterday.mp4",
+      "PackagePath": "staticwebassets\\uploads\\ee10a2f5-4416-4a77-948b-8df297337d6e_scence of yesterday.mp4"
     },
     {
       "Id": "E:\\sites\\GCTConnect (1)\\GCTConnect (1)\\GCTConnect\\wwwroot\\uploads\\f66395f5-fe26-4759-9f9e-25e31b1a9cb9_Operations Engineer.docx",

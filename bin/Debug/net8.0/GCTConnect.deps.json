@@ -17,6 +17,7 @@
           "Microsoft.EntityFrameworkCore.Tools": "9.0.3",
           "Microsoft.VisualStudio.Web.CodeGeneration.Design": "9.0.0",
           "OpenAI": "2.1.0",
+          "Profanity.Detector": "0.1.8",
           "RestSharp": "112.1.0",
           "Swashbuckle.AspNetCore": "8.1.1"
         },
@@ -2113,6 +2114,14 @@
           }
         }
       },
+      "Profanity.Detector/0.1.8": {
+        "runtime": {
+          "lib/netstandard2.0/ProfanityFilter.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
       "RestSharp/112.1.0": {
         "runtime": {
           "lib/net8.0/RestSharp.dll": {
@@ -3514,6 +3523,13 @@
       "sha512": "sha512-zl72nyP4O94ZyEoCLoE8qoc5vp8kSJmRuqR+UdK+jNIjFJGWJYjsb4rAGpMWWRTbPYuk82E8myMJdVQurMLDnQ==",
       "path": "openai/2.1.0",
       "hashPath": "openai.2.1.0.nupkg.sha512"
+    },
+    "Profanity.Detector/0.1.8": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-4rfonJb74vncmdyobz71Wm0N5YeKtReOMIr0P8z/IRP9iJsVcoRfFFfgANopaFjmHI1lZyZL+ps8AKwF1rNjHg==",
+      "path": "profanity.detector/0.1.8",
+      "hashPath": "profanity.detector.0.1.8.nupkg.sha512"
     },
     "RestSharp/112.1.0": {
       "type": "package",

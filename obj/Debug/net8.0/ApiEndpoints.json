@@ -653,16 +653,16 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "CollegeChatbot.Controllers.ChatController",
-    "Method": "Ask",
-    "RelativePath": "api/Chat/ask",
+    "ContainingType": "ChatController",
+    "Method": "Post",
+    "RelativePath": "api/Chat",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "query",
-        "Type": "CollegeChatbot.Controllers.UserQuery",
+        "Name": "request",
+        "Type": "GCTConnect.Models.ChatbotQuery",
         "IsRequired": true
       }
     ],

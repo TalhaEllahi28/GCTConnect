@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "MukEmcr8OhU=",
+  "dgSpecHash": "0vlcNl0F4pU=",
   "success": true,
   "projectFilePath": "E:\\sites\\GCTConnect (1)\\GCTConnect (1)\\GCTConnect\\GCTConnect.csproj",
   "expectedPackageFiles": [
@@ -158,6 +158,7 @@
     "C:\\Users\\PMYLS\\.nuget\\packages\\nuget.protocol\\6.11.0\\nuget.protocol.6.11.0.nupkg.sha512",
     "C:\\Users\\PMYLS\\.nuget\\packages\\nuget.versioning\\6.11.0\\nuget.versioning.6.11.0.nupkg.sha512",
     "C:\\Users\\PMYLS\\.nuget\\packages\\openai\\2.1.0\\openai.2.1.0.nupkg.sha512",
+    "C:\\Users\\PMYLS\\.nuget\\packages\\profanity.detector\\0.1.8\\profanity.detector.0.1.8.nupkg.sha512",
     "C:\\Users\\PMYLS\\.nuget\\packages\\restsharp\\112.1.0\\restsharp.112.1.0.nupkg.sha512",
     "C:\\Users\\PMYLS\\.nuget\\packages\\swashbuckle.aspnetcore\\8.1.1\\swashbuckle.aspnetcore.8.1.1.nupkg.sha512",
     "C:\\Users\\PMYLS\\.nuget\\packages\\swashbuckle.aspnetcore.swagger\\8.1.1\\swashbuckle.aspnetcore.swagger.8.1.1.nupkg.sha512",

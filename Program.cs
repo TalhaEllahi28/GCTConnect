@@ -24,8 +24,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddSingleton<GeminiChatService>();
-builder.Services.AddSingleton<OpenAIService>();
+builder.Services.AddScoped<IGeminiService, GeminiService>(); builder.Services.AddSingleton<OpenAIService>();
 builder.Services.AddHttpClient<OpenAIService>();
 
 builder.Services.AddDistributedMemoryCache();

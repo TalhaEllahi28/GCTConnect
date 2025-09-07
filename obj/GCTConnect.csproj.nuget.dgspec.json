@@ -90,6 +90,10 @@
               "target": "Package",
               "version": "[2.1.0, )"
             },
+            "Profanity.Detector": {
+              "target": "Package",
+              "version": "[0.1.8, )"
+            },
             "RestSharp": {
               "target": "Package",
               "version": "[112.1.0, )"

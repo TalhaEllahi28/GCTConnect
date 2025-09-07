@@ -61,7 +61,7 @@
         this.sendBtn.disabled = !hasText;
     }
 
-    sendMessage() {
+    async sendMessage() {
         const message = this.messageInput.value.trim();
         if (!message) return;
 
@@ -73,11 +73,28 @@
         // Show typing indicator
         this.showTypingIndicator();
 
-        // Simulate AI response
-        setTimeout(() => {
+        try {
+            // Call your API endpoint
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ QueryText: message })
+            });
+
+            if (!response.ok) {
+                throw new Error('API request failed');
+            }
+
+            const data = await response.json();
             this.hideTypingIndicator();
-            this.addBotResponse(message);
-        }, Math.random() * 2000 + 1000); // 1-3 seconds delay
+            this.addMessage(data.response, 'bot');
+        } catch (error) {
+            console.error('Error:', error);
+            this.hideTypingIndicator();
+            this.addMessage("I'm having trouble connecting right now. Please try again later.", 'bot');
+        }
     }
 
     addMessage(content, sender) {
@@ -98,23 +115,6 @@
 
         // Scroll to bottom
         this.scrollToBottom();
-    }
-
-    addBotResponse(userMessage) {
-        // Simple response logic - in a real app, this would be an API call
-        const responses = [
-            "That's an interesting question! I'm here to help you with any information you need.",
-            "I understand what you're asking. Let me provide you with a helpful response.",
-            "Great question! I'm processing your request and here's what I think...",
-            "Thank you for your message. I'm designed to assist you with various tasks and questions.",
-            "I appreciate you reaching out. Based on your input, here's my response...",
-            "That's a thoughtful inquiry. Let me share some insights on that topic.",
-            "I'm glad you asked! Here's what I can tell you about that...",
-            "Excellent point! I'm here to provide you with accurate and helpful information."
-        ];
-
-        const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-        this.addMessage(randomResponse, 'bot');
     }
 
     showTypingIndicator() {
@@ -159,16 +159,6 @@ window.addEventListener('resize', () => {
         chatbotContainer.style.height = `${window.innerHeight - 20}px`;
     }
 });
-
-// Add smooth scrolling behavior for better UX
-document.addEventListener('scroll', (e) => {
-    if (e.target.classList && e.target.classList.contains('chat-messages')) {
-        e.preventDefault();
-    }
-});
-
-// Prevent zoom on iOS when focusing input
-document.addEventListener('touchstart', {});
 
 // Add keyboard navigation support
 document.addEventListener('keydown', (e) => {
