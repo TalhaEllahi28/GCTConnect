@@ -53,6 +53,12 @@ public partial class User
 
     public virtual ICollection<Message> Messages { get; set; } = new List<Message>();
 
+    public virtual ICollection<PostComment> PostComments { get; set; } = new List<PostComment>();
+
+    public virtual ICollection<PostLike> PostLikes { get; set; } = new List<PostLike>();
+
+    public virtual ICollection<Post> Posts { get; set; } = new List<Post>();
+
     public virtual UserProfile? UserProfile { get; set; }
 
     public virtual ICollection<Batch> Batches { get; set; } = new List<Batch>();

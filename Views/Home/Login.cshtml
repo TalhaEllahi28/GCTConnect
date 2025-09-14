@@ -252,6 +252,23 @@
             .slide-in:nth-child(4) {
                 animation-delay: 0.6s;
             }
+
+
+        /* Style for eye icon */
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 18px;
+            color: #9370db;
+            transition: color 0.3s ease;
+        }
+
+            .toggle-password:hover {
+                color: #8a2be2;
+            }
     </style>
 </head>
 <body>
@@ -273,10 +290,33 @@
                     <span asp-validation-for="Username"></span>
                 </div>
 
+@*                 <div class="input-box slide-in">
+                    <input id="password" asp-for="Password" type="password" class="form-control" placeholder="Enter Password" />
+                    <span asp-validation-for="Password"></span>
+                </div> *@
                 <div class="input-box slide-in">
                     <input id="password" asp-for="Password" type="password" class="form-control" placeholder="Enter Password" />
                     <span asp-validation-for="Password"></span>
+
+                    <!-- Eye Button -->
+                    <span id="togglePassword"
+                          style="position:absolute; right:10px; top:50%; transform:translateY(-50%); cursor:pointer; color:#9370db; font-size:18px;">
+                        👁
+                    </span>
                 </div>
+
+                <script>
+                    const togglePassword = document.getElementById("togglePassword");
+                    const passwordField = document.getElementById("password");
+
+                    togglePassword.addEventListener("click", () => {
+                        const type = passwordField.getAttribute("type") === "password" ? "text" : "password";
+                        passwordField.setAttribute("type", type);
+
+                        // Change icon on toggle
+                        togglePassword.textContent = type === "password" ? "👁" : "👁";
+                    });
+                </script>
 
                 <button type="submit" class="next-btn slide-in">Login</button>
 

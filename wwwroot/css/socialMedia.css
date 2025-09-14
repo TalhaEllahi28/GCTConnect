@@ -9,7 +9,6 @@ body {
     background: linear-gradient(135deg, #F2F0EF 100%, #a855f7 100%);
     color: #1f2937;
     line-height: 1.6;
-    padding-left: 80px; /* Space for left navbar */
 }
 
 /* Top Search Bar */
@@ -625,13 +624,13 @@ body {
 }
 
 /* Responsive Design */
-@media (max-width: 1200px) {
+@@media (max-width: 1200px) {
     .main-container {
         grid-template-columns: 280px 1fr 250px;
     }
 }
 
-@media (max-width: 1024px) {
+@@media (max-width: 1024px) {
     body {
         padding-left: 0;
     }
@@ -650,7 +649,7 @@ body {
     }
 }
 
-@media (max-width: 768px) {
+@@media (max-width: 768px) {
     .main-container {
         grid-template-columns: 1fr;
         padding: 90px 15px 20px;
@@ -678,7 +677,7 @@ body {
         }
 }
 
-@media (max-width: 480px) {
+@@media (max-width: 480px) {
     .search-input {
         font-size: 14px;
     }
@@ -697,3 +696,4 @@ body {
         margin-top: 5px;
     }
 }
+

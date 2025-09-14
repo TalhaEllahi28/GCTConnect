@@ -75,19 +75,6 @@
 
                 <h1 class="page-title">User Management</h1>
             </div>
-            @if (message?.ToString() == "ok")
-            {
-                <div id="successMessage" class="alert-success">
-                    User add successfully!
-                </div>
-
-                <script>
-                    setTimeout(() => {
-                        document.getElementById("successMessage").style.opacity = "0";
-                        setTimeout(() => document.getElementById("successMessage").remove(), 500);
-                    }, 3000);
-                </script>
-            }
             <div class="header-right">
                 <div class="admin-profile">
                     <img src="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=40&h=40&dpr=1" alt="Admin" class="profile-img">
@@ -398,5 +385,33 @@
         }
 
     </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var message = "@message";
+            if (message) {
+                switch (message) {
+                    case "Success":
+                        toastr.success("User added successfully!");
+                        break;
+                    case "UserAddedButFailedToEmail":
+                        toastr.warning("User added but email sending failed!");
+                        break;
+                    case "UserNotAuthenticated":
+                        toastr.error("You must be logged in to perform this action.");
+                        break;
+                    case "FailedToAddUserInGroups":
+                        toastr.error("User added but failed to add into groups!");
+                        break;
+                    case "Fail":
+                        toastr.error("You are not authorized to add this user!");
+                        break;
+                    default:
+                        toastr.info(message); // fallback for other messages
+                        break;
+                }
+            }
+        });
+    </script>
+
 </body>
 </html>

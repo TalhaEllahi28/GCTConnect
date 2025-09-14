@@ -1,132 +1,1328 @@
 ﻿@{
-    ViewData["Title"] = "Hod Dashboard";
-    Layout = null;
+	Layout = null;
+	var currentUserRole = ViewData["CurrentUserRole"]?.ToString();
 }
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
 
-<link href="~/css/Dashboard.css" rel="stylesheet" />
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>GCTConnect</title>
+	<link rel="icon" type="image/png" href="~/images/logo.png">
+	<link rel="stylesheet" href="dashboard.css">
+	<link rel="stylesheet" href="/css/chatbot.css">
 
-<!-- Font Awesome for icons -->
+</head>
+
 <style>
+	/* ---- Global Styles ---- */
+	:root {
+		--primary-color: #7269ef;
+		--primary-light: #917bf1;
+		--primary-dark: #9370db;
+		--secondary-color: #f8f9fa;
+		--dark-color: #2e2e2e;
+		--dark-light: #36404a;
+		--light-color: #f5f7fb;
+		--gray-100: #eff2f7;
+		--gray-200: #e9ecef;
+		--gray-300: #dee2e6;
+		--gray-400: #ced4da;
+		--gray-500: #adb5bd;
+		--gray-600: #7a7f9a;
+		--gray-700: #495057;
+		--gray-800: #343a40;
+		--gray-900: #212529;
+		--white: #ffffff;
+		--red: #ef476f;
+		--green: #06d6a0;
+		--yellow: #ffd166;
+		--info: #50a5f1;
+		--border-radius: 0.375rem;
+		--box-shadow: 0 2px 4px rgba(15, 34, 58, 0.12);
+		--transition: all 0.3s ease;
+		--font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+	}
 
+	/* Reset and base styles */
+	* {
+		margin: 0;
+		padding: 0;
+		box-sizing: border-box;
+	}
+
+	html, body {
+		height: 100% !important;
+		font-family: var(--font-family);
+		font-size: 16px;
+		line-height: 1.5;
+		color: var(--gray-800);
+		background-color: var(--secondary-color);
+	}
+
+	.chat-app {
+		height: 100% !important;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.container {
+		width: 100%;
+		max-width: 1200px;
+		margin: 0 auto;
+		padding: 0 1rem;
+	}
+
+	/* Button styles */
+	.btn {
+		display: inline-block;
+		font-weight: 500;
+		text-align: center;
+		white-space: nowrap;
+		vertical-align: middle;
+		user-select: none;
+		border: 1px solid transparent;
+		padding: 0.5rem 1rem;
+		font-size: 1rem;
+		line-height: 1.5;
+		border-radius: var(--border-radius);
+		transition: var(--transition);
+		cursor: pointer;
+		background-color: var(--gray-200);
+		color: var(--gray-800);
+	}
+
+	.btn-primary {
+		background-color: var(--primary-color);
+		color: var(--white);
+	}
+
+		.btn-primary:hover {
+			background-color: var(--primary-dark);
+		}
+
+	.btn-sm {
+		padding: 0.25rem 0.5rem;
+		font-size: 0.875rem;
+	}
+
+	/* Header Styles */
+	.header {
+		background-color: var(--white);
+		border-bottom: 1px solid var(--gray-200);
+		padding: 0.75rem 0;
+		box-shadow: var(--box-shadow);
+		z-index: 10;
+	}
+
+		.header .container {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+		}
+
+	.logo {
+		display: flex;
+		align-items: center;
+	}
+
+	.logo-icon {
+		width: 32px;
+		height: 32px;
+		color: var(--primary-color);
+	}
+
+	.logo-text {
+		font-size: 1.25rem;
+		font-weight: 600;
+		color: var(--dark-color);
+		margin-left: 0.5rem;
+	}
+
+
+	.user-profile {
+		margin-top: auto;
+		position: relative;
+	}
+
+	.avatar {
+		width: 40px;
+		height: 40px;
+		border-radius: 50%;
+		overflow: hidden;
+		position: relative;
+		cursor: pointer;
+		border: 2px solid var(--primary-color);
+		box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+	}
+
+	.avatar-sm {
+		width: 36px;
+		height: 36px;
+		border-width: 1px;
+	}
+
+	.avatar-image {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.avatar-placeholder {
+		width: 100%;
+		height: 100%;
+		background-color: var(--primary-color);
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		color: var(--white);
+		font-weight: 600;
+	}
+
+
+
+
+
+
+
+
+
+
+	/* Group List Styling */
+	.group-container {
+		height: 100%;
+		overflow: hidden;
+		background-color: transparent;
+	}
+
+	.group-list {
+		height: 100%;
+		overflow-y: auto;
+		padding: 10px 0;
+		scrollbar-width: thin;
+		scrollbar-color: #9b87f5 rgba(155, 135, 245, 0.1);
+	}
+
+		.group-list::-webkit-scrollbar {
+			width: 6px;
+		}
+
+		.group-list::-webkit-scrollbar-track {
+			background: rgba(155, 135, 245, 0.1);
+		}
+
+		.group-list::-webkit-scrollbar-thumb {
+			background-color: #9b87f5;
+		}
+
+	#groups-ul {
+		list-style-type: none;
+		padding: 0;
+		margin: 0;
+	}
+
+		#groups-ul li {
+			margin-bottom: 8px;
+			transition: all 0.3s ease;
+		}
+
+		#groups-ul .conversation-item {
+			padding: 12px;
+			transition: all 0.2s ease;
+			background-color: rgba(255, 255, 255, 0.7);
+			box-shadow: 0 2px 5px rgba(155, 135, 245, 0.15);
+			border-left: 3px solid #9b87f5;
+		}
+
+			#groups-ul .conversation-item:hover {
+				background-color: rgba(155, 135, 245, 0.1);
+				transform: translateY(-2px);
+				box-shadow: 0 5px 10px rgba(155, 135, 245, 0.2);
+			}
+
+			#groups-ul .conversation-item.active {
+				background-color: #6E59A5;
+				border-left: 3px solid #7E69AB;
+			}
+
+		#groups-ul .conversation-avatar {
+			margin-right: 12px;
+		}
+
+		#groups-ul .avatar {
+			width: 45px;
+			height: 45px;
+			border: 2px solid #9b87f5;
+			box-shadow: 0 3px 6px rgba(155, 135, 245, 0.2);
+			transition: all 0.2s ease;
+		}
+
+		#groups-ul .conversation-item:hover .avatar {
+			transform: scale(1.05);
+		}
+
+		#groups-ul .avatar-placeholder {
+			background: linear-gradient(135deg, #9b87f5 0%, #7E69AB 100%);
+			font-size: 16px;
+			font-weight: 600;
+			color: white;
+		}
+
+		#groups-ul .status-indicator {
+			border: 2px solid white;
+			width: 12px;
+			height: 12px;
+			background-color: #4ade80;
+		}
+
+		#groups-ul .conversation-name {
+			font-weight: 600;
+			color: #1A1F2C;
+			font-size: 15px;
+		}
+
+		#groups-ul .conversation-time {
+			color: #7E69AB;
+			font-weight: 500;
+			font-size: 12px;
+		}
+
+		#groups-ul .conversation-last-message {
+			color: #6E59A5;
+			font-size: 13px;
+		}
+
+
+
+
+	/* Group search styling */
+	#group-search {
+		width: 100%;
+		padding: 10px 15px;
+		border-radius: 20px;
+		border: 1px solid #D6BCFA;
+		background-color: white;
+		margin-bottom: 10px;
+		font-size: 14px;
+		color: #1A1F2C;
+		box-shadow: 0 2px 5px rgba(155, 135, 245, 0.1);
+		transition: all 0.3s ease;
+	}
+
+		#group-search:focus {
+			outline: none;
+			border-color: #9b87f5;
+			box-shadow: 0 3px 10px rgba(155, 135, 245, 0.2);
+		}
+
+	/* Animation for new groups */
+	@@keyframes fadeInUp {
+		from {
+			opacity: 0;
+			transform: translateY(10px);
+		}
+
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	#groups-ul li {
+		animation: fadeInUp 0.4s ease forwards;
+	}
+
+		#groups-ul li:nth-child(1) {
+			animation-delay: 0.05s;
+		}
+
+		#groups-ul li:nth-child(2) {
+			animation-delay: 0.1s;
+		}
+
+		#groups-ul li:nth-child(3) {
+			animation-delay: 0.15s;
+		}
+
+		#groups-ul li:nth-child(4) {
+			animation-delay: 0.2s;
+		}
+
+		#groups-ul li:nth-child(5) {
+			animation-delay: 0.25s;
+		}
+
+
+
+
+
+
+
+
+
+
+
+
+	#friends-ul {
+		list-style-type: none;
+		padding: 0;
+		margin: 0;
+	}
+
+		#friends-ul li {
+			margin-bottom: 8px;
+			transition: all 0.3s ease;
+		}
+
+		#friends-ul .conversation-item {
+			padding: 12px;
+			transition: all 0.2s ease;
+			background-color: rgba(255, 255, 255, 0.7);
+			box-shadow: 0 2px 5px rgba(155, 135, 245, 0.15);
+			border-left: 3px solid #9b87f5;
+		}
+
+			#friends-ul .conversation-item:hover {
+				background-color: rgba(155, 135, 245, 0.1);
+				transform: translateY(-2px);
+				box-shadow: 0 5px 10px rgba(155, 135, 245, 0.2);
+			}
+
+			#friends-ul .conversation-item.active {
+				background-color: #6E59A5;
+				border-left: 3px solid #7E69AB;
+			}
+
+		#friends-ul .conversation-avatar {
+			margin-right: 12px;
+		}
+
+		#friends-ul .avatar {
+			width: 45px;
+			height: 45px;
+			border: 2px solid #9b87f5;
+			box-shadow: 0 3px 6px rgba(155, 135, 245, 0.2);
+			transition: all 0.2s ease;
+		}
+
+		#friends-ul .conversation-item:hover .avatar {
+			transform: scale(1.05);
+		}
+
+		#friends-ul .avatar-placeholder {
+			background: linear-gradient(135deg, #9b87f5 0%, #7E69AB 100%);
+			font-size: 16px;
+			font-weight: 600;
+			color: white;
+		}
+
+		#friends-ul .status-indicator {
+			border: 2px solid white;
+			width: 12px;
+			height: 12px;
+			background-color: #4ade80;
+		}
+
+		#friends-ul .conversation-name {
+			font-weight: 600;
+			color: #1A1F2C;
+			font-size: 15px;
+		}
+
+		#friends-ul .conversation-time {
+			color: #7E69AB;
+			font-weight: 500;
+			font-size: 12px;
+		}
+
+		#friends-ul .conversation-last-message {
+			color: #6E59A5;
+			font-size: 13px;
+		}
+
+
+
+	/* Groups Sidebar */
+	.groups-sidebar {
+		width: 380px;
+		flex-shrink: 0;
+		background-color: var(--white);
+		border-right: 1px solid var(--gray-200);
+		display: flex;
+		flex-direction: column;
+		overflow: hidden;
+	}
+
+	.sidebar-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 0.5rem;
+	}
+
+	.sidebar-title {
+		font-size: 1.25rem;
+		font-weight: 600;
+		color: var(--gray-800);
+	}
+
+	.sidebar-actions {
+		display: flex;
+		gap: 0.5rem;
+	}
+
+	.sidebar-action-btn, .chat-action-btn, .message-action-btn {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 36px;
+		height: 36px;
+		border-radius: 50%;
+		background: none;
+		border: none;
+		color: var(--gray-600);
+		cursor: pointer;
+		transition: var(--transition);
+	}
+
+		.sidebar-action-btn:hover, .chat-action-btn:hover, .message-action-btn:hover {
+			background-color: var(--gray-100);
+			color: var(--primary-color);
+		}
+
+	.action-icon {
+		width: 20px;
+		height: 20px;
+	}
+
+	.search-container {
+		padding: 1rem;
+		border-bottom: 1px solid var(--gray-200);
+	}
+
+	.search-input-wrapper {
+		display: flex;
+		align-items: center;
+		background-color: var(--gray-100);
+		border-radius: 20px;
+		padding: 0.5rem 1rem;
+	}
+
+	.search-icon {
+		width: 16px;
+		height: 16px;
+		color: var(--gray-500);
+		margin-right: 0.5rem;
+	}
+
+	.search-input {
+		flex: 1;
+		border: none;
+		background: none;
+		font-size: 0.875rem;
+		color: var(--gray-700);
+	}
+
+		.search-input:focus {
+			outline: none;
+		}
+
+	.filter-tabs {
+		display: flex;
+		padding: 0 1rem;
+		border-bottom: 1px solid var(--gray-200);
+	}
+
+	.filter-tab {
+		padding: 0.75rem 1rem;
+		font-size: 0.875rem;
+		color: var(--gray-600);
+		background: none;
+		border: none;
+		border-bottom: 2px solid transparent;
+		cursor: pointer;
+		transition: var(--transition);
+	}
+
+		.filter-tab.active {
+			color: var(--primary-color);
+			border-bottom-color: var(--primary-color);
+		}
+
+	.conversations-list {
+		flex: 1;
+		overflow-y: auto;
+	}
+
+	.conversation-item {
+		display: flex;
+		align-items: center;
+		padding: 0.75rem 1rem;
+		cursor: pointer;
+		transition: var(--transition);
+	}
+
+		.conversation-item:hover {
+			background-color: var(--gray-100);
+		}
+
+		.conversation-item.active {
+			background-color: rgba(114, 105, 239, 0.1);
+		}
+
+	.conversation-avatar {
+		position: relative;
+		margin-right: 0.75rem;
+	}
+
+	.conversation-info {
+		flex: 1;
+		min-width: 0;
+	}
+
+	.conversation-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 0.25rem;
+	}
+
+	.conversation-name {
+		font-weight: 500;
+		color: var(--gray-800);
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.conversation-time {
+		font-size: 0.75rem;
+		color: var(--gray-500);
+	}
+
+	.conversation-last-message {
+		font-size: 0.875rem;
+		color: var(--gray-600);
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		position: relative;
+	}
+
+	.unread-badge {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 18px;
+		height: 18px;
+		background-color: var(--primary-color);
+		color: var(--white);
+		font-size: 0.75rem;
+		border-radius: 50%;
+		margin-right: 0.5rem;
+	}
+
+	/* Chat Window */
+	.chat-window {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		background-color: var(--light-color);
+		overflow: hidden;
+	}
+
+	.form-select {
+		width: 120px;
+		padding: 5px;
+		border-radius: 10px;
+		color: var(--gray-700);
+	}
+
+
+	/* Media queries for responsive design */
+	@@media (max-width: 992px) {
+		.header-nav {
+			display: none;
+		}
+
+		.chat-layout {
+			height: calc(100% - 57px);
+		}
+	}
+
+	@@media (max-width: 768px) {
+		.groups-sidebar {
+			width: 240px;
+		}
+	}
+
+	@@media (max-width: 576px) {
+		.nav-sidebar {
+			width: 60px;
+		}
+
+		.groups-sidebar {
+			width: 220px;
+		}
+
+		.message {
+			max-width: 85%;
+		}
+	}
+
+
+	/* For mobile devices */
+	@@media (max-width: 480px) {
+		.chat-layout {
+			flex-direction: column;
+			height: calc(100% - 57px);
+		}
+
+		.nav-sidebar {
+			width: 100%;
+			height: 60px;
+			flex-direction: row;
+			justify-content: space-around;
+			padding: 0;
+		}
+
+
+		.logo-container, .user-profile {
+			display: none;
+		}
+
+		.sidebar-nav {
+			width: 100%;
+		}
+
+		.nav-list {
+			flex-direction: row;
+			justify-content: space-around;
+			margin: 0;
+			padding: 0.5rem 0;
+		}
+
+		.groups-sidebar {
+			width: 100%;
+			height: 300px;
+			min-height: 300px;
+			max-height: 300px;
+		}
+
+		.chat-window {
+			height: calc(100% - 360px);
+		}
+
+		.message {
+			max-width: 90%;
+		}
+	}
+
+	.modal-overlay {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background-color: rgba(0, 0, 0, 0.5);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		z-index: 1000;
+		opacity: 0;
+		visibility: hidden;
+		transition: all 0.3s ease;
+	}
+
+		.modal-overlay.active {
+			opacity: 1;
+			visibility: visible;
+		}
+
+	.modal-content {
+		background-color: white;
+		border-radius: 8px;
+		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+		max-width: 600px;
+		width: 90%;
+		max-height: 90vh;
+		overflow-y: auto;
+		transform: translateY(20px);
+		transition: transform 0.3s ease;
+	}
+
+	.modal-overlay.active .modal-content {
+		transform: translateY(0);
+	}
+
+	.modal-header {
+		padding: 16px 20px;
+		border-bottom: 1px solid #eee;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	.modal-title {
+		font-size: 1.25rem;
+		font-weight: 600;
+		margin: 0;
+	}
+
+	.close-btn {
+		background: none;
+		border: none;
+		font-size: 1.5rem;
+		cursor: pointer;
+		color: #777;
+	}
+
+	.modal-body {
+		padding: 20px;
+	}
+
+	.modal-footer {
+		padding: 16px 20px;
+		border-top: 1px solid #eee;
+		display: flex;
+		justify-content: flex-end;
+		gap: 10px;
+	}
+
+	.btn {
+		padding: 8px 16px;
+		border-radius: 4px;
+		cursor: pointer;
+		font-weight: 500;
+	}
+
+	.btn-secondary {
+		background-color: #f5f5f5;
+		color: #333;
+		border: 1px solid #ddd;
+	}
+
+	.btn-primary {
+		background-color: var(--primary-color);
+		color: white;
+		border: none;
+	}
+
+	/* Blur effect only for main content */
+	.blur-background > *:not(.modal-overlay) {
+		filter: blur(5px);
+		pointer-events: none;
+	}
+	/* Announcement Cards */
+	.announcement-card {
+		border: 1px solid #eee;
+		border-radius: 8px;
+		padding: 15px;
+		margin-bottom: 15px;
+		box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+	}
+
+	.announcement-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 10px;
+	}
+
+		.announcement-header h4 {
+			margin: 0;
+			font-size: 1.1rem;
+		}
+
+	.priority-badge {
+		padding: 4px 10px;
+		border-radius: 4px;
+		font-size: 0.85rem;
+		font-weight: 500;
+	}
+
+		.priority-badge[data-priority="High"] {
+			background-color: #ffebee;
+			color: #c62828;
+		}
+
+		.priority-badge[data-priority="Medium"] {
+			background-color: #fff8e1;
+			color: #f57f17;
+		}
+
+		.priority-badge[data-priority="Low"] {
+			background-color: #e8f5e9;
+			color: #2e7d32;
+		}
+
+	.announcement-content p {
+		margin: 0 0 10px 0;
+		line-height: 1.5;
+	}
+
+	.announcement-meta {
+		font-size: 0.85rem;
+		color: #777;
+	}
+
+	/* Loading States */
+	.loading-spinner {
+		text-align: center;
+		padding: 20px;
+		color: #666;
+	}
+
+	.empty-message {
+		text-align: center;
+		padding: 20px;
+		color: #666;
+		font-style: italic;
+	}
+
+	.error-message {
+		text-align: center;
+		padding: 20px;
+		color: #c62828;
+	}
+</style>
+
+<style>
+	.header-nav {
+		display: flex;
+		gap: 1.5rem;
+	}
+
+	.nav-link {
+		color: var(--gray-600);
+		text-decoration: none;
+		transition: var(--transition);
+	}
+
+		.nav-link:hover {
+			color: var(--primary-color);
+		}
+
+	/* ---- Chat Layout Styles ---- */
+	.chat-layout {
+		height: 100% !important;
+		display: flex;
+		height: calc(100% - 57px); /* subtract header height */
+		overflow: hidden;
+	}
+
+	/* Navigation Sidebar */
+	.nav-sidebar {
+		height: 100%;
+		width: 76px;
+		flex-shrink: 0;
+		background-color: #9370db !important;
+		border-right: 1px solid var(--dark-light);
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		padding: 1rem 0;
+		color: var(--white);
+	}
+
+	.logo-container {
+		padding: 0.5rem 0 1.5rem;
+	}
+
+	img.sidebar-img {
+		height: 45px;
+		width: 45px;
+		border-radius: 10px;
+	}
+
+	.chat-logo-icon {
+		width: 32px;
+		height: 32px;
+		color: var(--white);
+		opacity: 0.7;
+		transition: var(--transition);
+		cursor: pointer;
+	}
+
+		.chat-logo-icon:hover {
+			opacity: 1;
+		}
+
+	.sidebar-nav {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		justify-content: center; /* Vertically center icons */
+		width: 100%; /* Ensure full width */
+	}
+
+	.nav-list {
+		list-style: none;
+		display: flex;
+		flex-direction: column;
+		align-items: center; /* Horizontally center each icon */
+		gap: 1.5rem;
+		padding: 0;
+		margin: 0;
+	}
+
+
+	.nav-item {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		position: relative;
+		cursor: pointer;
+	}
+
+	.nav-icon {
+		width: 24px;
+		height: 24px;
+		color: #ced4da;
+		transition: var(--transition);
+	}
+
+	.nav-text {
+		font-size: 0.75rem;
+		margin-top: 0.25rem;
+		color: var(--gray-400);
+	}
+
+	.nav-item:hover .nav-icon,
+	.nav-item:hover .nav-text {
+		color: #ffffff;
+	}
+
+
+	.nav-item.active .nav-icon,
+	.nav-item.active .nav-text {
+		color: white;
+	}
+
+
+	.user-profile {
+		margin-top: auto;
+		position: relative;
+	}
+
+	.badge {
+		position: absolute;
+		top: -5px;
+		right: -5px;
+		background: red;
+		color: white;
+		border-radius: 50%;
+		padding: 2px 6px;
+		font-size: 0.7em;
+		min-width: 18px;
+		text-align: center;
+	}
+
+	.d-none {
+		display: none !important;
+	}
+
+	/* Toast styles */
+	.toast {
+		margin-bottom: 10px;
+		max-width: 350px;
+	}
+
+	.toast-header.bg-low {
+		background-color: #0d6efd !important;
+	}
+
+	.toast-header.bg-medium {
+		background-color: #ffc107 !important;
+		color: #000 !important;
+	}
+
+	.toast-header.bg-high {
+		background-color: #dc3545 !important;
+	}
 </style>
 <body>
-    <div class="grid-container">
-        <!-- First Column: Vertical Nav Bar -->
-        <div class="grid-item nav-bar">
+	<div class="chat-app" id="chat-app-container">
+		<div class="chat-layout" id="main-content">
+			<partial name="_NavPartial" />
 
-            <div class="nav-items">
-                <a asp-controller="Home" asp-action="AddSomeone" style="color: white;">
+			<!-- Groups/Conversations Sidebar -->
+			<aside class="groups-sidebar">
+				<div class="sidebar-header">
+					<h2 class="sidebar-title">Chats</h2>
 
-                    <svg id="nav-item-1" class="nav-item" xmlns="http://www.w3.org/2000/svg" width="1.3em" height="1.3em" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m.5-5v1h1a.5.5 0 0 1 0 1h-1v1a.5.5 0 0 1-1 0v-1h-1a.5.5 0 0 1 0-1h1v-1a.5.5 0 0 1 1 0m-2-6a3 3 0 1 1-6 0 3 3 0 0 1 6 0M8 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4" />
-                        <path d="M8.256 14a4.5 4.5 0 0 1-.229-1.004H3c.001-.246.154-.986.832-1.664C4.484 10.68 5.711 10 8 10q.39 0 .74.025c.226-.341.496-.65.804-.918Q8.844 9.002 8 9c-5 0-6 3-6 4s1 1 1 1z" />
-                    </svg>
-                </a>
-            </div>
-            <div class="nav-items">
-                <svg id="nav-item-2" width="1.2em" height="1.2em" class="nav-item" viewBox="0 0 640 512" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M192 256c61.9 0 112-50.1 112-112S253.9 32 192 32 80 82.1 80 144s50.1 112 112 112zm76.8 32h-8.3c-20.8 10-43.9 16-68.5 16s-47.6-6-68.5-16h-8.3C51.6 288 0 339.6 0 403.2V432c0 26.5 21.5 48 48 48h288c26.5 0 48-21.5 48-48v-28.8c0-63.6-51.6-115.2-115.2-115.2zM480 256c53 0 96-43 96-96s-43-96-96-96-96 43-96 96 43 96 96 96zm48 32h-3.8c-13.9 4.8-28.6 8-44.2 8s-30.3-3.2-44.2-8H432c-20.4 0-39.2 5.9-55.7 15.4 24.4 26.3 39.7 61.2 39.7 99.8v38.4c0 2.2-.5 4.3-.6 6.4H592c26.5 0 48-21.5 48-48 0-61.9-50.1-112-112-112z" fill="currentColor" />
-                </svg>
-            </div>
-            <div class="nav-items">
-                <svg id="nav-item-3" class="nav-item" xmlns="http://www.w3.org/2000/svg" width="1.3em" height="1.3em" fill="currentColor" viewBox="0 0 16 16">
-                    <!-- User Silhouette -->
-                    <path d="M8 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4z" />
-                    <path d="M8.256 14a4.5 4.5 0 0 1-.229-1.004H3c.001-.246.154-.986.832-1.664C4.484 10.68 5.711 10 8 10q.39 0 .74.025c.226-.341.496-.65.804-.918Q8.844 9.002 8 9c-5 0-6 3-6 4s1 1 1 1z" />
-                    <!-- Pencil Overlay for Edit -->
-                    <g transform="translate(9,9) scale(0.5)">
-                        <path d="M12.146.854a.5.5 0 0 1 .708 0l2.292 2.292a.5.5 0 0 1 0 .708l-9.792 9.792a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l9.792-9.792zM11.207 2L2 11.207V14h2.793L14 4.793 11.207 2z" />
-                    </g>
-                </svg>
-            </div>
-            <div class="nav-items">
-                <svg id="nav-item-4" class="nav-item" width="1em" height="1.1em" viewBox="0 0 576 512" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                    <path d="M576 240c0-23.63-12.95-44.04-32-55.12V32.01C544 23.26 537.02 0 512 0c-7.12 0-14.19 2.38-19.98 7.02l-85.03 68.03C364.28 109.19 310.66 128 256 128H64c-35.35 0-64 28.65-64 64v96c0 35.35 28.65 64 64 64h33.7c-1.39 10.48-2.18 21.14-2.18 32 0 39.77 9.26 77.35 25.56 110.94 5.19 10.69 16.52 17.06 28.4 17.06h74.28c26.05 0 41.69-29.84 25.9-50.56-16.4-21.52-26.15-48.36-26.15-77.44 0-11.11 1.62-21.79 4.41-32H256c54.66 0 108.28 18.81 150.98 52.95l85.03 68.03a32.023 32.023 0 0 0 19.98 7.02c24.92 0 32-22.78 32-32V295.13C563.05 284.04 576 263.63 576 240zm-96 141.42l-33.05-26.44C392.95 311.78 325.12 288 256 288v-96c69.12 0 136.95-23.78 190.95-66.98L480 98.58v282.84z" fill="currentColor" />
-                </svg>
-            </div>
-        </div>
+					<div class="sidebar-actions">
 
-        <!-- Second Column: Group Names -->
-        <div class="grid-item" id="group-names">
-            <!-- Render the partial view which includes our bounce-in class -->
-            <partial name="_GroupNamesPartial" />
-        </div>
+						<select class="form-select" id="groupSelector">
+							<option value="classGroups">Class Groups</option>
+							<option value="friends">Friends</option>
+							@if (currentUserRole == "Students")
+							{
+								<option value="classmates">Classmates</option>
+							}
+							else if (currentUserRole == "HOD" || currentUserRole == "Teacher")
+							{
+								<option value="colleagues">Colleagues</option>
+							}
+						</select>
 
-        <!-- Third Column: Chat Window -->
-        <div class="grid-item" id="chat-window">
-            <div id="chat-container">
-                <!-- Chat messages will appear here -->
-            </div>
-        </div>
+						<button class="sidebar-action-btn">
+							<svg class="action-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+								<line x1="12" y1="5" x2="12" y2="19"></line>
+								<line x1="5" y1="12" x2="19" y2="12"></line>
+							</svg>
+						</button>
+						<button class="sidebar-action-btn">
+							<svg class="action-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+								<circle cx="11" cy="11" r="8"></circle>
+								<line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+							</svg>
+						</button>
+						<button class="sidebar-action-btn">
+							<svg class="action-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+								<circle cx="12" cy="12" r="1"></circle>
+								<circle cx="19" cy="12" r="1"></circle>
+								<circle cx="5" cy="12" r="1"></circle>
+							</svg>
+						</button>
+					</div>
+				</div>
 
-        <!-- Fourth Column: AI Chatbot -->
-        <div class="grid-item" id="ai-chatbot">
-            <div id="chatbot-body" ">
-                <div class="container">
-                    <div class="icon-container">
-                        <svg class="chatbot-icon" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                            <!-- Base circle with glow -->
-                            <circle cx="12" cy="12" r="9" stroke-opacity="0.2" stroke-width="1" stroke-dasharray="2 2" />
-
-                            <!-- Message bubble with modern shape -->
-                            <path d="M3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21H3L4.5 17.5" />
-
-                            <!-- Robot face -->
-                            <circle class="eye" cx="9" cy="11" r="1" fill="#60a5fa" />
-                            <circle class="eye" cx="15" cy="11" r="1" fill="#60a5fa" />
-
-                            <!-- Animated mouth/scanner -->
-                            <path class="scanner" d="M9 15h6" />
-
-                            <!-- Advanced antenna system -->
-                            <path d="M12 7V5" />
-                            <circle class="antenna-light" cx="12" cy="4" r="1" fill="#60a5fa" />
-
-                            <!-- Side antennas -->
-                            <path d="M8 6L9 8M16 6L15 8" stroke-opacity="0.7" stroke-width="1" />
-
-                            <!-- Circuit patterns -->
-                            <path d="M6 12h2M16 12h2" stroke-opacity="0.3" stroke-width="1" stroke-dasharray="1 2" />
-                        </svg>
-                        <div class="scan-overlay"></div>
-                    </div>
-                    <div class="text-content">
-                        <h2 class="title">AI Assistant</h2>
-                        <p class="subtitle">Comming Soon</p>
-                    </div>
-                </div>
-            </div>
-            <!-- Your AI chatbot UI elements go here -->
-        </div>
-    </div>
-
-    <!-- Bootstrap 5 JavaScript Bundle (includes Popper) -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Include SignalR JS with cache busting -->
-    <script src="~/js/signalr/dist/browser/signalr.js?v=1.0.3"></script>
-    <script>
-
-        // Get all elements with the class 'group-item'
+				<div class="search-container">
+					<div class="search-input-wrapper">
+						<svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<circle cx="11" cy="11" r="8"></circle>
+						</svg>
+						<input type="text" class="search-input" placeholder="Search messages or users">
+					</div>
+				</div>
 
 
-        window.onload = function () {
-            // Scroll to bottom of chat container if it exists
-            const container = document.getElementById("chat-container");
-            if (container) {
-                container.scrollTop = container.scrollHeight;
-            }
-            // Optional: set up event listener for a group button if available
-            const groupButton = document.getElementById("group-button");
-            if (groupButton) {
-                groupButton.addEventListener("click", function () {
-                    console.log("Group button clicked");
-                    if (container) {
-                        container.scrollTop = container.scrollHeight;
-                    }
-                });
-            }
-        };
-    </script>
+				<div id="friends-list" class="conversations-list" style="display:none;">
+					<partial name="_FriendsPartial" />
+				</div>
+
+				<div id="members-list" class="conversations-list" style="display:none;">
+					<!-- Colleagues (for HOD/Teachers) content goes here -->
+				</div>
+
+				<div id="classgroup-list" class="conversations-list">
+					<partial name="_GroupNamesPartial" />
+				</div>
+
+
+
+			</aside>
+
+			<!-- Chat Window -->
+			<main class="chat-window" id="chat-container">
+				<div class="chat-area">
+				</div>
+
+			</main>
+
+
+
+		</div>
+		<div id="announcement-modals-container"></div>
+
+		<!-- Chatbot Container -->
+		<div class="chatbot-container" id="chatbotContainer">
+			<!-- Header -->
+			<div class="chatbot-header">
+				<div class="header-content">
+					<div class="bot-info">
+						<div class="bot-avatar">
+							<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 1H5C3.89 1 3 1.89 3 3V7H1V9H3V15C3 16.11 3.89 17 5 17H8.5C8.5 18.66 9.84 20 11.5 20S14.5 18.66 14.5 17H19C20.11 17 21 16.11 21 15V9H21ZM12 15.5C11.17 15.5 10.5 14.83 10.5 14S11.17 12.5 12 12.5S13.5 13.17 13.5 14S12.83 15.5 12 15.5Z" fill="#8A2BE2" />
+							</svg>
+						</div>
+						<div class="bot-details">
+							<h3>AI Assistant</h3>
+							<span class="status">Online</span>
+						</div>
+					</div>
+					<button class="close-btn" id="closeBtn">
+						<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" fill="#8A2BE2" />
+						</svg>
+					</button>
+				</div>
+			</div>
+
+			<!-- Chat Messages -->
+			<div class="chat-messages-chatbot" id="chatMessages">
+				<div class="message bot-message">
+					<div class="message-content-chatbot">
+						<p>Hello! I'm your AI assistant. How can I help you today?</p>
+					</div>
+					<div class="message-time">Just now</div>
+				</div>
+			</div>
+
+			<!-- Typing Indicator -->
+			<div class="typing-indicator" id="typingIndicator">
+				<div class="typing-dots">
+					<span></span>
+					<span></span>
+					<span></span>
+				</div>
+				<span class="typing-text">AI is typing...</span>
+			</div>
+
+			<!-- Input Area -->
+			<div class="chat-input-area">
+				<div class="input-container">
+					<input type="text" id="messageInput" placeholder="Type your message..." autocomplete="off">
+					<button class="send-btn" id="sendBtn">
+						<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" fill="white" />
+						</svg>
+					</button>
+				</div>
+			</div>
+		</div>
+
+	</div>
 </body>
 
+
+</html>
+<script>
+	document.addEventListener("DOMContentLoaded", function () {
+		var groupSelector = document.getElementById("groupSelector");
+		const classGroupList = document.getElementById("classgroup-list");
+		const membersList = document.getElementById("members-list");
+		const friendsList = document.getElementById("friends-list");
+		const currentUserRole = "@ViewData["CurrentUserRole"]";
+
+		function updateVisibility() {
+			const selectedValue = groupSelector.value;
+
+			// Hide both first
+			classGroupList.style.display = "none";
+			membersList.style.display = "none";
+			friendsList.style.display = "none";
+
+			if (selectedValue === "classGroups") {
+				classGroupList.style.display = "block";
+			}
+			else if (selectedValue === "colleagues" || selectedValue==="classmates") {
+				membersList.style.display = "block";
+			}
+			else{
+				friendsList.style.display = "block";
+			}
+		}
+
+		if (groupSelector) {
+			groupSelector.addEventListener("change", updateVisibility);
+		}
+	});
+</script>
+<script>
+	// Custom Modal System
+	const Modal = {
+		showAnnouncement(title, content, priority) {
+			// Create modal HTML
+			const modalHTML = `
+				<div class="modal-overlay active" id="announcementModal">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h3 class="modal-title">${title}</h3>
+							<button class="close-btn">&times;</button>
+						</div>
+						<div class="modal-body">
+							<p>${content}</p>
+							<div class="priority-badge">Priority: <span>${priority}</span></div>
+						</div>
+						<div class="modal-footer">
+							<button class="btn btn-secondary" data-close>Close</button>
+							<button class="btn btn-primary" data-view-all>View All Announcements</button>
+						</div>
+					</div>
+				</div>
+			`;
+
+			// Add to container
+			document.getElementById('announcement-modals-container').innerHTML = modalHTML;
+
+			// Add event listeners
+			document.querySelector('#announcementModal .close-btn').addEventListener('click', () => {
+				Modal.close();
+			});
+
+			document.querySelector('#announcementModal [data-close]').addEventListener('click', () => {
+				Modal.close();
+			});
+
+			document.querySelector('#announcementModal [data-view-all]').addEventListener('click', () => {
+				Modal.close();
+				window.showAllAnnouncementsModal();
+			});
+
+			// Blur background
+			document.getElementById('main-content').classList.add('blur-background');
+		},
+
+		showAllAnnouncements() {
+			// Create modal HTML
+			const modalHTML = `
+				<div class="modal-overlay active" id="allAnnouncementsModal">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h3 class="modal-title">Your Announcements</h3>
+							<button class="close-btn">&times;</button>
+						</div>
+						<div class="modal-body">
+							<div id="announcementsContainer" class="announcements-container">
+
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button class="btn btn-secondary" data-close>Close</button>
+						</div>
+					</div>
+				</div>
+			`;
+
+			// Add to container
+			document.getElementById('announcement-modals-container').innerHTML = modalHTML;
+
+			// Add event listeners
+			document.querySelector('#allAnnouncementsModal .close-btn').addEventListener('click', () => {
+				Modal.close();
+			});
+
+			document.querySelector('#allAnnouncementsModal [data-close]').addEventListener('click', () => {
+				Modal.close();
+			});
+
+			// Blur background
+			document.getElementById('main-content').classList.add('blur-background');
+
+			// Load announcements
+			window.loadAnnouncements();
+		},
+
+		close() {
+			// Remove blur
+			document.getElementById('main-content').classList.remove('blur-background');
+
+			// Clear modals
+			document.getElementById('announcement-modals-container').innerHTML = '';
+		}
+	};
+
+	// Global functions
+	window.showAnnouncementModal = Modal.showAnnouncement;
+	window.showAllAnnouncementsModal = Modal.showAllAnnouncements;
+</script>
+<script src="/js/chatbot.js"></script>
+
+
+@* <script src="~/js/signalr/dist/browser/signalr.js?v=1.0.3"></script>
+<!-- Bootstrap JS --> *@
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>

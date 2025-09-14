@@ -9,15 +9,20 @@ public interface IGeminiService
     Task<string> GetResponseAsync(string userMessage);
 }
 
+
 // Services/GeminiService.cs
 public class GeminiService : IGeminiService
 {
-    private readonly string _apiKey;
+    //Attributes of geminiService class
+    private readonly string _apiKey;  
     private readonly string _model;
     private readonly string _collegeData;
 
+
+    //constructor
     public GeminiService(IConfiguration configuration, IWebHostEnvironment env)
     {
+        //values taken from appsetting.josn file
         _apiKey = configuration["Llm:ApiKey"];
         _model = configuration["Llm:Model"] ?? "gemini-1.5-flash";
 
@@ -66,6 +71,13 @@ public class GeminiService : IGeminiService
             ?? "I'm sorry, I couldn't process your request at the moment.";
     }
 }
+
+
+
+
+
+
+
 
 // Models for Gemini response
 public class GeminiResponse

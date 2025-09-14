@@ -9,8 +9,9 @@ using System.Collections.Concurrent;
 using System.Security.Claims;
 using System.Text.RegularExpressions;
 using Message = GCTConnect.Models.Message;
-using ProfanityFilter; // Add at top of file
-using System.Text;      // For normalization if needed
+using ProfanityFilter;
+using System.Text;
+using System.Linq.Expressions;
 
 public class ChatHub : Hub
 {
@@ -128,26 +129,27 @@ public class ChatHub : Hub
     }
 
 
-        // Fix the SendUnreadAnnouncementsToUser method
+    // Fix the SendUnreadAnnouncementsToUser method
     public async Task SendUnreadAnnouncementsToUser(int userId)
-        {
-            var unread = await _context.AnnouncementRecipients
-                .Include(ar => ar.Announcement)
-                .Where(ar => ar.UserId == userId && ar.IsRead == false)
-                .Select(ar => new {
-                    ar.Announcement.Title,
-                    ar.Announcement.Content,
-                    Priority = ar.Announcement.Priority == 1 ? "Low" :
-                              ar.Announcement.Priority == 2 ? "Medium" : "High"
-                })
-                .ToListAsync();
-
-            foreach (var ann in unread)
+    {
+        var unread = await _context.AnnouncementRecipients
+            .Include(ar => ar.Announcement)
+            .Where(ar => ar.UserId == userId && ar.IsRead == false)
+            .Select(ar => new
             {
-                await Clients.User(userId.ToString())
-                    .SendAsync("receiveannouncement", ann.Title, ann.Content, ann.Priority);
-            }
+                ar.Announcement.Title,
+                ar.Announcement.Content,
+                Priority = ar.Announcement.Priority == 1 ? "Low" :
+                          ar.Announcement.Priority == 2 ? "Medium" : "High"
+            })
+            .ToListAsync();
+
+        foreach (var ann in unread)
+        {
+            await Clients.User(userId.ToString())
+                .SendAsync("receiveannouncement", ann.Title, ann.Content, ann.Priority);
         }
+    }
 
 
     public async Task JoinGroup(int identifier, bool isPrivate)
@@ -255,6 +257,7 @@ public class ChatHub : Hub
 
         string senderFullName = $"{user.Name} {user.LastName}".Trim();
 
+
         if (chatType == "group")
         {
             var group = await _context.Groups.FirstOrDefaultAsync(g => g.GroupId == GroupIdOrRecieverId);
@@ -278,18 +281,26 @@ public class ChatHub : Hub
             };
             _context.Messages.Add(newMessage);
 
-            if (group.CourseId != null)
+            if (group.CourseId != null && fileUrl != null)
             {
-                var newFile = new GCTConnect.Models.File
+                try
                 {
-                    FileUrl = fileUrl,
-                    FileType = fileType,
-                    FileName = fileName,
-                    CourseId = group.CourseId,
-                    UploaderId = sender.UserId,
-                    UploadedAt = DateTime.Now
-                };
-                _context.Files.Add(newFile);
+                    var newFile = new GCTConnect.Models.File
+                    {
+                        FileUrl = fileUrl,
+                        FileType = fileType,
+                        FileName = fileName,
+                        CourseId = group.CourseId,
+                        UploaderId = sender.UserId,
+                        UploadedAt = DateTime.Now
+                    };
+                    _context.Files.Add(newFile);
+                }
+
+                catch (Exception e)
+                {
+                    Console.WriteLine("Error: ", e);
+                }
             }
 
             await _context.SaveChangesAsync();

@@ -631,7 +631,7 @@ function disableSendButton(disable) {
     const sendButton = document.getElementById('send-button');
     const messageInput = document.getElementById('message-input');
     const recordButton = document.getElementById('record-button');
-    const fileButtons = document.querySelectorAll('.message-action-btn, #document-button');
+    const fileButtons = document.querySelectorAll('.message-action-btn');
 
     if (sendButton) {
         sendButton.disabled = disable;
@@ -1329,7 +1329,7 @@ function openUploadModal() {
     const modal = document.getElementById('uploadModal');
     if (!modal) return;
 
-    modal.style.display = 'block';
+    modal.style.display = 'flex';
     selectedFileType = null;
     const uploadBtn = document.getElementById('uploadBtn');
     if (uploadBtn) {

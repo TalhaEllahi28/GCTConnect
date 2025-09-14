@@ -158,7 +158,7 @@ public class AdminController : Controller
 
 
     [HttpGet("user-management")]
-    public IActionResult UserManagement(string role = "", int departmentId = 0, string search = "", int page = 1, int pageSize = 10)
+    public IActionResult UserManagement(string role = "", int departmentId = 0, string search = "", int page = 1, int pageSize = 20)
     {
         var currentUser = _userService.GetCurrentUser();
         if (currentUser == null)
@@ -218,7 +218,7 @@ public class AdminController : Controller
 
         // Apply pagination
         var users = usersQuery
-            .OrderBy(u => u.Name)
+            .OrderByDescending(u => u.UserId)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToList();
@@ -888,15 +888,64 @@ public class AdminController : Controller
                 GroupName = g.GroupName,
                 DepartmentName = g.Department != null
                     ? g.Department.Name
-                    : g.GroupName.Split('_')[1],
+                    : (g.GroupName.Contains('_') && g.GroupName.Split('_').Length > 1
+                        ? g.GroupName.Split('_')[1]
+                        : "N/A"), // fallback value
                 MembersCount = _context.GroupMembers.Count(m => m.GroupId == g.GroupId),
                 CreatedAt = g.CreatedAt ?? DateTime.Now
             })
             .OrderByDescending(g => g.CreatedAt)
             .ToList();
 
+
         return View(groups);
     }
+
+    [HttpPost("group-managment/delete/{id}")]
+    public async Task<IActionResult> DeleteGroup(int id)
+    {
+        try
+        {
+            // Find group
+            var group = await _context.Groups.FirstOrDefaultAsync(g => g.GroupId == id);
+            if (group == null)
+            {
+                return Json(new { success = false, message = "Group not found." });
+            }
+
+            // Remove related messages
+            var messages = await _context.Messages.Where(m => m.GroupId == id).ToListAsync();
+            if (messages.Any())
+            {
+                _context.Messages.RemoveRange(messages);
+            }
+
+            // Remove related members
+            var groupMembers = await _context.GroupMembers.Where(gm => gm.GroupId == id).ToListAsync();
+            if (groupMembers.Any())
+            {
+                _context.GroupMembers.RemoveRange(groupMembers);
+            }
+
+            // Remove group itself
+            _context.Groups.Remove(group);
+
+            await _context.SaveChangesAsync();
+
+            // Return success response for toast
+            return Json(new { success = true, message = "Group deleted successfully!" });
+        }
+        catch (Exception ex)
+        {
+            // Log the error (optional)
+            Console.WriteLine($"Error deleting group: {ex.Message}");
+
+            return Json(new { success = false, message = "An error occurred while deleting the group." });
+        }
+    }
+
+
+
 
 
     [HttpGet("department-management")]

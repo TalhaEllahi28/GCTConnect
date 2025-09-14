@@ -138,6 +138,21 @@
         "IsRequired": false
       },
       {
+        "Name": "PostComments",
+        "Type": "System.Collections.Generic.ICollection\u00601[[GCTConnect.Models.PostComment, GCTConnect, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "PostLikes",
+        "Type": "System.Collections.Generic.ICollection\u00601[[GCTConnect.Models.PostLike, GCTConnect, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "Posts",
+        "Type": "System.Collections.Generic.ICollection\u00601[[GCTConnect.Models.Post, GCTConnect, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "IsRequired": false
+      },
+      {
         "Name": "UserProfile.UserId",
         "Type": "System.Int32",
         "IsRequired": false
@@ -275,6 +290,21 @@
       {
         "Name": "UserProfile.User.Messages",
         "Type": "System.Collections.Generic.ICollection\u00601[[GCTConnect.Models.Message, GCTConnect, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "UserProfile.User.PostComments",
+        "Type": "System.Collections.Generic.ICollection\u00601[[GCTConnect.Models.PostComment, GCTConnect, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "UserProfile.User.PostLikes",
+        "Type": "System.Collections.Generic.ICollection\u00601[[GCTConnect.Models.PostLike, GCTConnect, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "UserProfile.User.Posts",
+        "Type": "System.Collections.Generic.ICollection\u00601[[GCTConnect.Models.Post, GCTConnect, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "IsRequired": false
       },
       {
@@ -618,6 +648,22 @@
   },
   {
     "ContainingType": "GCTConnect.Controllers.AdminController",
+    "Method": "DeleteGroup",
+    "RelativePath": "admin/group-managment/delete/{id}",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GCTConnect.Controllers.AdminController",
     "Method": "UserManagement",
     "RelativePath": "admin/user-management",
     "HttpMethod": "GET",
@@ -688,6 +734,213 @@
     "ContainingType": "GCTConnect.Controllers.GeneralApiController",
     "Method": "GetDepartments",
     "RelativePath": "api/GeneralApi/departments",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GCTConnect.Controllers.Api.SocialMediaApiController",
+    "Method": "GetFeed",
+    "RelativePath": "api/social/feed",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "page",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageSize",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.List\u00601[[GCTConnect.Models.DTOs.PostDto, GCTConnect, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "GCTConnect.Controllers.Api.SocialMediaApiController",
+    "Method": "SendFriendRequest",
+    "RelativePath": "api/social/friend-request",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "receiverId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GCTConnect.Controllers.Api.SocialMediaApiController",
+    "Method": "CreatePost",
+    "RelativePath": "api/social/posts",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "postDto",
+        "Type": "GCTConnect.Models.DTOs.PostCreateDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "GCTConnect.Models.DTOs.PostDto",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "GCTConnect.Controllers.Api.SocialMediaApiController",
+    "Method": "LikePost",
+    "RelativePath": "api/social/posts/{postId}/like",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "postId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GCTConnect.Controllers.Api.SocialMediaApiController",
+    "Method": "UnlikePost",
+    "RelativePath": "api/social/posts/{postId}/like",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "postId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "GCTConnect.Controllers.Api.SocialMediaApiController",
+    "Method": "GetProfile",
+    "RelativePath": "api/social/profile",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "GCTConnect.Models.DTOs.UserProfileDto",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "GCTConnect.Controllers.Api.SocialMediaApiController",
+    "Method": "Search",
+    "RelativePath": "api/social/search",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "q",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "GCTConnect.Models.DTOs.SearchResultDto",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "GCTConnect.Controllers.Api.SocialMediaApiController",
+    "Method": "GetSuggestedFriends",
+    "RelativePath": "api/social/suggested-friends",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "filter",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.List\u00601[[GCTConnect.Models.DTOs.SuggestedFriendDto, GCTConnect, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "GCTConnect.Controllers.Api.SocialMediaApiController",
+    "Method": "GetTrending",
+    "RelativePath": "api/social/trending",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.List\u00601[[GCTConnect.Models.DTOs.TrendingItemDto, GCTConnect, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "GCTConnect.Controllers.SocialMediaController",
+    "Method": "Home",
+    "RelativePath": "social-media/home",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,

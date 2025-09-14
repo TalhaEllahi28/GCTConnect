@@ -298,6 +298,7 @@ D:\Talha\GCTConnect (1)\GCTConnect\bin\Debug\net8.0\GCTConnect.Ingestion\obj\pro
 D:\Talha\GCTConnect (1)\GCTConnect\bin\Debug\net8.0\RestSharp.dll
 E:\sites\GCTConnect (1)\GCTConnect (1)\GCTConnect\bin\Debug\net8.0\appsettings.Development.json
 E:\sites\GCTConnect (1)\GCTConnect (1)\GCTConnect\bin\Debug\net8.0\appsettings.json
+E:\sites\GCTConnect (1)\GCTConnect (1)\GCTConnect\bin\Debug\net8.0\CollegeData.json
 E:\sites\GCTConnect (1)\GCTConnect (1)\GCTConnect\bin\Debug\net8.0\GCTConnect.Ingestion\obj\GCTConnect.Ingestion.csproj.nuget.dgspec.json
 E:\sites\GCTConnect (1)\GCTConnect (1)\GCTConnect\bin\Debug\net8.0\GCTConnect.Ingestion\obj\project.assets.json
 E:\sites\GCTConnect (1)\GCTConnect (1)\GCTConnect\bin\Debug\net8.0\libman.json
@@ -383,6 +384,7 @@ E:\sites\GCTConnect (1)\GCTConnect (1)\GCTConnect\bin\Debug\net8.0\NuGet.Project
 E:\sites\GCTConnect (1)\GCTConnect (1)\GCTConnect\bin\Debug\net8.0\NuGet.Protocol.dll
 E:\sites\GCTConnect (1)\GCTConnect (1)\GCTConnect\bin\Debug\net8.0\NuGet.Versioning.dll
 E:\sites\GCTConnect (1)\GCTConnect (1)\GCTConnect\bin\Debug\net8.0\OpenAI.dll
+E:\sites\GCTConnect (1)\GCTConnect (1)\GCTConnect\bin\Debug\net8.0\ProfanityFilter.dll
 E:\sites\GCTConnect (1)\GCTConnect (1)\GCTConnect\bin\Debug\net8.0\RestSharp.dll
 E:\sites\GCTConnect (1)\GCTConnect (1)\GCTConnect\bin\Debug\net8.0\Swashbuckle.AspNetCore.Swagger.dll
 E:\sites\GCTConnect (1)\GCTConnect (1)\GCTConnect\bin\Debug\net8.0\Swashbuckle.AspNetCore.SwaggerGen.dll
@@ -594,5 +596,3 @@ E:\sites\GCTConnect (1)\GCTConnect (1)\GCTConnect\obj\Debug\net8.0\refint\GCTCon
 E:\sites\GCTConnect (1)\GCTConnect (1)\GCTConnect\obj\Debug\net8.0\GCTConnect.pdb
 E:\sites\GCTConnect (1)\GCTConnect (1)\GCTConnect\obj\Debug\net8.0\GCTConnect.genruntimeconfig.cache
 E:\sites\GCTConnect (1)\GCTConnect (1)\GCTConnect\obj\Debug\net8.0\ref\GCTConnect.dll
-E:\sites\GCTConnect (1)\GCTConnect (1)\GCTConnect\bin\Debug\net8.0\ProfanityFilter.dll
-E:\sites\GCTConnect (1)\GCTConnect (1)\GCTConnect\bin\Debug\net8.0\CollegeData.json

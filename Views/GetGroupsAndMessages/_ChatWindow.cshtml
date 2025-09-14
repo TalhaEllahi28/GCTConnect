@@ -1,1164 +1,1155 @@
 ﻿@model IEnumerable<dynamic>
 <style>
-	/* Reset default styles */
-	* {
-		margin: 0;
-		padding: 0;
-		box-sizing: border-box;
-	}
-
-	/* Purple Theme Color Variables */
-	:root {
-		--purple-50: #F8F7FF;
-		--purple-100: #F3F0FF;
-		--purple-200: #E9DFFF;
-		--purple-300: #D6BCFA;
-		--purple-400: #B794F4;
-		--purple-500: #9B87F5;
-		--purple-600: #7E69AB;
-		--purple-700: #6E59A5;
-		--purple-800: #553C9A;
-		--purple-900: #1A1F2C;
-		--white: #FFFFFF;
-		--gray-100: #F9FAFB;
-		--gray-200: #E5E7EB;
-		--gray-300: #D1D5DB;
-		--gray-700: #374151;
-	}
-
-	body {
-		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-		background-color: var(--white);
-		color: #000000;
-		line-height: 1.5;
-	}
-
-	p {
-		min-width: 40px;
-	}
-
-	/* Chat container */
-	.chat-container {
-		max-width: 600px;
-		margin: 20px auto;
-		padding: 20px;
-		overflow-y: auto;
-		background-color: var(--purple-50);
-		border-radius: 16px;
-		box-shadow: 0 10px 25px rgba(124, 58, 237, 0.1);
-	}
-
-	/* Message container - keeping structure as requested */
-	.message-container {
-		display: flex;
-		align-items: flex-end;
-		margin-bottom: 16px;
-	}
-
-		.message-container.sent {
-			flex-direction: row-reverse;
-			opacity: 0.99;
-		}
-
-	/* Enhanced Avatar styling with purple border */
-	.avatar-wrapper {
-		position: relative;
-		z-index: 2;
-		padding: 2px;
-		background-color: var(--white);
-		border: 2px solid var(--purple-400);
-		border-radius: 50%;
-		width: 40px;
-		height: 40px;
-		box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-	}
-
-	.sent .avatar-wrapper {
-		margin-left: -20px;
-		opacity: 100 !important;
-	}
-
-	.received .avatar-wrapper {
-		margin-right: -20px;
-	}
-
-	.avatar-image {
-		width: 100%;
-		height: 100%;
-		border-radius: 50%;
-		object-fit: cover;
-	}
-
-	/* Message content structure (unchanged as requested) */
-	.message-content {
-		display: flex;
-		flex-direction: column;
-		gap: 4px;
-		max-width: 80%;
-	}
-
-	.sent .message-content {
-		align-items: flex-end;
-	}
-
-	.received .message-content {
-		align-items: flex-start;
-	}
-
-	/* Enhanced Message bubble with purple theme */
-	.message-bubble {
-		padding: 10px 16px;
-		border-radius: 16px;
-		position: relative;
-		max-width: 100%;
-		word-wrap: break-word;
-		overflow-wrap: break-word;
-		word-break: break-all;
-		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-	}
-
-	.sent .message-bubble {
-		background: linear-gradient(135deg, var(--purple-600) 0%, var(--purple-700) 100%);
-		color: var(--white);
-		border-bottom-right-radius: 4px;
-	}
-
-	.received .message-bubble {
-		background-color: var(--white);
-		color: var(--purple-900);
-		border: 1px solid var(--purple-200);
-		border-bottom-left-radius: 4px;
-	}
-
-	.message-bubble p {
-		font-size: 14px;
-		margin: 0;
-		white-space: normal;
-		word-wrap: break-word;
-		overflow-wrap: break-word;
-		word-break: break-all;
-	}
-
-	/* Timestamp with purple tint */
-	.timestamp {
-		font-size: 11px;
-		font-weight: 500;
-		color: var(--purple-600);
-	}
-
-	.sent .timestamp {
-		margin-right: 20px;
-	}
-
-	.received .timestamp {
-		margin-left: 20px;
-	}
-
-	/* Chat window wrapper */
-	.chat-window-wrapper {
-		height: 100%;
-		overflow: hidden;
-		background: linear-gradient(to bottom, var(--purple-100), var(--white));
-		border-radius: 16px;
-		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-		position: relative;
-	}
-
-	/* Outer chat window container */
-	#chat-window-inner {
-		display: flex;
-		flex-direction: column;
-		border: 1px solid var(--purple-200);
-		border-radius: 13px;
-		height: 100%;
-		background-color: var(--white);
-		box-shadow: 0 0 15px rgba(124, 58, 237, 0.08);
-		overflow: hidden;
-	}
-
-	/* Messages container - keeping background image as requested */
-	#messages-container {
-		flex-grow: 1;
-		overflow-y: scroll;
-		padding: 15px;
-		background-image: url('../images/chat_background.jpeg');
-		background-repeat: repeat;
-		background-size: cover;
-		scrollbar-width: none;
-		-ms-overflow-style: none;
-		position: relative;
-	}
-
-		/* Add a subtle purple overlay to background */
-		#messages-container::before {
-			content: "";
-			position: fixed;
-			top: 0;
-			left: 0;
-			right: 0;
-			bottom: 0;
-			z-index: -1;
-			background: linear-gradient(135deg, rgba(155, 135, 245, 0.1) 0%, rgba(110, 89, 165, 0.2) 100%);
-		}
-
-		#messages-container::after {
-			content: "";
-			position: absolute;
-			top: 0;
-			left: 0;
-			right: 0;
-			bottom: 0;
-			z-index: -2;
-			background-image: url('../images/chat_background.jpeg');
-			background-repeat: repeat;
-			background-size: cover;
-			background-attachment: fixed;
-		}
-
-		#messages-container::-webkit-scrollbar {
-			display: none;
-		}
-
-	/* Redesigned input area */
-	.message-input-container {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		padding: 1rem;
-		background-color: var(--purple-50);
-		border-top: 1px solid var(--purple-200);
-	}
-
-	.message-input-wrapper {
-		flex: 1;
-		background-color: var(--white);
-		border-radius: 20px;
-		padding: 0.5rem 1rem;
-		border: 1px solid var(--purple-300);
-		transition: all 0.3s ease;
-	}
-
-		.message-input-wrapper:focus-within {
-			box-shadow: 0 0 0 2px var(--purple-200);
-			border-color: var(--purple-500);
-		}
-
-	.message-input {
-		width: 100%;
-		border: none;
-		background: none;
-		font-size: 0.875rem;
-		color: var(--purple-900);
-	}
-
-		.message-input:focus {
-			outline: none;
-		}
-
-		.message-input::placeholder {
-			color: var(--purple-400);
-		}
-
-	/* Action buttons styling */
-	.message-action-btn {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		width: 36px;
-		height: 36px;
-		border-radius: 50%;
-		background-color: var(--white);
-		border: 1px solid var(--purple-300);
-		cursor: pointer;
-		transition: all 0.2s ease;
-		color: var(--purple-600);
-	}
-
-		.message-action-btn:hover {
-			background-color: var(--purple-100);
-			transform: translateY(-2px);
-		}
-
-	.action-icon {
-		width: 18px;
-		height: 18px;
-	}
-
-	/* Send button styling */
-	.send-message-btn {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		width: 42px;
-		height: 42px;
-		border-radius: 50%;
-		background: linear-gradient(135deg, var(--purple-500) 0%, var(--purple-700) 100%);
-		border: none;
-		cursor: pointer;
-		transition: all 0.2s ease;
-		box-shadow: 0 2px 5px rgba(126, 105, 171, 0.4);
-	}
-
-		.send-message-btn:hover {
-			transform: scale(1.05);
-			box-shadow: 0 4px 8px rgba(126, 105, 171, 0.5);
-		}
-
-	.send-icon {
-		width: 20px;
-		height: 20px;
-		color: var(--white);
-	}
-
-	/* Chat header (new) */
-	.chat-header {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding: 12px 16px;
-		background: linear-gradient(135deg, var(--purple-600) 0%, var(--purple-700) 100%);
-		color: white;
-		border-radius: 12px 12px 0 0;
-	}
-
-	.chat-title {
-		font-weight: 600;
-		font-size: 16px;
-		display: flex;
-		align-items: center;
-		gap: 8px;
-	}
-
-	.status-indicator {
-		width: 8px;
-		height: 8px;
-		background-color: #4ade80;
-		border-radius: 50%;
-		display: inline-block;
-	}
-
-
-	/* Modified document sections for side-by-side layout */
-
-	/* Document Panel Styles - Modified for overlay layout with tabs */
-	.document-panel {
-		position: fixed;
-		top: 0;
-		right: -50%;
-		width: 50%;
-		height: 100vh;
-		background: linear-gradient(to bottom, var(--purple-50), var(--white));
-		border-left: 2px solid var(--purple-200);
-		box-shadow: -5px 0 25px rgba(124, 58, 237, 0.15);
-		z-index: 1000;
-		transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-		display: flex;
-		flex-direction: column;
-	}
-
-		.document-panel.show {
-			right: 0;
-		}
-
-	/* Chat window stays full screen - no width changes */
-	.chat-window-wrapper {
-		height: 100%;
-		overflow: hidden;
-		background: linear-gradient(to bottom, var(--purple-100), var(--white));
-		border-radius: 16px;
-		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-		position: relative;
-		width: 100%; /* Always full width */
-	}
-
-		/* Remove the panel-open class effect */
-		.chat-window-wrapper.panel-open {
-			width: 100%; /* Keep full width even when panel is open */
-		}
-
-	.document-panel-header {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding: 20px 24px;
-		background: linear-gradient(135deg, var(--purple-600) 0%, var(--purple-700) 100%);
-		color: white;
-		border-bottom: 1px solid var(--purple-200);
-		flex-shrink: 0; /* Prevent header from shrinking */
-	}
-
-	.document-panel-title {
-		font-size: 18px;
-		font-weight: 600;
-		display: flex;
-		align-items: center;
-		gap: 10px;
-	}
-
-	.close-panel-btn {
-		background: none;
-		border: none;
-		color: white;
-		cursor: pointer;
-		padding: 8px;
-		border-radius: 50%;
-		transition: all 0.2s ease;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
-
-		.close-panel-btn:hover {
-			background-color: rgba(255, 255, 255, 0.1);
-			transform: scale(1.1);
-		}
-
-	.document-panel-content {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		overflow: hidden; /* Prevent content from overflowing */
-	}
-
-	/* New tab styles */
-	.document-tabs {
-		display: flex;
-		background: var(--purple-100);
-		border-bottom: 2px solid var(--purple-200);
-		flex-shrink: 0;
-	}
-
-	.tab-button {
-		flex: 1;
-		padding: 16px 20px;
-		background: none;
-		border: none;
-		cursor: pointer;
-		font-size: 14px;
-		font-weight: 500;
-		color: var(--purple-700);
-		transition: all 0.2s ease;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 8px;
-		border-bottom: 3px solid transparent;
-	}
-
-		.tab-button:hover {
-			background: var(--purple-200);
-			color: var(--purple-800);
-		}
-
-		.tab-button.active {
-			background: var(--white);
-			color: var(--purple-900);
-			border-bottom-color: var(--purple-600);
-		}
-
-	.tab-content {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		overflow: hidden;
-	}
-
-	/* Modified document sections for tab content */
-	.document-section {
-		flex: 1;
-		min-height: 0;
-		flex-direction: column;
-		gap: 16px;
-		padding: 24px;
-		overflow: hidden;
-	}
-
-	.search-container {
-		margin-bottom: 12px;
-		flex-shrink: 0;
-	}
-
-	.search-input {
-		width: 100%;
-		padding: 8px 12px;
-		border: 2px solid var(--purple-200);
-		border-radius: 8px;
-		font-size: 14px;
-		background: var(--white);
-		color: var(--purple-900);
-		transition: border-color 0.2s ease;
-	}
-
-		.search-input:focus {
-			outline: none;
-			border-color: var(--purple-400);
-			box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
-		}
-
-		.search-input::placeholder {
-			color: var(--purple-500);
-		}
-
-	.document-grid {
-		display: grid;
-		gap: 12px;
-		overflow-y: auto; /* Enable independent scrolling for each section */
-		flex: 1;
-		padding-right: 8px; /* Space for scrollbar */
-	}
-
-		/* Custom scrollbar for document grids */
-		.document-grid::-webkit-scrollbar {
-			width: 6px;
-		}
-
-		.document-grid::-webkit-scrollbar-track {
-			background: var(--purple-100);
-			border-radius: 3px;
-		}
-
-		.document-grid::-webkit-scrollbar-thumb {
-			background: var(--purple-400);
-			border-radius: 3px;
-		}
-
-			.document-grid::-webkit-scrollbar-thumb:hover {
-				background: var(--purple-500);
-			}
-
-	.document-item {
-		background: var(--white);
-		border: 2px solid var(--purple-200);
-		border-radius: 12px;
-		padding: 16px;
-		transition: all 0.3s ease;
-		cursor: pointer;
-		display: flex;
-		align-items: center;
-		gap: 12px;
-		flex-shrink: 0; /* Prevent items from shrinking */
-	}
-
-		.document-item:hover {
-			border-color: var(--purple-400);
-			transform: translateY(-2px);
-			box-shadow: 0 4px 12px rgba(124, 58, 237, 0.15);
-		}
-
-	.document-icon {
-		width: 40px;
-		height: 40px;
-		background: linear-gradient(135deg, var(--purple-500) 0%, var(--purple-600) 100%);
-		border-radius: 8px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		color: white;
-		flex-shrink: 0;
-	}
-
-	.document-info {
-		flex: 1;
-		min-width: 0;
-	}
-
-	.document-name {
-		font-weight: 600;
-		color: var(--purple-900);
-		font-size: 14px;
-		margin-bottom: 4px;
-		word-break: break-word;
-	}
-
-	.document-meta {
-		font-size: 12px;
-		color: var(--purple-600);
-		display: flex;
-		align-items: center;
-		gap: 8px;
-	}
-
-	.document-download-btn {
-		background: var(--purple-100);
-		border: 1px solid var(--purple-300);
-		border-radius: 6px;
-		padding: 6px 8px;
-		color: var(--purple-700);
-		text-decoration: none;
-		font-size: 12px;
-		font-weight: 500;
-		transition: all 0.2s ease;
-		flex-shrink: 0;
-	}
-
-		.document-download-btn:hover {
-			background: var(--purple-200);
-			transform: scale(1.05);
-		}
-
-	.empty-state {
-		text-align: center;
-		color: var(--purple-600);
-		font-style: italic;
-		padding: 40px 20px;
-	}
-
-	.loading-state {
-		text-align: center;
-		color: var(--purple-600);
-		padding: 40px 20px;
-	}
-
-	.loading-spinner {
-		display: inline-block;
-		width: 20px;
-		height: 20px;
-		border: 3px solid var(--purple-200);
-		border-radius: 50%;
-		border-top-color: var(--purple-600);
-		animation: spin 1s ease-in-out infinite;
-		margin-bottom: 10px;
-	}
-
-
-	/* Animation for new messages */
-	@@keyframes fadeIn {
-		from
-
-	{
-		opacity: 0;
-		transform: translateY(10px);
-	}
-
-	to {
-		opacity: 1;
-		transform: translateY(0);
-	}
-
-	}
-
-	@@keyframes spin {
-		to
-
-	{
-		transform: rotate(360deg);
-	}
-
-	}
-
-	.message-container {
-		animation: fadeIn 0.3s ease-out;
-	}
-
-	/* ... keep existing code (Additional styles for file uploads and audio recordings) */
-	.file-preview {
-		margin-top: 8px;
-		display: flex;
-		flex-direction: column;
-		gap: 4px;
-	}
-
-	.image-preview {
-		max-width: 200px;
-		max-height: 150px;
-		border-radius: 8px;
-		object-fit: contain;
-	}
-
-	.video-preview {
-		max-width: 200px;
-		max-height: 150px;
-		border-radius: 8px;
-	}
-
-	.audio-preview {
-		max-width: 200px;
-	}
-
-	.file-download {
-		font-size: 12px;
-		color: var(--purple-600);
-		text-decoration: underline;
-	}
-
-	.generic-file {
-		display: flex;
-		align-items: center;
-		gap: 8px;
-		background-color: var(--purple-100);
-		padding: 8px;
-		border-radius: 6px;
-	}
-
-	.file-icon {
-		width: 24px;
-		height: 24px;
-		color: var(--purple-700);
-	}
-
-	.file-name {
-		font-size: 14px;
-		word-break: break-all;
-	}
-
-	#file-preview, #audio-player-container {
-		display: none;
-		margin: 8px 0;
-		padding: 8px;
-		background-color: var(--purple-100);
-		border-radius: 8px;
-	}
-
-	.selected-file, .recording-status {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		font-size: 14px;
-	}
-
-	.clear-file, .clear-recording {
-		background: none;
-		border: none;
-		color: var(--purple-700);
-		cursor: pointer;
-		font-size: 16px;
-	}
-
-	.recording {
-		animation: pulse 1.5s infinite;
-		background-color: rgba(220, 38, 38, 0.8) !important;
-	}
-
-	@@keyframes pulse {
-		0%
-
-	{
-		opacity: 1;
-		transform: scale(1);
-	}
-
-	50% {
-		opacity: 0.8;
-		transform: scale(1.05);
-	}
-
-	100% {
-		opacity: 1;
-		transform: scale(1);
-	}
-
-	}
-
-	/* ... keep existing code (Additional styles for sender names and emoji picker) */
-	.sender-name {
-		font-size: 13px;
-		font-weight: 600;
-		color: var(--purple-800);
-		margin-bottom: 2px;
-	}
-
-	.received .sender-name {
-		margin-left: 10px;
-	}
-
-	.sent .sender-name {
-		margin-right: 10px;
-		text-align: right;
-	}
-
-	#emoji-container {
-		position: relative;
-	}
-
-	.emoji-mart {
-		position: absolute;
-		bottom: 50px;
-		right: 0;
-		z-index: 100;
-	}
-
-	/* ... keep existing code (Upload Modal Styles) */
-	.upload-modal {
-		display: none;
-		position: fixed;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		background-color: rgba(0, 0, 0, 0.5);
-		z-index: 1000;
-		animation: fadeIn 0.3s ease-out;
-	}
-
-		.upload-modal.show {
-			display: flex;
-			align-items: center;
-			justify-content: center;
-		}
-
-	.upload-modal-content {
-		background-color: white;
-		border-radius: 16px;
-		padding: 24px;
-		max-width: 400px;
-		width: 90%;
-		box-shadow: 0 10px 25px rgba(124, 58, 237, 0.2);
-		border: 2px solid #e5d9f2;
-		animation: slideIn 0.3s ease-out;
-	}
-
-	.upload-modal-header {
-		text-align: center;
-		margin-bottom: 20px;
-	}
-
-	.upload-modal-title {
-		font-size: 20px;
-		font-weight: 600;
-		color: #581c87;
-		margin-bottom: 8px;
-	}
-
-	.upload-modal-subtitle {
-		font-size: 14px;
-		color: #7c3aed;
-	}
-
-	.upload-options {
-		display: flex;
-		flex-direction: column;
-		gap: 12px;
-		margin-bottom: 24px;
-	}
-
-	.upload-option {
-		display: flex;
-		align-items: center;
-		padding: 16px;
-		border: 2px solid #e5d9f2;
-		border-radius: 12px;
-		cursor: pointer;
-		transition: all 0.2s ease;
-		background-color: white;
-	}
-
-		.upload-option:hover {
-			border-color: #a855f7;
-			background-color: #faf5ff;
-		}
-
-		.upload-option.selected {
-			border-color: #7c3aed;
-			background-color: #f3e8ff;
-		}
-
-	.upload-option-icon {
-		width: 24px;
-		height: 24px;
-		margin-right: 12px;
-		color: #7c3aed;
-	}
-
-	.upload-option-content {
-		flex: 1;
-	}
-
-	.upload-option-label {
-		font-weight: 600;
-		color: #581c87;
-		margin-bottom: 4px;
-	}
-
-	.upload-option-description {
-		font-size: 12px;
-		color: #7c3aed;
-	}
-
-	.upload-option-radio {
-		width: 18px;
-		height: 18px;
-		border: 2px solid #a855f7;
-		border-radius: 50%;
-		position: relative;
-	}
-
-	.upload-option.selected .upload-option-radio {
-		border-color: #7c3aed;
-	}
-
-		.upload-option.selected .upload-option-radio::after {
-			content: '';
-			position: absolute;
-			top: 3px;
-			left: 3px;
-			width: 8px;
-			height: 8px;
-			background-color: #7c3aed;
-			border-radius: 50%;
-		}
-
-	.upload-modal-actions {
-		display: flex;
-		gap: 12px;
-		justify-content: flex-end;
-	}
-
-	.modal-btn {
-		padding: 10px 20px;
-		border-radius: 8px;
-		border: none;
-		cursor: pointer;
-		font-weight: 500;
-		transition: all 0.2s ease;
-	}
-
-	.modal-btn-cancel {
-		background-color: #e5e7eb;
-		color: #374151;
-	}
-
-		.modal-btn-cancel:hover {
-			background-color: #d1d5db;
-		}
-
-	.modal-btn-upload {
-		background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
-		color: white;
-	}
-
-		.modal-btn-upload:hover {
-			transform: translateY(-1px);
-			box-shadow: 0 4px 8px rgba(126, 105, 171, 0.3);
-		}
-
-		.modal-btn-upload:disabled {
-			opacity: 0.5;
-			cursor: not-allowed;
-			transform: none;
-			box-shadow: none;
-		}
-
-	@@keyframes slideIn {
-		from
-
-	{
-		opacity: 0;
-		transform: translateY(-20px) scale(0.95);
-	}
-
-	to {
-		opacity: 1;
-		transform: translateY(0) scale(1);
-	}
-
-	}
+    /* Reset default styles */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    /* Purple Theme Color Variables */
+    :root {
+        --purple-50: #F8F7FF;
+        --purple-100: #F3F0FF;
+        --purple-200: #E9DFFF;
+        --purple-300: #D6BCFA;
+        --purple-400: #B794F4;
+        --purple-500: #9B87F5;
+        --purple-600: #7E69AB;
+        --purple-700: #6E59A5;
+        --purple-800: #553C9A;
+        --purple-900: #1A1F2C;
+        --white: #FFFFFF;
+        --gray-100: #F9FAFB;
+        --gray-200: #E5E7EB;
+        --gray-300: #D1D5DB;
+        --gray-700: #374151;
+    }
+
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background-color: var(--white);
+        color: #000000;
+        line-height: 1.5;
+    }
+
+    p {
+        min-width: 40px;
+    }
+
+    /* Chat container */
+    .chat-container {
+        max-width: 600px;
+        margin: 20px auto;
+        padding: 20px;
+        overflow-y: auto;
+        background-color: var(--purple-50);
+        border-radius: 16px;
+        box-shadow: 0 10px 25px rgba(124, 58, 237, 0.1);
+    }
+
+    /* Message container - keeping structure as requested */
+    .message-container {
+        display: flex;
+        align-items: flex-end;
+        margin-bottom: 16px;
+    }
+
+        .message-container.sent {
+            flex-direction: row-reverse;
+            opacity: 0.99;
+        }
+
+    /* Enhanced Avatar styling with purple border */
+    .avatar-wrapper {
+        position: relative;
+        z-index: 2;
+        padding: 2px;
+        background-color: var(--white);
+        border: 2px solid var(--purple-400);
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .sent .avatar-wrapper {
+        margin-left: -20px;
+        opacity: 100 !important;
+    }
+
+    .received .avatar-wrapper {
+        margin-right: -20px;
+    }
+
+    .avatar-image {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    /* Message content structure (unchanged as requested) */
+    .message-content {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        max-width: 80%;
+    }
+
+    .sent .message-content {
+        align-items: flex-end;
+    }
+
+    .received .message-content {
+        align-items: flex-start;
+    }
+
+    /* Enhanced Message bubble with purple theme */
+    .message-bubble {
+        padding: 10px 16px;
+        border-radius: 16px;
+        position: relative;
+        max-width: 100%;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        word-break: break-all;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+
+    .sent .message-bubble {
+        background: linear-gradient(135deg, var(--purple-600) 0%, var(--purple-700) 100%);
+        color: var(--white);
+        border-bottom-right-radius: 4px;
+    }
+
+    .received .message-bubble {
+        background-color: var(--white);
+        color: var(--purple-900);
+        border: 1px solid var(--purple-200);
+        border-bottom-left-radius: 4px;
+    }
+
+    .message-bubble p {
+        font-size: 14px;
+        margin: 0;
+        white-space: normal;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        word-break: break-all;
+    }
+
+    /* Timestamp with purple tint */
+    .timestamp {
+        font-size: 11px;
+        font-weight: 500;
+        color: var(--purple-600);
+    }
+
+    .sent .timestamp {
+        margin-right: 20px;
+    }
+
+    .received .timestamp {
+        margin-left: 20px;
+    }
+
+    /* Chat window wrapper */
+    .chat-window-wrapper {
+        height: 100%;
+        overflow: hidden;
+        background: linear-gradient(to bottom, var(--purple-100), var(--white));
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        position: relative;
+    }
+
+    /* Outer chat window container */
+    #chat-window-inner {
+        display: flex;
+        flex-direction: column;
+        border: 1px solid var(--purple-200);
+        border-radius: 13px;
+        height: 100%;
+        background-color: var(--white);
+        box-shadow: 0 0 15px rgba(124, 58, 237, 0.08);
+        overflow: hidden;
+    }
+
+    /* Messages container - keeping background image as requested */
+    #messages-container {
+        flex-grow: 1;
+        overflow-y: scroll;
+        padding: 15px;
+        background-image: url('../images/chat_background.jpeg');
+        background-repeat: repeat;
+        background-size: cover;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        position: relative;
+    }
+
+        /* Add a subtle purple overlay to background */
+        #messages-container::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: -1;
+            background: linear-gradient(135deg, rgba(155, 135, 245, 0.1) 0%, rgba(110, 89, 165, 0.2) 100%);
+        }
+
+        #messages-container::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: -2;
+            background-image: url('../images/chat_background.jpeg');
+            background-repeat: repeat;
+            background-size: cover;
+            background-attachment: fixed;
+        }
+
+        #messages-container::-webkit-scrollbar {
+            display: none;
+        }
+
+    /* Redesigned input area */
+    .message-input-container {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 1rem;
+        background-color: var(--purple-50);
+        border-top: 1px solid var(--purple-200);
+    }
+
+    .message-input-wrapper {
+        flex: 1;
+        background-color: var(--white);
+        border-radius: 20px;
+        padding: 0.5rem 1rem;
+        border: 1px solid var(--purple-300);
+        transition: all 0.3s ease;
+    }
+
+        .message-input-wrapper:focus-within {
+            box-shadow: 0 0 0 2px var(--purple-200);
+            border-color: var(--purple-500);
+        }
+
+    .message-input {
+        width: 100%;
+        border: none;
+        background: none;
+        font-size: 0.875rem;
+        color: var(--purple-900);
+    }
+
+        .message-input:focus {
+            outline: none;
+        }
+
+        .message-input::placeholder {
+            color: var(--purple-400);
+        }
+
+    /* Action buttons styling */
+    .message-action-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background-color: var(--white);
+        border: 1px solid var(--purple-300);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        color: var(--purple-600);
+    }
+
+        .message-action-btn:hover {
+            background-color: var(--purple-100);
+            transform: translateY(-2px);
+        }
+
+    .action-icon {
+        width: 18px;
+        height: 18px;
+    }
+
+    /* Send button styling */
+    .send-message-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--purple-500) 0%, var(--purple-700) 100%);
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 5px rgba(126, 105, 171, 0.4);
+    }
+
+        .send-message-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(126, 105, 171, 0.5);
+        }
+
+    .send-icon {
+        width: 20px;
+        height: 20px;
+        color: var(--white);
+    }
+
+    /* Chat header (new) */
+    .chat-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 16px;
+        background: linear-gradient(135deg, var(--purple-600) 0%, var(--purple-700) 100%);
+        color: white;
+        border-radius: 12px 12px 0 0;
+    }
+
+    .chat-title {
+        font-weight: 600;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .status-indicator {
+        width: 8px;
+        height: 8px;
+        background-color: #4ade80;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+
+    /* Modified document sections for side-by-side layout */
+
+    /* Document Panel Styles - Modified for overlay layout with tabs */
+    .document-panel {
+        position: fixed;
+        top: 0;
+        right: -50%;
+        width: 50%;
+        height: 100vh;
+        background: linear-gradient(to bottom, var(--purple-50), var(--white));
+        border-left: 2px solid var(--purple-200);
+        box-shadow: -5px 0 25px rgba(124, 58, 237, 0.15);
+        z-index: 1000;
+        transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        flex-direction: column;
+    }
+
+        .document-panel.show {
+            right: 0;
+        }
+
+    /* Chat window stays full screen - no width changes */
+    .chat-window-wrapper {
+        height: 100%;
+        overflow: hidden;
+        background: linear-gradient(to bottom, var(--purple-100), var(--white));
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        position: relative;
+        width: 100%; /* Always full width */
+    }
+
+        /* Remove the panel-open class effect */
+        .chat-window-wrapper.panel-open {
+            width: 100%; /* Keep full width even when panel is open */
+        }
+
+    .document-panel-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px 24px;
+        background: linear-gradient(135deg, var(--purple-600) 0%, var(--purple-700) 100%);
+        color: white;
+        border-bottom: 1px solid var(--purple-200);
+        flex-shrink: 0; /* Prevent header from shrinking */
+    }
+
+    .document-panel-title {
+        font-size: 18px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .close-panel-btn {
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+        padding: 8px;
+        border-radius: 50%;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .close-panel-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: scale(1.1);
+        }
+
+    .document-panel-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden; /* Prevent content from overflowing */
+    }
+
+    /* New tab styles */
+    .document-tabs {
+        display: flex;
+        background: var(--purple-100);
+        border-bottom: 2px solid var(--purple-200);
+        flex-shrink: 0;
+    }
+
+    .tab-button {
+        flex: 1;
+        padding: 16px 20px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--purple-700);
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        border-bottom: 3px solid transparent;
+    }
+
+        .tab-button:hover {
+            background: var(--purple-200);
+            color: var(--purple-800);
+        }
+
+        .tab-button.active {
+            background: var(--white);
+            color: var(--purple-900);
+            border-bottom-color: var(--purple-600);
+        }
+
+    .tab-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    /* Modified document sections for tab content */
+    .document-section {
+        flex: 1;
+        min-height: 0;
+        flex-direction: column;
+        gap: 16px;
+        padding: 24px;
+        overflow: hidden;
+    }
+
+    .search-container {
+        margin-bottom: 12px;
+        flex-shrink: 0;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 8px 12px;
+        border: 2px solid var(--purple-200);
+        border-radius: 8px;
+        font-size: 14px;
+        background: var(--white);
+        color: var(--purple-900);
+        transition: border-color 0.2s ease;
+    }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--purple-400);
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+        }
+
+        .search-input::placeholder {
+            color: var(--purple-500);
+        }
+
+    .document-grid {
+        display: grid;
+        gap: 12px;
+        overflow-y: auto; /* Enable independent scrolling for each section */
+        flex: 1;
+        padding-right: 8px; /* Space for scrollbar */
+    }
+
+        /* Custom scrollbar for document grids */
+        .document-grid::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .document-grid::-webkit-scrollbar-track {
+            background: var(--purple-100);
+            border-radius: 3px;
+        }
+
+        .document-grid::-webkit-scrollbar-thumb {
+            background: var(--purple-400);
+            border-radius: 3px;
+        }
+
+            .document-grid::-webkit-scrollbar-thumb:hover {
+                background: var(--purple-500);
+            }
+
+    .document-item {
+        background: var(--white);
+        border: 2px solid var(--purple-200);
+        border-radius: 12px;
+        padding: 16px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-shrink: 0; /* Prevent items from shrinking */
+    }
+
+        .document-item:hover {
+            border-color: var(--purple-400);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.15);
+        }
+
+    .document-icon {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, var(--purple-500) 0%, var(--purple-600) 100%);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        flex-shrink: 0;
+    }
+
+    .document-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .document-name {
+        font-weight: 600;
+        color: var(--purple-900);
+        font-size: 14px;
+        margin-bottom: 4px;
+        word-break: break-word;
+    }
+
+    .document-meta {
+        font-size: 12px;
+        color: var(--purple-600);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .document-download-btn {
+        background: var(--purple-100);
+        border: 1px solid var(--purple-300);
+        border-radius: 6px;
+        padding: 6px 8px;
+        color: var(--purple-700);
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+    }
+
+        .document-download-btn:hover {
+            background: var(--purple-200);
+            transform: scale(1.05);
+        }
+
+    .empty-state {
+        text-align: center;
+        color: var(--purple-600);
+        font-style: italic;
+        padding: 40px 20px;
+    }
+
+    .loading-state {
+        text-align: center;
+        color: var(--purple-600);
+        padding: 40px 20px;
+    }
+
+    .loading-spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid var(--purple-200);
+        border-radius: 50%;
+        border-top-color: var(--purple-600);
+        animation: spin 1s ease-in-out infinite;
+        margin-bottom: 10px;
+    }
+
+
+    /* Animation for new messages */
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @@keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .message-container {
+        animation: fadeIn 0.3s ease-out;
+    }
+
+    /* ... keep existing code (Additional styles for file uploads and audio recordings) */
+    .file-preview {
+        margin-top: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .image-preview {
+        max-width: 200px;
+        max-height: 150px;
+        border-radius: 8px;
+        object-fit: contain;
+    }
+
+    .video-preview {
+        max-width: 200px;
+        max-height: 150px;
+        border-radius: 8px;
+    }
+
+    .audio-preview {
+        min-width: 100%;
+        max-width: 100%;
+    }
+
+    .file-download {
+        font-size: 12px;
+        color: var(--purple-600);
+        text-decoration: underline;
+    }
+
+    .generic-file {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background-color: var(--purple-100);
+        padding: 8px;
+        border-radius: 6px;
+    }
+
+    .file-icon {
+        width: 24px;
+        height: 24px;
+        color: var(--purple-700);
+    }
+
+    .file-name {
+        font-size: 14px;
+        word-break: break-all;
+    }
+
+    #file-preview, #audio-player-container {
+        display: none;
+        margin: 8px 0;
+        padding: 8px;
+        background-color: var(--purple-100);
+        border-radius: 8px;
+    }
+
+    .selected-file, .recording-status {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 14px;
+    }
+
+    .clear-file, .clear-recording {
+        background: none;
+        border: none;
+        color: var(--purple-700);
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    .recording {
+        animation: pulse 1.5s infinite;
+        background-color: rgba(220, 38, 38, 0.8) !important;
+    }
+
+    @@keyframes pulse {
+        0% {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        50% {
+            opacity: 0.8;
+            transform: scale(1.05);
+        }
+
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    /* ... keep existing code (Additional styles for sender names and emoji picker) */
+    .sender-name {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--purple-800);
+        margin-bottom: 2px;
+    }
+
+    .received .sender-name {
+        margin-left: 10px;
+    }
+
+    .sent .sender-name {
+        margin-right: 10px;
+        text-align: right;
+    }
+
+    #emoji-container {
+        position: relative;
+    }
+
+    .emoji-mart {
+        position: absolute;
+        bottom: 50px;
+        right: 0;
+        z-index: 100;
+    }
+
+    /* ... keep existing code (Upload Modal Styles) */
+    .upload-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        animation: fadeIn 0.3s ease-out;
+        align-items:center;
+        justify-content:center;
+    }
+
+        .upload-modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+    .upload-modal-content {
+        background-color: white;
+        border-radius: 16px;
+        padding: 24px;
+        max-width: 400px;
+        width: 90%;
+        box-shadow: 0 10px 25px rgba(124, 58, 237, 0.2);
+        border: 2px solid #e5d9f2;
+        animation: slideIn 0.3s ease-out;
+    }
+
+    .upload-modal-header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .upload-modal-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: #581c87;
+        margin-bottom: 8px;
+    }
+
+    .upload-modal-subtitle {
+        font-size: 14px;
+        color: #7c3aed;
+    }
+
+    .upload-options {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-bottom: 24px;
+    }
+
+    .upload-option {
+        display: flex;
+        align-items: center;
+        padding: 16px;
+        border: 2px solid #e5d9f2;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        background-color: white;
+    }
+
+        .upload-option:hover {
+            border-color: #a855f7;
+            background-color: #faf5ff;
+        }
+
+        .upload-option.selected {
+            border-color: #7c3aed;
+            background-color: #f3e8ff;
+        }
+
+    .upload-option-icon {
+        width: 24px;
+        height: 24px;
+        margin-right: 12px;
+        color: #7c3aed;
+    }
+
+    .upload-option-content {
+        flex: 1;
+    }
+
+    .upload-option-label {
+        font-weight: 600;
+        color: #581c87;
+        margin-bottom: 4px;
+    }
+
+    .upload-option-description {
+        font-size: 12px;
+        color: #7c3aed;
+    }
+
+    .upload-option-radio {
+        width: 18px;
+        height: 18px;
+        border: 2px solid #a855f7;
+        border-radius: 50%;
+        position: relative;
+    }
+
+    .upload-option.selected .upload-option-radio {
+        border-color: #7c3aed;
+    }
+
+        .upload-option.selected .upload-option-radio::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 8px;
+            height: 8px;
+            background-color: #7c3aed;
+            border-radius: 50%;
+        }
+
+    .upload-modal-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+    }
+
+    .modal-btn {
+        padding: 10px 20px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+
+    .modal-btn-cancel {
+        background-color: #e5e7eb;
+        color: #374151;
+    }
+
+        .modal-btn-cancel:hover {
+            background-color: #d1d5db;
+        }
+
+    .modal-btn-upload {
+        background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+        color: white;
+    }
+
+        .modal-btn-upload:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(126, 105, 171, 0.3);
+        }
+
+        .modal-btn-upload:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+    @@keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px) scale(0.95);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
 </style>
 
 <div class="chat-window-wrapper">
-	<div id="chat-window-inner" class="chat-container1">
-		<!-- New chat header -->
-		<div class="chat-header">
-			<div class="chat-title">
-				<span>Messages</span>
-				<span class="status-indicator"></span>
-			</div>
-		</div>
+    <div id="chat-window-inner" class="chat-container1">
+        <!-- New chat header -->
+        <div class="chat-header">
+            <div class="chat-title">
+                <span>Messages</span>
+                <span class="status-indicator"></span>
+            </div>
+        </div>
 
-		<div id="messages-container" data-current-user="@User.Identity.Name">
-			@foreach (var message in Model)
-			{
-				<div class="message-container @(message.IsCurrentUser ? "sent" : "received")">
-					<div class="avatar-wrapper">
-						<img src="@(message.ProfilePic ?? "https://thumbs.dreamstime.com/b/default-avatar-profile-icon-vector-social-media-user-image-182145777.jpg")" alt="@message.Sender" class="avatar-image" />
-					</div>
-					<div class="message-content">
-						<div class="message-bubble">
-							@if (!string.IsNullOrEmpty(message.Content))
-							{
-								<p>@message.Content</p>
-							}
+        <div id="messages-container" data-current-user="@User.Identity.Name">
+            @foreach (var message in Model)
+            {
+                <div class="message-container @(message.IsCurrentUser ? "sent" : "received")">
+                    <div class="avatar-wrapper">
+                        <img src="@(message.ProfilePic ?? "https://thumbs.dreamstime.com/b/default-avatar-profile-icon-vector-social-media-user-image-182145777.jpg")" alt="@message.Sender" class="avatar-image" />
+                    </div>
+                    <div class="message-content">
+                        <div class="message-bubble">
+                            @if (!string.IsNullOrEmpty(message.Content))
+                            {
+                                <p>@message.Content</p>
+                            }
 
-							@if (!string.IsNullOrEmpty(message.FileUrl))
-							{
-								<div class="file-preview">
-									@if (message.FileType != null && message.FileType.StartsWith("image/"))
-									{
-										<img src="@message.FileUrl" alt="@(message.FileName ?? "Image")" class="image-preview" />
-										<a href="@message.FileUrl" download="@message.FileName" class="file-download">@(message.FileName ?? "Download image")</a>
-									}
-									else if (message.FileType != null && message.FileType.StartsWith("video/"))
-									{
-										<video src="@message.FileUrl" controls class="video-preview"></video>
-										<a href="@message.FileUrl" download="@message.FileName" class="file-download">@(message.FileName ?? "Download video")</a>
-									}
-									else if (message.FileType != null && message.FileType.StartsWith("audio/"))
-									{
-										<audio src="@message.FileUrl" controls class="audio-preview"></audio>
-										<a href="@message.FileUrl" download="@message.FileName" class="file-download">@(message.FileName ?? "Download audio")</a>
-									}
-									else
-									{
-										<div class="generic-file">
-											<svg class="file-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-												<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-												<polyline points="14 2 14 8 20 8"></polyline>
-												<line x1="16" y1="13" x2="8" y2="13"></line>
-												<line x1="16" y1="17" x2="8" y2="17"></line>
-												<line x1="10" y1="9" x2="8" y2="9"></line>
-											</svg>
-											<span class="file-name">@(message.FileName ?? "File")</span>
-										</div>
-										<a href="@message.FileUrl" download="@message.FileName" class="file-download">Download file</a>
-									}
-								</div>
-							}
+                            @if (!string.IsNullOrEmpty(message.FileUrl))
+                            {
+                                <div class="file-preview">
+                                    @if (message.FileType != null && message.FileType.StartsWith("image/"))
+                                    {
+                                        <img src="@message.FileUrl" alt="@(message.FileName ?? "Image")" class="image-preview" />
+                                        <a href="@message.FileUrl" download="@message.FileName" class="file-download">@(message.FileName ?? "Download image")</a>
+                                    }
+                                    else if (message.FileType != null && message.FileType.StartsWith("video/"))
+                                    {
+                                        <video src="@message.FileUrl" controls class="video-preview"></video>
+                                        <a href="@message.FileUrl" download="@message.FileName" class="file-download">@(message.FileName ?? "Download video")</a>
+                                    }
+                                    else if (message.FileType != null && message.FileType.StartsWith("audio/"))
+                                    {
+                                        <audio src="@message.FileUrl" controls class="audio-preview"></audio>
+                                        <a href="@message.FileUrl" download="@message.FileName" class="file-download">@(message.FileName ?? "Download audio")</a>
+                                    }
+                                    else
+                                    {
+                                        <div class="generic-file">
+                                            <svg class="file-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                                <polyline points="14 2 14 8 20 8"></polyline>
+                                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                                <line x1="10" y1="9" x2="8" y2="9"></line>
+                                            </svg>
+                                            <span class="file-name">@(message.FileName ?? "File")</span>
+                                        </div>
+                                        <a href="@message.FileUrl" download="@message.FileName" class="file-download">Download file</a>
+                                    }
+                                </div>
+                            }
 
-							@if (!string.IsNullOrEmpty(message.AudioUrl))
-							{
-								<div class="file-preview">
-									<audio src="@message.AudioUrl" controls class="audio-preview"></audio>
-									<a href="@message.AudioUrl" download="voice-message.wav" class="file-download">Download voice message</a>
-								</div>
-							}
-						</div>
-						<span class="timestamp">@message.Timestamp.ToString("hh:mm tt")</span>
-					</div>
-				</div>
-			}
-		</div>
+                            @if (!string.IsNullOrEmpty(message.AudioUrl))
+                            {
+                                <div class="file-preview">
+                                    <audio src="@message.AudioUrl" controls class="audio-preview"></audio>
+                                    <a href="@message.AudioUrl" download="voice-message.wav" class="file-download">Download voice message</a>
+                                </div>
+                            }
+                        </div>
+                        <span class="timestamp">@message.Timestamp.ToString("hh:mm tt")</span>
+                    </div>
+                </div>
+            }
+        </div>
 
-		<!-- File preview area -->
-		<div id="file-preview"></div>
+        <!-- File preview area -->
+        <div id="file-preview"></div>
 
-		<!-- Audio player container -->
-		<div id="audio-player-container"></div>
+        <!-- Audio player container -->
+        <div id="audio-player-container"></div>
 
-		<!-- Hidden input for audio data -->
-		<input type="hidden" id="recorded-audio-data" />
+        <!-- Hidden input for audio data -->
+        <input type="hidden" id="recorded-audio-data" />
 
-		<div id="input-container" class="message-input-container">
-			<!-- Document button -->
-			<button id="document-button" class="message-action-btn" title="View Documents">
-				<svg class="action-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-					<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-					<polyline points="14 2 14 8 20 8"></polyline>
-					<line x1="16" y1="13" x2="8" y2="13"></line>
-					<line x1="16" y1="17" x2="8" y2="17"></line>
-					<line x1="10" y1="9" x2="8" y2="9"></line>
-				</svg>
-			</button>
+        <div id="input-container" class="message-input-container">
+            <!-- Document button -->
+            <button id="document-button" class="message-action-btn" title="View Documents">
+                <svg class="action-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <line x1="10" y1="9" x2="8" y2="9"></line>
+                </svg>
+            </button>
 
-			<!-- File upload button -->
-			<button class="message-action-btn" onclick="document.getElementById('file-input').click()">
-				<svg class="action-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-					<path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path>
-					<circle cx="12" cy="13" r="3"></circle>
-				</svg>
-			</button>
-			<input type="file" id="file-input" style="display:none">
+            <!-- File upload button -->
+            <button class="message-action-btn" onclick="document.getElementById('file-input').click()">
+                <svg class="action-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path>
+                    <circle cx="12" cy="13" r="3"></circle>
+                </svg>
+            </button>
+            <input type="file" id="file-input" style="display:none">
 
-			<!-- Audio recording button -->
-			<button id="record-button" class="message-action-btn">
-				<svg id="record-icon" class="action-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-					<path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
-					<path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-					<line x1="12" y1="19" x2="12" y2="22"></line>
-				</svg>
-				<svg id="stop-icon" class="action-icon" style="display:none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-					<rect x="6" y="6" width="12" height="12" rx="2" ry="2"></rect>
-				</svg>
-			</button>
+            <!-- Audio recording button -->
+            <button id="record-button" class="message-action-btn">
+                <svg id="record-icon" class="action-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                    <line x1="12" y1="19" x2="12" y2="22"></line>
+                </svg>
+                <svg id="stop-icon" class="action-icon" style="display:none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="6" y="6" width="12" height="12" rx="2" ry="2"></rect>
+                </svg>
+            </button>
 
-			<div class="message-input-wrapper">
-				<input id="message-input" type="text" class="message-input" placeholder="Type a message...">
-			</div>
-			<button id="send-button" class="send-message-btn">
-				<svg class="send-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-					<line x1="22" y1="2" x2="11" y2="13"></line>
-					<polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-				</svg>
-			</button>
-		</div>
+            <div class="message-input-wrapper">
+                <input id="message-input" type="text" class="message-input" placeholder="Type a message...">
+            </div>
+            <button id="send-button" class="send-message-btn">
+                <svg class="send-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+            </button>
+        </div>
 
-		<!-- ... keep existing code (Upload Modal) -->
-		<div id="uploadModal" class="upload-modal" style="display:none;">
-			<div class="upload-modal-content">
-				<div class="upload-modal-header">
-					<h3 class="upload-modal-title">Upload File</h3>
-					<p class="upload-modal-subtitle">Choose the type of file you're uploading</p>
-				</div>
+        <!-- ... keep existing code (Upload Modal) -->
+        <div id="uploadModal" class="upload-modal" style="display:none;">
+            <div class="upload-modal-content">
+                <div class="upload-modal-header">
+                    <h3 class="upload-modal-title">Upload File</h3>
+                    <p class="upload-modal-subtitle">Choose the type of file you're uploading</p>
+                </div>
 
-				<div class="upload-options">
-					<div class="upload-option" data-type="Document">
-						<svg class="upload-option-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-								  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-							</path>
-						</svg>
-						<div class="upload-option-content">
-							<div class="upload-option-label">Document</div>
-							<div class="upload-option-description">General documents, PDFs, Word files</div>
-						</div>
-						<div class="upload-option-radio"></div>
-					</div>
+                <div class="upload-options">
+                    <div class="upload-option" data-type="Document">
+                        <svg class="upload-option-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                            </path>
+                        </svg>
+                        <div class="upload-option-content">
+                            <div class="upload-option-label">Document</div>
+                            <div class="upload-option-description">General documents, PDFs, Word files</div>
+                        </div>
+                        <div class="upload-option-radio"></div>
+                    </div>
 
-					<div class="upload-option" data-type="Past Paper">
-						<svg class="upload-option-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-								  d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253">
-							</path>
-						</svg>
-						<div class="upload-option-content">
-							<div class="upload-option-label">Past Paper</div>
-							<div class="upload-option-description">Previous exam papers and tests</div>
-						</div>
-						<div class="upload-option-radio"></div>
-					</div>
+                    <div class="upload-option" data-type="Past Paper">
+                        <svg class="upload-option-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253">
+                            </path>
+                        </svg>
+                        <div class="upload-option-content">
+                            <div class="upload-option-label">Past Paper</div>
+                            <div class="upload-option-description">Previous exam papers and tests</div>
+                        </div>
+                        <div class="upload-option-radio"></div>
+                    </div>
 
-					<div class="upload-option" data-type="Other">
-						<svg class="upload-option-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-								  d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17v4a2 2 0 002 2h4">
-							</path>
-						</svg>
-						<div class="upload-option-content">
-							<div class="upload-option-label">Other</div>
-							<div class="upload-option-description">Images, videos, or other file types</div>
-						</div>
-						<div class="upload-option-radio"></div>
-					</div>
-				</div>
+                    <div class="upload-option" data-type="Other">
+                        <svg class="upload-option-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17v4a2 2 0 002 2h4">
+                            </path>
+                        </svg>
+                        <div class="upload-option-content">
+                            <div class="upload-option-label">Other</div>
+                            <div class="upload-option-description">Images, videos, or other file types</div>
+                        </div>
+                        <div class="upload-option-radio"></div>
+                    </div>
+                </div>
 
-				<input type="file" id="fileInput" style="display: none;" />
+                <input type="file" id="fileInput" style="display: none;" />
 
-				<div class="upload-modal-actions">
-					<button type="button" class="modal-btn modal-btn-cancel" onclick="closeUploadModal()">Cancel</button>
-					<button type="button" class="modal-btn modal-btn-upload" id="uploadBtn" disabled onclick="handleFileUpload()">Upload File</button>
-				</div>
-			</div>
-		</div>
-	</div>
+                <div class="upload-modal-actions">
+                    <button type="button" class="modal-btn modal-btn-cancel" onclick="closeUploadModal()">Cancel</button>
+                    <button type="button" class="modal-btn modal-btn-upload" id="uploadBtn" disabled onclick="handleFileUpload()">Upload File</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-	<!-- Document Panel -->
-	<div id="documentPanel" class="document-panel">
-		<div class="document-panel-header">
-			<div class="document-panel-title">
-				<svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-				</svg>
-				Course Resources
-			</div>
-			<button class="close-panel-btn" onclick="closeDocumentPanel()">
-				<svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<line x1="18" y1="6" x2="6" y2="18"></line>
-					<line x1="6" y1="6" x2="18" y2="18"></line>
-				</svg>
-			</button>
-		</div>
-		<div class="document-panel-content" id="documentPanelContent">
-			<!-- Content will be loaded dynamically -->
-		</div>
-	</div>
+    <!-- Document Panel -->
+    <div id="documentPanel" class="document-panel">
+        <div class="document-panel-header">
+            <div class="document-panel-title">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                Course Resources
+            </div>
+            <button class="close-panel-btn" onclick="closeDocumentPanel()">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <div class="document-panel-content" id="documentPanelContent">
+            <!-- Content will be loaded dynamically -->
+        </div>
+    </div>
 </div>
 
 <script src="~/js/ChatWindow.js"></script>

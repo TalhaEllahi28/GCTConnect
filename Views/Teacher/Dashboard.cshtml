@@ -11,6 +11,8 @@
 	<title>GCTConnect</title>
 	<link rel="icon" type="image/png" href="~/images/logo.png">
 	<link rel="stylesheet" href="dashboard.css">
+	<link rel="stylesheet" href="/css/chatbot.css">
+
 </head>
 
 <style>
@@ -885,6 +887,161 @@
 		color: #c62828;
 	}
 </style>
+
+<style>
+	.header-nav {
+		display: flex;
+		gap: 1.5rem;
+	}
+
+	.nav-link {
+		color: var(--gray-600);
+		text-decoration: none;
+		transition: var(--transition);
+	}
+
+		.nav-link:hover {
+			color: var(--primary-color);
+		}
+
+	/* ---- Chat Layout Styles ---- */
+	.chat-layout {
+		height: 100% !important;
+		display: flex;
+		height: calc(100% - 57px); /* subtract header height */
+		overflow: hidden;
+	}
+
+	/* Navigation Sidebar */
+	.nav-sidebar {
+		height: 100%;
+		width: 76px;
+		flex-shrink: 0;
+		background-color: #9370db !important;
+		border-right: 1px solid var(--dark-light);
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		padding: 1rem 0;
+		color: var(--white);
+	}
+
+	.logo-container {
+		padding: 0.5rem 0 1.5rem;
+	}
+
+	img.sidebar-img {
+		height: 45px;
+		width: 45px;
+		border-radius: 10px;
+	}
+
+	.chat-logo-icon {
+		width: 32px;
+		height: 32px;
+		color: var(--white);
+		opacity: 0.7;
+		transition: var(--transition);
+		cursor: pointer;
+	}
+
+		.chat-logo-icon:hover {
+			opacity: 1;
+		}
+
+	.sidebar-nav {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		justify-content: center; /* Vertically center icons */
+		width: 100%; /* Ensure full width */
+	}
+
+	.nav-list {
+		list-style: none;
+		display: flex;
+		flex-direction: column;
+		align-items: center; /* Horizontally center each icon */
+		gap: 1.5rem;
+		padding: 0;
+		margin: 0;
+	}
+
+
+	.nav-item {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		position: relative;
+		cursor: pointer;
+	}
+
+	.nav-icon {
+		width: 24px;
+		height: 24px;
+		color: #ced4da;
+		transition: var(--transition);
+	}
+
+	.nav-text {
+		font-size: 0.75rem;
+		margin-top: 0.25rem;
+		color: var(--gray-400);
+	}
+
+	.nav-item:hover .nav-icon,
+	.nav-item:hover .nav-text {
+		color: #ffffff;
+	}
+
+
+	.nav-item.active .nav-icon,
+	.nav-item.active .nav-text {
+		color: white;
+	}
+
+
+	.user-profile {
+		margin-top: auto;
+		position: relative;
+	}
+
+	.badge {
+		position: absolute;
+		top: -5px;
+		right: -5px;
+		background: red;
+		color: white;
+		border-radius: 50%;
+		padding: 2px 6px;
+		font-size: 0.7em;
+		min-width: 18px;
+		text-align: center;
+	}
+
+	.d-none {
+		display: none !important;
+	}
+
+	/* Toast styles */
+	.toast {
+		margin-bottom: 10px;
+		max-width: 350px;
+	}
+
+	.toast-header.bg-low {
+		background-color: #0d6efd !important;
+	}
+
+	.toast-header.bg-medium {
+		background-color: #ffc107 !important;
+		color: #000 !important;
+	}
+
+	.toast-header.bg-high {
+		background-color: #dc3545 !important;
+	}
+</style>
 <body>
 	<div class="chat-app" id="chat-app-container">
 		<div class="chat-layout" id="main-content">
@@ -969,6 +1126,64 @@
 
 		</div>
 		<div id="announcement-modals-container"></div>
+
+		<!-- Chatbot Container -->
+		<div class="chatbot-container" id="chatbotContainer">
+			<!-- Header -->
+			<div class="chatbot-header">
+				<div class="header-content">
+					<div class="bot-info">
+						<div class="bot-avatar">
+							<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 1H5C3.89 1 3 1.89 3 3V7H1V9H3V15C3 16.11 3.89 17 5 17H8.5C8.5 18.66 9.84 20 11.5 20S14.5 18.66 14.5 17H19C20.11 17 21 16.11 21 15V9H21ZM12 15.5C11.17 15.5 10.5 14.83 10.5 14S11.17 12.5 12 12.5S13.5 13.17 13.5 14S12.83 15.5 12 15.5Z" fill="#8A2BE2" />
+							</svg>
+						</div>
+						<div class="bot-details">
+							<h3>AI Assistant</h3>
+							<span class="status">Online</span>
+						</div>
+					</div>
+					<button class="close-btn" id="closeBtn">
+						<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" fill="#8A2BE2" />
+						</svg>
+					</button>
+				</div>
+			</div>
+
+			<!-- Chat Messages -->
+			<div class="chat-messages-chatbot" id="chatMessages">
+				<div class="message bot-message">
+					<div class="message-content-chatbot">
+						<p>Hello! I'm your AI assistant. How can I help you today?</p>
+					</div>
+					<div class="message-time">Just now</div>
+				</div>
+			</div>
+
+			<!-- Typing Indicator -->
+			<div class="typing-indicator" id="typingIndicator">
+				<div class="typing-dots">
+					<span></span>
+					<span></span>
+					<span></span>
+				</div>
+				<span class="typing-text">AI is typing...</span>
+			</div>
+
+			<!-- Input Area -->
+			<div class="chat-input-area">
+				<div class="input-container">
+					<input type="text" id="messageInput" placeholder="Type your message..." autocomplete="off">
+					<button class="send-btn" id="sendBtn">
+						<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" fill="white" />
+						</svg>
+					</button>
+				</div>
+			</div>
+		</div>
+
 	</div>
 </body>
 
@@ -1104,6 +1319,7 @@
 	window.showAnnouncementModal = Modal.showAnnouncement;
 	window.showAllAnnouncementsModal = Modal.showAllAnnouncements;
 </script>
+<script src="/js/chatbot.js"></script>
 
 
 @* <script src="~/js/signalr/dist/browser/signalr.js?v=1.0.3"></script>

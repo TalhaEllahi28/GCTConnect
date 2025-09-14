@@ -24,9 +24,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IGeminiService, GeminiService>(); builder.Services.AddSingleton<OpenAIService>();
-builder.Services.AddHttpClient<OpenAIService>();
-
+builder.Services.AddScoped<IGeminiService, GeminiService>();
+builder.Services.AddScoped<ISocialMediaService, SocialMediaService>();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
@@ -35,10 +34,7 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 builder.Services.AddSignalR();
-builder.Services.AddHttpClient<QdrantVectorStore>();
 builder.Services.AddSingleton<GeminiLlmClient>();
-builder.Services.AddSingleton<OpenAiLlmClient>();
-builder.Services.AddScoped<RagService>();
 
 builder.Services.AddDbContext<GctConnectContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("gctconnectdbcs")));

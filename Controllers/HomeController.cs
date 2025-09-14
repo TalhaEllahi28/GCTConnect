@@ -251,180 +251,356 @@ namespace GCTConnect.Controllers
             return View();
         }
 
+
+
+
         [HttpPost]
         [Authorize(Roles = "Admin,Hod")]
         public async Task<IActionResult> AddSomeone(User newUser)
         {
-            // Reload dropdown data in case of validation errors
-            ViewBag.Batches = _context.Batches
-                .Select(b => new { Id = b.BatchId, Year = b.BatchYear })
-                .ToList();
-            ViewBag.Departments = _context.Departments
-                .Select(d => new { Id = d.DepartmentId, Name = d.Name })
-                .ToList();
-            ViewBag.Subjects = _context.Users
-                .Where(u => u.Subject != null) // Exclude NULL entries
-                .Select(u => u.Subject)
-                .Distinct()
-                .ToList();
-
             var currentUser = _userService.GetCurrentUser();
             if (currentUser == null)
             {
-                return RedirectToAction("Login");
+                TempData["Success"] = "UserNotAuthenticated";
+                return RedirectToAction("UserManagement", "Admin");
             }
+
             ModelState.Remove("Username");
             ModelState.Remove("Password");
+
             if (!ModelState.IsValid)
             {
-                return View(newUser);
+                // Return validation errors as JSON
+                var errors = ModelState.ToDictionary(
+                    kvp => kvp.Key,
+                    kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).ToArray()
+                );
+                return Json(new { success = false, errors });
             }
 
             if (_context.Users.Any(u => u.Email == newUser.Email))
             {
-                ModelState.AddModelError("Email", "This email already exists.");
-                return View(newUser);
+                return Json(new { success = false, errors = new { Email = new[] { "This email already exists." } } });
             }
 
-            var User = new User
+            try
             {
-                Name = newUser.Name,
-                LastName = newUser.LastName,
-                Email = newUser.Email,
-                Gender = newUser.Gender,
-                CreatedAt = DateTime.UtcNow,
-                Password = GenerateComplexRandomPassword(8),
-                ProfilePic = "https://thumbs.dreamstime.com/b/default-avatar-profile-icon-vector-social-media-user-image-182145777.jpg"
-            };
-
-            if (newUser.PhoneNumber != null)
-            {
-                User.PhoneNumber = newUser.PhoneNumber;
-            }
-
-            // Role-based logic
-            if ((newUser.Role == "Students" && (currentUser.Role == "Admin" || currentUser.Role == "Hod")))
-            {
-                User.Role = newUser.Role;
-
-                if (newUser.RollNumber == null)
+                var User = new User
                 {
-                    ModelState.AddModelError("RollNumber", "Roll Number is required");
-                    return View(newUser);
-                    //return RedirectToAction("UserManagement", "Admin", newUser);
+                    Name = newUser.Name,
+                    LastName = newUser.LastName,
+                    Email = newUser.Email,
+                    Gender = newUser.Gender,
+                    CreatedAt = DateTime.UtcNow,
+                    Password = GenerateComplexRandomPassword(8),
+                    ProfilePic = "https://thumbs.dreamstime.com/b/default-avatar-profile-icon-vector-social-media-user-image-182145777.jpg"
+                };
+
+                if (!string.IsNullOrEmpty(newUser.PhoneNumber))
+                    User.PhoneNumber = newUser.PhoneNumber;
+
+                // ==========================
+                // Role-based Logic
+                // ==========================
+                if (newUser.Role == "Students" && (currentUser.Role == "Admin" || currentUser.Role == "Hod"))
+                {
+                    if (string.IsNullOrEmpty(newUser.RollNumber))
+                        return Json(new { success = false, errors = new { RollNumber = new[] { "Roll Number is required." } } });
+
+                    if (newUser.DepartmentId == null)
+                        return Json(new { success = false, errors = new { Department = new[] { "Department Name is required." } } });
+
+                    if (newUser.BatchId == null)
+                        return Json(new { success = false, errors = new { Batch = new[] { "Batch Year is required." } } });
+
+                    User.Role = newUser.Role;
+                    User.RollNumber = newUser.RollNumber;
+                    User.Username = $"{newUser.Name}-{newUser.RollNumber}";
+
+                    var batchYear = _context.Batches.FirstOrDefault(b => b.BatchId == newUser.BatchId)?.BatchYear;
+                    User.BatchId = _context.Batches
+                        .FirstOrDefault(b => b.DepartmentId == newUser.DepartmentId && b.BatchYear == batchYear)?.BatchId;
+                    User.DepartmentId = newUser.DepartmentId;
+
+                    _context.Users.Add(User);
+                    _context.SaveChanges();
+
+                    var batch = _context.Batches.FirstOrDefault(b => b.BatchId == User.BatchId);
+                    var department = _context.Departments.FirstOrDefault(d => d.DepartmentId == newUser.DepartmentId);
+
+                    if (batch != null)
+                    {
+                        batch.StudentsCount += 1;
+                        _context.SaveChanges();
+                    }
+
+
+                    addUserInSubjectGroups(User);
 
                 }
-
-                if (newUser.DepartmentId == null)
+                else if (newUser.Role == "Teachers" && (currentUser.Role == "Admin" || currentUser.Role == "Hod"))
                 {
-                    ModelState.AddModelError("Department", "Department Name is required");
-                    return View(newUser);
+                    User.Role = newUser.Role;
+                    User.Username = newUser.Name;
+                    User.BatchId = null;
+                    User.DepartmentId = newUser.DepartmentId;
+                    User.Subject = newUser.Subject;
+
+                    _context.Users.Add(User);
+                    _context.SaveChanges();
+
+                    var department = _context.Departments.FirstOrDefault(d => d.DepartmentId == newUser.DepartmentId);
+                    addUserInGroup(department, User, "StudentsTeachersHod");
+                    addUserInGroup(department, User, "TeachersHod");
                 }
-
-                if (newUser.BatchId == null)
+                else if (newUser.Role == "Hod" && currentUser.Role == "Admin")
                 {
-                    ModelState.AddModelError("Batch", "Batch Year is required");
-                    return View(newUser);
-                }
+                    User.Role = newUser.Role;
+                    User.Username = newUser.Name;
+                    User.BatchId = null;
+                    User.DepartmentId = newUser.DepartmentId;
 
-                User.RollNumber = newUser.RollNumber;
-                User.Username = $"{newUser.Name}-{newUser.RollNumber}";
-                var batchYear = _context.Batches.FirstOrDefault(b => b.BatchId == newUser.BatchId)?.BatchYear;
-                User.BatchId = _context.Batches.FirstOrDefault(b => b.DepartmentId == newUser.DepartmentId && b.BatchYear == batchYear)?.BatchId;
-                User.DepartmentId = newUser.DepartmentId;
+                    _context.Users.Add(User);
+                    _context.SaveChanges();
 
-                var batch = _context.Batches.FirstOrDefault(b => b.BatchId == User.BatchId);
-                var department = _context.Departments.FirstOrDefault(d => d.DepartmentId == newUser.DepartmentId);
-                // Save user to the database
-                _context.Users.Add(User);
-                _context.SaveChanges();
-                if (batch != null)
-                {
-                    batch.StudentsCount += 1; // Increment student count
-                    _context.SaveChanges(); // Save changes
-                }
-
-
-                addUserInGroup(batch, department, User, "StudentsOnly");
-                addUserInGroup(batch, department, User, "StudentsTeachersHod");
-
-            }
-            else if (newUser.Role == "Teachers" && (currentUser.Role == "Admin" || currentUser.Role == "Hod"))
-            {
-                User.Role = newUser.Role;
-                User.Username = newUser.Name;
-                User.BatchId = null;
-                User.DepartmentId = newUser.DepartmentId;
-                User.Subject = newUser.Subject;
-                // Save user to the database
-                _context.Users.Add(User);
-                _context.SaveChanges();
-                var department = _context.Departments.FirstOrDefault(d => d.DepartmentId == newUser.DepartmentId);
-                addUserInGroup(department, User, "StudentsTeachersHod");
-                addUserInGroup(department, User, "TeachersHod");
-            }
-
-            else if (newUser.Role == "Hod" && currentUser.Role == "Admin")
-            {
-                User.Role = newUser.Role;
-                User.Username = newUser.Name;
-                User.BatchId = null;
-                User.DepartmentId = newUser.DepartmentId;
-                // Save user to the database
-                _context.Users.Add(User);
-                _context.SaveChanges();
-                if (newUser.Role == "Hod")
-                {
                     var department = _context.Departments.FirstOrDefault(d => d.DepartmentId == newUser.DepartmentId);
                     if (department != null && department.HodId == null)
                     {
                         department.HodId = User.UserId;
                         _context.Departments.Update(department);
+                        _context.SaveChanges();
                     }
+
                     addUserInGroup(department, User, "StudentsTeachersHod");
                     addUserInGroup(User, "PrincipalHod");
                 }
-            }
-
-
-            else if ((newUser.Role == "Principal" || newUser.Role == "Admin") && currentUser.Role == "Admin")
-            {
-                User.Role = newUser.Role;
-                User.Username = newUser.Name;
-                User.BatchId = null;
-                User.DepartmentId = null;
-                // Save user to the database
-                _context.Users.Add(User);
-                _context.SaveChanges();
-                if (newUser.Role == "Principle")
+                else if ((newUser.Role == "Principal" || newUser.Role == "Admin") && currentUser.Role == "Admin")
                 {
-                    addUserInGroup(User, "PrincipalOnly");
+                    User.Role = newUser.Role;
+                    User.Username = newUser.Name;
+                    User.BatchId = null;
+                    User.DepartmentId = null;
+
+                    _context.Users.Add(User);
+                    _context.SaveChanges();
+
+                    if (newUser.Role == "Principal")
+                    {
+                        addUserInGroup(User, "PrincipalOnly");
+                    }
                 }
-            }
+                else
+                {
+                    TempData["Success"] = "Fail";
+                    return RedirectToAction("UserManagement", "Admin");
+                }
 
-            // Send email to the user with credentials
-            try
-            {
-                var emailSender = HttpContext.RequestServices.GetRequiredService<EmailService>();
-                string subject = "Your Account Registration Details";
-                string body = $@"
-            <h1>Welcome {User.Name},</h1>
-            <p>Your account has been successfully registered. Below are your login details:</p>
-            <p><strong>Username:</strong> {User.Username}</p>
-            <p><strong>Password:</strong> {User.Password}</p>
-            <p>Thank you!</p>";
+                // ==========================
+                // Send Email
+                // ==========================
+                try
+                {
+                    var emailSender = HttpContext.RequestServices.GetRequiredService<EmailService>();
+                    string subject = "Your Account Registration Details";
+                    string body = $@"
+                <h1>Welcome {User.Name},</h1>
+                <p>Your account has been successfully registered. Below are your login details:</p>
+                <p><strong>Username:</strong> {User.Username}</p>
+                <p><strong>Password:</strong> {User.Password}</p>
+                <p>Thank you!</p>";
 
-                await emailSender.SendEmailAsync(User.Email, subject, body);
+                    await emailSender.SendEmailAsync(User.Email, subject, body);
+                }
+                catch (Exception ex)
+                {
+                    TempData["Success"] = "UserAddedButFailedToEmail";
+                    return RedirectToAction("UserManagement", "Admin");
+                }
+
+                TempData["Success"] = "Success";
+                return RedirectToAction("UserManagement", "Admin");
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError("", $"Failed to send email. Error: {ex.Message}");
-                return View(newUser); // Redirect back to view in case of email failure
+                TempData["Success"] = "FailedToAddUserInGroups";
+                return RedirectToAction("UserManagement", "Admin");
             }
-            TempData["Success"] = "ok";
-            // Redirect to appropriate dashboard
-            return currentUser.Role == "Admin" ? RedirectToAction("UserManagement", "Admin") : RedirectToAction("Dashboard", "Hod");
         }
+
+        //[HttpPost]
+        //[Authorize(Roles = "Admin,Hod")]
+        //public async Task<IActionResult> AddSomeone(User newUser)
+        //{
+        //    // Reload dropdown data in case of validation errors
+        //    ViewBag.Batches = _context.Batches
+        //        .Select(b => new { Id = b.BatchId, Year = b.BatchYear })
+        //        .ToList();
+        //    ViewBag.Departments = _context.Departments
+        //        .Select(d => new { Id = d.DepartmentId, Name = d.Name })
+        //        .ToList();
+        //    ViewBag.Subjects = _context.Users
+        //        .Where(u => u.Subject != null) // Exclude NULL entries
+        //        .Select(u => u.Subject)
+        //        .Distinct()
+        //        .ToList();
+
+        //    var currentUser = _userService.GetCurrentUser();
+        //    if (currentUser == null)
+        //    {
+        //        return RedirectToAction("Login");
+        //    }
+        //    ModelState.Remove("Username");
+        //    ModelState.Remove("Password");
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return View(newUser);
+        //    }
+
+        //    if (_context.Users.Any(u => u.Email == newUser.Email))
+        //    {
+        //        ModelState.AddModelError("Email", "This email already exists.");
+        //        return View(newUser);
+        //    }
+
+        //    var User = new User
+        //    {
+        //        Name = newUser.Name,
+        //        LastName = newUser.LastName,
+        //        Email = newUser.Email,
+        //        Gender = newUser.Gender,
+        //        CreatedAt = DateTime.UtcNow,
+        //        Password = GenerateComplexRandomPassword(8),
+        //        ProfilePic = "https://thumbs.dreamstime.com/b/default-avatar-profile-icon-vector-social-media-user-image-182145777.jpg"
+        //    };
+
+        //    if (newUser.PhoneNumber != null)
+        //    {
+        //        User.PhoneNumber = newUser.PhoneNumber;
+        //    }
+
+        //    // Role-based logic
+        //    if ((newUser.Role == "Students" && (currentUser.Role == "Admin" || currentUser.Role == "Hod")))
+        //    {
+        //        User.Role = newUser.Role;
+
+        //        if (newUser.RollNumber == null)
+        //        {
+        //            ModelState.AddModelError("RollNumber", "Roll Number is required");
+        //            return View(newUser);
+        //            //return RedirectToAction("UserManagement", "Admin", newUser);
+
+        //        }
+
+        //        if (newUser.DepartmentId == null)
+        //        {
+        //            ModelState.AddModelError("Department", "Department Name is required");
+        //            return View(newUser);
+        //        }
+
+        //        if (newUser.BatchId == null)
+        //        {
+        //            ModelState.AddModelError("Batch", "Batch Year is required");
+        //            return View(newUser);
+        //        }
+
+        //        User.RollNumber = newUser.RollNumber;
+        //        User.Username = $"{newUser.Name}-{newUser.RollNumber}";
+        //        var batchYear = _context.Batches.FirstOrDefault(b => b.BatchId == newUser.BatchId)?.BatchYear;
+        //        User.BatchId = _context.Batches.FirstOrDefault(b => b.DepartmentId == newUser.DepartmentId && b.BatchYear == batchYear)?.BatchId;
+        //        User.DepartmentId = newUser.DepartmentId;
+
+        //        var batch = _context.Batches.FirstOrDefault(b => b.BatchId == User.BatchId);
+        //        var department = _context.Departments.FirstOrDefault(d => d.DepartmentId == newUser.DepartmentId);
+        //        // Save user to the database
+        //        _context.Users.Add(User);
+        //        _context.SaveChanges();
+        //        if (batch != null)
+        //        {
+        //            batch.StudentsCount += 1; // Increment student count
+        //            _context.SaveChanges(); // Save changes
+        //        }
+
+
+        //        addUserInGroup(batch, department, User, "StudentsOnly");
+        //        addUserInGroup(batch, department, User, "StudentsTeachersHod");
+
+        //    }
+        //    else if (newUser.Role == "Teachers" && (currentUser.Role == "Admin" || currentUser.Role == "Hod"))
+        //    {
+        //        User.Role = newUser.Role;
+        //        User.Username = newUser.Name;
+        //        User.BatchId = null;
+        //        User.DepartmentId = newUser.DepartmentId;
+        //        User.Subject = newUser.Subject;
+        //        // Save user to the database
+        //        _context.Users.Add(User);
+        //        _context.SaveChanges();
+        //        var department = _context.Departments.FirstOrDefault(d => d.DepartmentId == newUser.DepartmentId);
+        //        addUserInGroup(department, User, "StudentsTeachersHod");
+        //        addUserInGroup(department, User, "TeachersHod");
+        //    }
+
+        //    else if (newUser.Role == "Hod" && currentUser.Role == "Admin")
+        //    {
+        //        User.Role = newUser.Role;
+        //        User.Username = newUser.Name;
+        //        User.BatchId = null;
+        //        User.DepartmentId = newUser.DepartmentId;
+        //        // Save user to the database
+        //        _context.Users.Add(User);
+        //        _context.SaveChanges();
+        //        if (newUser.Role == "Hod")
+        //        {
+        //            var department = _context.Departments.FirstOrDefault(d => d.DepartmentId == newUser.DepartmentId);
+        //            if (department != null && department.HodId == null)
+        //            {
+        //                department.HodId = User.UserId;
+        //                _context.Departments.Update(department);
+        //            }
+        //            addUserInGroup(department, User, "StudentsTeachersHod");
+        //            addUserInGroup(User, "PrincipalHod");
+        //        }
+        //    }
+
+
+        //    else if ((newUser.Role == "Principal" || newUser.Role == "Admin") && currentUser.Role == "Admin")
+        //    {
+        //        User.Role = newUser.Role;
+        //        User.Username = newUser.Name;
+        //        User.BatchId = null;
+        //        User.DepartmentId = null;
+        //        // Save user to the database
+        //        _context.Users.Add(User);
+        //        _context.SaveChanges();
+        //        if (newUser.Role == "Principle")
+        //        {
+        //            addUserInGroup(User, "PrincipalOnly");
+        //        }
+        //    }
+
+        //    // Send email to the user with credentials
+        //    try
+        //    {
+        //        var emailSender = HttpContext.RequestServices.GetRequiredService<EmailService>();
+        //        string subject = "Your Account Registration Details";
+        //        string body = $@"
+        //    <h1>Welcome {User.Name},</h1>
+        //    <p>Your account has been successfully registered. Below are your login details:</p>
+        //    <p><strong>Username:</strong> {User.Username}</p>
+        //    <p><strong>Password:</strong> {User.Password}</p>
+        //    <p>Thank you!</p>";
+
+        //        await emailSender.SendEmailAsync(User.Email, subject, body);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        ModelState.AddModelError("", $"Failed to send email. Error: {ex.Message}");
+        //        return View(newUser); // Redirect back to view in case of email failure
+        //    }
+        //    TempData["Success"] = "ok";
+        //    // Redirect to appropriate dashboard
+        //    return currentUser.Role == "Admin" ? RedirectToAction("UserManagement", "Admin") : RedirectToAction("Dashboard", "Hod");
+        //}
 
         [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
         public async Task<IActionResult> Login()
@@ -590,6 +766,20 @@ namespace GCTConnect.Controllers
         private void addUserInGroup(User user, string groupType)
         {
             var Group = _context.Groups.FirstOrDefault(u => u.GroupName == $"{groupType}");
+            if(Group  == null)
+            {
+                Group = new Group
+                {
+                    GroupName = "PrincipalOnly",
+                    Description = "This group is for Higher Managment Only",
+                    CreatedBy = 7,
+                    CreatedAt = DateTime.Now,
+
+                };
+                _context.Groups.Add(Group);
+                _context.SaveChanges();
+
+            }
             GroupMember groupMember = new GroupMember
             {
                 GroupId = Group.GroupId,
